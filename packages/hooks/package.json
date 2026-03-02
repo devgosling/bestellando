@@ -1,0 +1,21 @@
+{
+  "name": "hooks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^25.3.3",
+    "@types/react": "19.2.2"
+  },
+  "dependencies": {
+    "@repo/appwrite": "workspace:^",
+    "appwrite": "^22.4.1",
+    "react": "^19.2.0"
+  }
+}

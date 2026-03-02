@@ -1,0 +1,21 @@
+{
+  "name": "@repo/appwrite",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared Appwrite client utilities",
+  "exports": {
+    ".": "./appwrite.ts",
+    "./appwrite": "./appwrite.ts"
+  },
+  "types": "./appwrite.ts",
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "appwrite": "^22.4.1"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^25.3.3"
+  }
+}
