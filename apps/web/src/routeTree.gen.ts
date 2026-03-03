@@ -9,16 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as protectedCustomerRouteRouteImport } from './routes/(protected-customer)/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as publicLoginRouteImport } from './routes/(public)/login'
 import { Route as protectedCustomerProtectedRouteImport } from './routes/(protected-customer)/protected'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const protectedCustomerRouteRoute = protectedCustomerRouteRouteImport.update({
   id: '/(protected-customer)',
   getParentRoute: () => rootRouteImport,
@@ -26,6 +21,11 @@ const protectedCustomerRouteRoute = protectedCustomerRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const publicLoginRoute = publicLoginRouteImport.update({
+  id: '/(public)/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const protectedCustomerProtectedRoute =
@@ -37,49 +37,42 @@ const protectedCustomerProtectedRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
   '/protected': typeof protectedCustomerProtectedRoute
+  '/login': typeof publicLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
   '/protected': typeof protectedCustomerProtectedRoute
+  '/login': typeof publicLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/(protected-customer)': typeof protectedCustomerRouteRouteWithChildren
-  '/login': typeof LoginRoute
   '/(protected-customer)/protected': typeof protectedCustomerProtectedRoute
+  '/(public)/login': typeof publicLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/protected'
+  fullPaths: '/' | '/protected' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/protected'
+  to: '/' | '/protected' | '/login'
   id:
     | '__root__'
     | '/'
     | '/(protected-customer)'
-    | '/login'
     | '/(protected-customer)/protected'
+    | '/(public)/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   protectedCustomerRouteRoute: typeof protectedCustomerRouteRouteWithChildren
-  LoginRoute: typeof LoginRoute
+  publicLoginRoute: typeof publicLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(protected-customer)': {
       id: '/(protected-customer)'
       path: ''
@@ -92,6 +85,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/login': {
+      id: '/(public)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof publicLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(protected-customer)/protected': {
@@ -121,7 +121,7 @@ const protectedCustomerRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   protectedCustomerRouteRoute: protectedCustomerRouteRouteWithChildren,
-  LoginRoute: LoginRoute,
+  publicLoginRoute: publicLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
