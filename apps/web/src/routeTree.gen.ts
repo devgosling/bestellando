@@ -9,18 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProtectedRouteImport } from './routes/protected'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as protectedCustomerRouteRouteImport } from './routes/(protected-customer)/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as protectedCustomerProtectedRouteImport } from './routes/(protected-customer)/protected'
 
-const ProtectedRoute = ProtectedRouteImport.update({
-  id: '/protected',
-  path: '/protected',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const protectedCustomerRouteRoute = protectedCustomerRouteRouteImport.update({
+  id: '/(protected-customer)',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -28,51 +28,63 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const protectedCustomerProtectedRoute =
+  protectedCustomerProtectedRouteImport.update({
+    id: '/protected',
+    path: '/protected',
+    getParentRoute: () => protectedCustomerRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/protected': typeof ProtectedRoute
+  '/protected': typeof protectedCustomerProtectedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/protected': typeof ProtectedRoute
+  '/protected': typeof protectedCustomerProtectedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/(protected-customer)': typeof protectedCustomerRouteRouteWithChildren
   '/login': typeof LoginRoute
-  '/protected': typeof ProtectedRoute
+  '/(protected-customer)/protected': typeof protectedCustomerProtectedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/login' | '/protected'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/login' | '/protected'
-  id: '__root__' | '/' | '/login' | '/protected'
+  id:
+    | '__root__'
+    | '/'
+    | '/(protected-customer)'
+    | '/login'
+    | '/(protected-customer)/protected'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  protectedCustomerRouteRoute: typeof protectedCustomerRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
-  ProtectedRoute: typeof ProtectedRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/protected': {
-      id: '/protected'
-      path: '/protected'
-      fullPath: '/protected'
-      preLoaderRoute: typeof ProtectedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(protected-customer)': {
+      id: '/(protected-customer)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof protectedCustomerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -82,13 +94,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(protected-customer)/protected': {
+      id: '/(protected-customer)/protected'
+      path: '/protected'
+      fullPath: '/protected'
+      preLoaderRoute: typeof protectedCustomerProtectedRouteImport
+      parentRoute: typeof protectedCustomerRouteRoute
+    }
   }
 }
 
+interface protectedCustomerRouteRouteChildren {
+  protectedCustomerProtectedRoute: typeof protectedCustomerProtectedRoute
+}
+
+const protectedCustomerRouteRouteChildren: protectedCustomerRouteRouteChildren =
+  {
+    protectedCustomerProtectedRoute: protectedCustomerProtectedRoute,
+  }
+
+const protectedCustomerRouteRouteWithChildren =
+  protectedCustomerRouteRoute._addFileChildren(
+    protectedCustomerRouteRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  protectedCustomerRouteRoute: protectedCustomerRouteRouteWithChildren,
   LoginRoute: LoginRoute,
-  ProtectedRoute: ProtectedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

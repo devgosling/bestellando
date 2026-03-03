@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@repo/appwrite": "workspace:^",
+    "@repo/lib": "workspace:^",
     "@repo/contexts": "workspace:^",
     "@repo/hooks": "workspace:^",
     "@tanstack/react-query": "^5.90.21",
