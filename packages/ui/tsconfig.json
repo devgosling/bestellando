@@ -1,9 +1,9 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
+  "extends": "../typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist",
     "strictNullChecks": true
   },
-  "include": ["src"],
+  "include": ["src", "index.ts", "types.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

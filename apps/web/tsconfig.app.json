@@ -24,5 +24,14 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": [
+    "next-env.d.ts",
+    "src",
+    "app",
+    "components",
+    "lib",
+    "routes",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
 }
