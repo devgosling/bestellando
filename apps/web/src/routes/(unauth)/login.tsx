@@ -33,15 +33,15 @@ const Page = () => {
 				.then(async () => {
 					navigate({
 						to: redirectUrl,
-					});
+					})
 				})
 				.catch((error) => {
 					if (!(error instanceof AppwriteException)) {
 						appwriteAccount.deleteSession({
 							sessionId: "current",
-						});
+						})
 					}
-				});
+				})
 		},
 	});
 
@@ -100,16 +100,16 @@ const Page = () => {
 				</form.Subscribe>
 			</div>
 		</div>
-	);
+	)
 };
 
-export const Route = createFileRoute("/(public)/login")({
+export const Route = createFileRoute("/(unauth)/login")({
 	component: Page,
 	validateSearch: (
 		search: Record<string, string>,
 	): { redirectUrl: string } => {
 		return {
 			redirectUrl: search.redirectUrl ? String(search.redirectUrl) : "/",
-		};
+		}
 	},
 });

@@ -1,7 +1,7 @@
-import { appwriteClient } from "@repo/lib/appwrite";
+import { appwriteAccount, appwriteClient } from "@repo/lib";
 
 export function useAuth() {
-	const account = appwriteClient;
+	const account = appwriteAccount;
 
 	const login = async (email: string, password: string) => {
 		await account.createEmailPasswordSession({
