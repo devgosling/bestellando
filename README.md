@@ -1,135 +1,110 @@
-# Turborepo starter
+# Bestellando
 
-This Turborepo starter is maintained by the Turborepo core team.
+Ein Turborepo Monorepo für die Bestellando Anwendung.
 
-## Using this example
+## Aufsetzen
 
-Run the following command:
+### pnpm mit npm installieren
 
 ```sh
-npx create-turbo@latest
+npm install -g pnpm
 ```
 
-## What's inside?
+### Alle Packages installieren
 
-This Turborepo includes the following packages/apps:
+```sh
+pnpm install
+```
 
-### Apps and Packages
+## Was ist enthalten?
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Dieses Turborepo beinhaltet folgende Packages und Apps:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Apps und Packages
 
-### Utilities
+- `api`: eine [NestJS](https://nestjs.com/) Backend-Anwendung
+- `web`: eine [Vite](https://vitejs.dev/) + [React](https://react.dev/) Frontend-Anwendung mit [TanStack Router](https://tanstack.com/router)
+- `@repo/ui`: eine gemeinsam genutzte React-Komponentenbibliothek
+- `@repo/contexts`: gemeinsam genutzte React Contexts (z.B. Theme)
+- `@repo/hooks`: gemeinsam genutzte React Hooks (z.B. useAuth, useTheme)
+- `@repo/lib`: gemeinsam genutzte Bibliotheken und Utilities (z.B. Appwrite-Konfiguration)
+- `@repo/eslint-config`: `eslint` Konfigurationen für das gesamte Monorepo
+- `@repo/typescript-config`: `tsconfig.json` Konfigurationen für das gesamte Monorepo
 
-This Turborepo has some additional tools already setup for you:
+Alle Packages und Apps verwenden [TypeScript](https://www.typescriptlang.org/) zu 100%.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### Werkzeuge
+
+Dieses Turborepo hat folgende Werkzeuge bereits konfiguriert:
+
+- [TypeScript](https://www.typescriptlang.org/) für statische Typenprüfung
+- [ESLint](https://eslint.org/) für Code-Linting
+- [Prettier](https://prettier.io) für Code-Formatierung
 
 ### Build
 
-To build all apps and packages, run the following command:
+Um alle Apps und Packages zu bauen, führe folgenden Befehl aus:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
+```sh
 pnpm exec turbo build
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Du kannst ein bestimmtes Package mit einem [Filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters) bauen:
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+```sh
+# Nur die Web-App bauen
+pnpm exec turbo build --filter=web
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+# Nur die API bauen
+pnpm exec turbo build --filter=api
 ```
 
-### Develop
+### Entwicklung
 
-To develop all apps and packages, run the following command:
+Um alle Apps und Packages im Entwicklungsmodus zu starten, führe folgenden Befehl aus:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
+```sh
 pnpm exec turbo dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Du kannst ein bestimmtes Package mit einem [Filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters) entwickeln:
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
+```sh
+# Nur die Web-App starten
 pnpm exec turbo dev --filter=web
+
+# Nur die API starten
+pnpm exec turbo dev --filter=api
 ```
 
 ### Remote Caching
 
 > [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+> Vercel Remote Cache ist für alle Pläne kostenlos. Starte noch heute auf [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+Turborepo kann eine Technik namens [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) verwenden, um Cache-Artefakte zwischen Rechnern zu teilen. Dies ermöglicht das Teilen von Build-Caches mit deinem Team und CI/CD-Pipelines.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Standardmäßig cached Turborepo lokal. Um Remote Caching zu aktivieren, benötigst du einen Account bei Vercel. Falls du noch keinen Account hast, kannst du [einen erstellen](https://vercel.com/signup?utm_source=turborepo-examples), und dann folgende Befehle ausführen:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
+```sh
 pnpm exec turbo login
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Dies authentifiziert die Turborepo CLI mit deinem [Vercel Account](https://vercel.com/docs/concepts/personal-accounts/overview).
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+Als Nächstes kannst du dein Turborepo mit dem Remote Cache verknüpfen:
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
+```sh
 pnpm exec turbo link
 ```
 
-## Useful Links
+## Nützliche Links
 
-Learn more about the power of Turborepo:
+Erfahre mehr über Turborepo:
 
 - [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
 - [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
 - [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
 - [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- [Konfigurationsoptionen](https://turborepo.dev/docs/reference/configuration)
+- [CLI Verwendung](https://turborepo.dev/docs/reference/command-line-reference)

@@ -1,7 +1,6 @@
-import { createFileRoute, Outlet, redirect, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { router } from "../../main";
 import { appwriteAccount } from "@repo/lib";
-import { useContext } from "react";
 
 const UnauthLayout = () => {
 	return <Outlet />;
@@ -14,23 +13,28 @@ export const Route = createFileRoute("/(unauth)")({
 
 		if (!loggedIn) {
 			try {
-				await appwriteAccount.get();
+				const appwriteUser = await appwriteAccount.get();
 				loggedIn = true;
 
 				router.update({
+					...options,
 					context: {
 						...options.context,
-						userContext: ,
+						userContext: {
+							appwriteUser
+						},
 					},
 				})
 			} catch {
 				router.update({
+					...options,
 					context: {
 						...options.context,
 						userContext: undefined,
 					},
 				})
 			}
+		}
 
 		if (loggedIn) {
 			throw redirect({

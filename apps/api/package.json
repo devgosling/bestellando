@@ -23,8 +23,13 @@
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "nestjs-cls": "^6.2.0",
+    "node-appwrite": "^22.1.3",
+    "passport-http-bearer": "^1.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },

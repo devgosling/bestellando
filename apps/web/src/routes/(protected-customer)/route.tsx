@@ -19,14 +19,19 @@ export const Route = createFileRoute("/(protected-customer)")({
 				loggedIn = true;
 
 				router.update({
+					...options,
 					context: {
 						...options.context,
+						userContext: {
+							appwriteUser
+						}
 					}
 				});
 			} catch {
 				loggedIn = false;
 
 				router.update({
+					...options,
 					context: {
 						...options.context,
 						userContext: undefined,
