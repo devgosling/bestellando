@@ -1,23 +1,21 @@
-import {Injectable, Scope} from '@nestjs/common';
-import {JwtUser, RequestMeta} from '../interface/user-request.interface';
+import { Injectable, Scope } from "@nestjs/common";
+import { JwtUser, RequestMeta } from "../interface/user-request.interface";
 
 export type ActorContext = {
-    user: JwtUser;
-    meta: RequestMeta;
-    username: string;
-}
+  user: JwtUser;
+  meta: RequestMeta;
+  username: string;
+};
 
-@Injectable({scope: Scope.REQUEST})
+@Injectable({ scope: Scope.REQUEST })
 export class ActorContextService {
+  private actorContext: ActorContext;
 
-    private actorContext: ActorContext;
+  set(actorContext: ActorContext) {
+    this.actorContext = actorContext;
+  }
 
-    set(actorContext: ActorContext) {
-        this.actorContext = actorContext;
-    }
-
-    get() {
-        return this.actorContext;
-    }
-
+  get() {
+    return this.actorContext;
+  }
 }

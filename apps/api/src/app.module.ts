@@ -1,17 +1,34 @@
-import { CooldownService } from './auth/service/cooldown.service';
-import { ActorContextService } from './auth/service/actor-context.service';
-import { AppwriteService } from './auth/service/appwrite.service';
-import { AuthModule } from './auth/auth.module';
-import { Module } from '@nestjs/common';
+import { UserModule } from "./user/user.module";
+import { CooldownService } from "./auth/service/cooldown.service";
+import { ActorContextService } from "./auth/service/actor-context.service";
+import { AppwriteService } from "./auth/service/appwrite.service";
+import { AuthModule } from "./auth/auth.module";
+import { Module, NestModule } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { APP_INTERCEPTOR } from "@nestjs/core";
+import { AccessInterceptor } from "./auth/interceptor/access.interceptor";
+import { ClsModule } from "nestjs-cls/dist/src/lib/cls-module/cls.module";
 
 @Module({
   imports: [
-    AuthModule,],
+    AuthModule,
+    UserModule,
+    ConfigModule.forRoot(),
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true,
+        generateId: true,
+        idGenerator: () => crypto.randomUUID(),
+      },
+    }),
+  ],
   controllers: [],
   providers: [
-
-
-
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AccessInterceptor,
+    },
   ],
 })
-export class AppModule { }
+export class AppModule {}
