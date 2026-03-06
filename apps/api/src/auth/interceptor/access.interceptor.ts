@@ -1,7 +1,6 @@
 import {
   CallHandler,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
   NestInterceptor,
   Scope,

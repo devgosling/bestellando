@@ -1,7 +1,4 @@
 import { UserModule } from "./user/user.module";
-import { CooldownService } from "./auth/service/cooldown.service";
-import { ActorContextService } from "./auth/service/actor-context.service";
-import { AppwriteService } from "./auth/service/appwrite.service";
 import { AuthModule } from "./auth/auth.module";
 import { Module, NestModule } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
