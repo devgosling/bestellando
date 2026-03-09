@@ -1,3 +1,4 @@
+import { DatabaseModule } from "./database/database.module";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
 import { Module, NestModule } from "@nestjs/common";
@@ -8,6 +9,7 @@ import { ClsModule } from "nestjs-cls/dist/src/lib/cls-module/cls.module";
 
 @Module({
   imports: [
+    DatabaseModule,
     AuthModule,
     UserModule,
     ConfigModule.forRoot(),

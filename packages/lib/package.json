@@ -13,12 +13,13 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
     "@types/node": "^25.3.3",
-    "@types/react": "19.2.2",
-    "@repo/typescript-config": "workspace:^"
+    "@types/react": "19.2.2"
   },
   "dependencies": {
     "@repo/contexts": "workspace:^",
+    "@tanstack/react-query": "^5.90.21",
     "appwrite": "^22.4.1",
     "react": "^19.2.0"
   }

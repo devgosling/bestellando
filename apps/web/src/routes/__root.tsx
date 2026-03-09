@@ -8,6 +8,7 @@ import type { ThemeContextType } from "@repo/contexts";
 
 export interface UserContext {
 	appwriteUser: Models.User;
+	userRole?: "CUSTOMER" | "DELIVERY_PERSON" | "RESTAURANT" | "ADMIN";
 }
 
 const RootLayout = () => {

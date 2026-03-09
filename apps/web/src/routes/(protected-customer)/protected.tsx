@@ -4,7 +4,7 @@ const Page = () => {
 	return (
 		<div>
 			This is a protected page. You should only see this if you are logged
-			in.
+			in as a customer.
 		</div>
 	)
 };

@@ -21,6 +21,8 @@ export class JwtStrategy extends PassportStrategy(BearerStrategy, "jwt") {
       return {
         id: user.$id,
         appwrite: user,
+        jwt: token,
+        client: client,
       };
     } catch {
       throw new UnauthorizedException("Invalid JWT");

@@ -1,4 +1,4 @@
-import { Models } from "node-appwrite";
+import { Client, Models } from "node-appwrite";
 
 export interface UserRequest extends Request {
   user: JwtUser;
@@ -8,6 +8,8 @@ export interface UserRequest extends Request {
 export interface JwtUser {
   id: string;
   appwrite: Models.User;
+  jwt: string;
+  client: Client;
 }
 
 export interface RequestMeta {
