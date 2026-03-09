@@ -1,7 +1,9 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { router } from "../../main";
 import { appwriteAccount, authenticatedFetch } from "@repo/lib";
-import { patchUserContext } from "../../kit/router-context";
+import {
+  setUserContextImperative,
+  updateUserContextImperative,
+} from "../../providers/auth-store";
 
 const ProtectedCustomerLayout = () => {
   return <Outlet />;
@@ -18,11 +20,11 @@ export const Route = createFileRoute("/(protected-customer)")({
         const appwriteUser = await appwriteAccount.get();
         loggedIn = true;
 
-        router.update(patchUserContext(options, { appwriteUser }));
+        updateUserContextImperative({ appwriteUser });
       } catch {
         loggedIn = false;
 
-        router.update(patchUserContext(options, undefined));
+        setUserContextImperative(undefined);
       }
     }
 
@@ -38,7 +40,7 @@ export const Route = createFileRoute("/(protected-customer)")({
     if (!userRole) {
       const { role } = await authenticatedFetch("/v1/user/data");
       userRole = role;
-      router.update(patchUserContext(options, { userRole: role }));
+      updateUserContextImperative({ userRole: role });
     }
 
     if (userRole !== "CUSTOMER") {

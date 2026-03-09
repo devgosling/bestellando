@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   CallHandler,
   ExecutionContext,
@@ -9,11 +14,13 @@ import {
 import { Observable, tap } from "rxjs";
 import { CLS_ID, ClsService } from "nestjs-cls";
 import { IS_PUBLIC_KEY } from "../decorator/public.decorator";
-import { JwtUser } from "../interface/user-request.interface";
 import { Reflector } from "@nestjs/core";
 import { CooldownService } from "../service/cooldown.service";
 import { COOLDOWN_KEY } from "../decorator/cooldown.decorator";
 import { ActorContextService } from "../service/actor-context.service";
+import { USER_TYPE_KEY } from "../decorator/user-type.decorator";
+import { UserType } from "src/user/interface/user.interface";
+import { UserService } from "src/user/service/user.service";
 
 @Injectable({ scope: Scope.REQUEST })
 export class AccessInterceptor implements NestInterceptor {
@@ -22,6 +29,7 @@ export class AccessInterceptor implements NestInterceptor {
     private readonly cooldownService: CooldownService,
     private readonly actorContextService: ActorContextService,
     private readonly reflector: Reflector,
+    private readonly userService: UserService,
   ) {}
 
   async intercept(
@@ -29,13 +37,18 @@ export class AccessInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<Observable<any>> {
     const http = context.switchToHttp();
-    const response = http.getResponse();
-    const request = http.getRequest();
+    const response = http.getResponse<any>();
+    const request = http.getRequest<any>();
 
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
+
+    const requiredUserType = this.reflector.getAllAndOverride<UserType[]>(
+      USER_TYPE_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     const cooldownSeconds = this.reflector.get<number>(
       COOLDOWN_KEY,
@@ -47,7 +60,7 @@ export class AccessInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    const user = request.user as JwtUser;
+    const user = request.user;
 
     if (!user && !isPublic) {
       throw new UnauthorizedException();
@@ -60,6 +73,16 @@ export class AccessInterceptor implements NestInterceptor {
         request.route.path,
         cooldownSeconds,
       );
+    }
+
+    if (
+      user &&
+      requiredUserType &&
+      !requiredUserType.includes(
+        (await this.userService.getUserType()) || "CUSTOMER",
+      )
+    ) {
+      throw new UnauthorizedException("Insufficient user type");
     }
 
     request.meta = {

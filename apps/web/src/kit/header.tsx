@@ -1,6 +1,10 @@
 import { Button } from "primereact/button";
+import { useUserContext } from "../providers/useUserContext";
 
 const Header = () => {
+  const { userContext } = useUserContext();
+  const loggedIn = userContext !== undefined;
+
   return (
     <header
       className="flex align-items-center justify-content-between px-4 py-3 shadow-2"
@@ -30,7 +34,7 @@ const Header = () => {
           So funktioniert's
         </a>
         <Button
-          label="Anmelden"
+          label={loggedIn ? "Mein Konto" : "Anmelden"}
           className="p-button-rounded p-button-outlined"
           style={{ color: "#fff", borderColor: "#fff" }}
         />

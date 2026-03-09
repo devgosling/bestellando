@@ -7,6 +7,7 @@ import z from "zod";
 import { useForm } from "@tanstack/react-form";
 import { appwriteAccount } from "@repo/lib";
 import { AppwriteException } from "appwrite";
+import { useUserContext } from "../../providers/useUserContext";
 
 const Page = () => {
   const formValidator = z.object({
@@ -14,7 +15,8 @@ const Page = () => {
     password: z.string().min(8),
   });
   const navigate = useNavigate();
-  const { redirectUrl } = Route.useSearch();
+  const { redirectUrl }: { redirectUrl: string } = Route.useSearch();
+  const { updateUserContext } = useUserContext();
 
   const form = useForm({
     defaultValues: {
@@ -31,6 +33,8 @@ const Page = () => {
           password: props.value.password,
         })
         .then(async () => {
+          const appwriteUser = await appwriteAccount.get();
+          updateUserContext({ appwriteUser });
           navigate({
             to: redirectUrl,
           });
@@ -99,7 +103,7 @@ const Page = () => {
   );
 };
 
-export const Route = createFileRoute("/(unauth)/login")({
+export const Route = createFileRoute("/(public)/login")({
   component: Page,
   validateSearch: (search: Record<string, string>): { redirectUrl: string } => {
     return {

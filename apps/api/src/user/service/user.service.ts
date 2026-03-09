@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { ActorContextService } from "src/auth/service/actor-context.service";
-import { AppwriteService } from "src/auth/service/appwrite.service";
 import { UserType } from "../interface/user.interface";
 import sdk, { Teams } from "node-appwrite";
 import { ConfigService } from "@nestjs/config";

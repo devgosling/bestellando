@@ -16,7 +16,7 @@ export interface UserContext {
 
 const RootLayout = () => {
   const matches = useMatches();
-  const lastMatch = matches[matches.length - 1];
+  const lastMatch = matches.at(matches.length - 1);
   const staticData = lastMatch?.staticData as
     | { showHeader?: boolean; showFooter?: boolean }
     | undefined;

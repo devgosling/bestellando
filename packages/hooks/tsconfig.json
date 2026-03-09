@@ -5,10 +5,6 @@
     "outDir": "dist",
     "strictNullChecks": true
   },
-  "include": [
-    "src",
-    "index.ts",
-    "types.d.ts"
-  ],
+  "include": ["src", "index.ts", "types.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

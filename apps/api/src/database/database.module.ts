@@ -3,9 +3,7 @@ import { DatabaseService } from "./service/database.service";
 import { Module } from "@nestjs/common";
 
 @Module({
-  imports: [
-    AuthModule
-  ],
+  imports: [AuthModule],
   controllers: [],
   providers: [DatabaseService],
 })

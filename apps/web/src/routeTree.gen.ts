@@ -8,134 +8,147 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProtectedRouteImport } from './routes/protected'
-import { Route as unauthRouteRouteImport } from './routes/(unauth)/route'
-import { Route as protectedCustomerRouteRouteImport } from './routes/(protected-customer)/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as unauthLoginRouteImport } from './routes/(unauth)/login'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as unauthRouteRouteImport } from "./routes/(unauth)/route";
+import { Route as protectedCustomerRouteRouteImport } from "./routes/(protected-customer)/route";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as unauthLoginRouteImport } from "./routes/(unauth)/login";
+import { Route as protectedCustomerProtectedRouteImport } from "./routes/(protected-customer)/protected";
 
-const ProtectedRoute = ProtectedRouteImport.update({
-  id: '/protected',
-  path: '/protected',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const unauthRouteRoute = unauthRouteRouteImport.update({
-  id: '/(unauth)',
+  id: "/(unauth)",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const protectedCustomerRouteRoute = protectedCustomerRouteRouteImport.update({
-  id: '/(protected-customer)',
+  id: "/(protected-customer)",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const unauthLoginRoute = unauthLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => unauthRouteRoute,
-} as any)
+} as any);
+const protectedCustomerProtectedRoute =
+  protectedCustomerProtectedRouteImport.update({
+    id: "/protected",
+    path: "/protected",
+    getParentRoute: () => protectedCustomerRouteRoute,
+  } as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/protected': typeof ProtectedRoute
-  '/login': typeof unauthLoginRoute
+  "/": typeof IndexRoute;
+  "/protected": typeof protectedCustomerProtectedRoute;
+  "/login": typeof unauthLoginRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/protected': typeof ProtectedRoute
-  '/login': typeof unauthLoginRoute
+  "/": typeof IndexRoute;
+  "/protected": typeof protectedCustomerProtectedRoute;
+  "/login": typeof unauthLoginRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/(protected-customer)': typeof protectedCustomerRouteRoute
-  '/(unauth)': typeof unauthRouteRouteWithChildren
-  '/protected': typeof ProtectedRoute
-  '/(unauth)/login': typeof unauthLoginRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/(protected-customer)": typeof protectedCustomerRouteRouteWithChildren;
+  "/(unauth)": typeof unauthRouteRouteWithChildren;
+  "/(protected-customer)/protected": typeof protectedCustomerProtectedRoute;
+  "/(unauth)/login": typeof unauthLoginRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/protected' | '/login'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/protected' | '/login'
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/" | "/protected" | "/login";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/" | "/protected" | "/login";
   id:
-    | '__root__'
-    | '/'
-    | '/(protected-customer)'
-    | '/(unauth)'
-    | '/protected'
-    | '/(unauth)/login'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/(protected-customer)"
+    | "/(unauth)"
+    | "/(protected-customer)/protected"
+    | "/(unauth)/login";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  protectedCustomerRouteRoute: typeof protectedCustomerRouteRoute
-  unauthRouteRoute: typeof unauthRouteRouteWithChildren
-  ProtectedRoute: typeof ProtectedRoute
+  IndexRoute: typeof IndexRoute;
+  protectedCustomerRouteRoute: typeof protectedCustomerRouteRouteWithChildren;
+  unauthRouteRoute: typeof unauthRouteRouteWithChildren;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/protected': {
-      id: '/protected'
-      path: '/protected'
-      fullPath: '/protected'
-      preLoaderRoute: typeof ProtectedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(unauth)': {
-      id: '/(unauth)'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof unauthRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(protected-customer)': {
-      id: '/(protected-customer)'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof protectedCustomerRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(unauth)/login': {
-      id: '/(unauth)/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof unauthLoginRouteImport
-      parentRoute: typeof unauthRouteRoute
-    }
+    "/(unauth)": {
+      id: "/(unauth)";
+      path: "";
+      fullPath: "";
+      preLoaderRoute: typeof unauthRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/(protected-customer)": {
+      id: "/(protected-customer)";
+      path: "";
+      fullPath: "";
+      preLoaderRoute: typeof protectedCustomerRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/(unauth)/login": {
+      id: "/(unauth)/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof unauthLoginRouteImport;
+      parentRoute: typeof unauthRouteRoute;
+    };
+    "/(protected-customer)/protected": {
+      id: "/(protected-customer)/protected";
+      path: "/protected";
+      fullPath: "/protected";
+      preLoaderRoute: typeof protectedCustomerProtectedRouteImport;
+      parentRoute: typeof protectedCustomerRouteRoute;
+    };
   }
 }
 
+interface protectedCustomerRouteRouteChildren {
+  protectedCustomerProtectedRoute: typeof protectedCustomerProtectedRoute;
+}
+
+const protectedCustomerRouteRouteChildren: protectedCustomerRouteRouteChildren =
+  {
+    protectedCustomerProtectedRoute: protectedCustomerProtectedRoute,
+  };
+
+const protectedCustomerRouteRouteWithChildren =
+  protectedCustomerRouteRoute._addFileChildren(
+    protectedCustomerRouteRouteChildren,
+  );
+
 interface unauthRouteRouteChildren {
-  unauthLoginRoute: typeof unauthLoginRoute
+  unauthLoginRoute: typeof unauthLoginRoute;
 }
 
 const unauthRouteRouteChildren: unauthRouteRouteChildren = {
   unauthLoginRoute: unauthLoginRoute,
-}
+};
 
 const unauthRouteRouteWithChildren = unauthRouteRoute._addFileChildren(
   unauthRouteRouteChildren,
-)
+);
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  protectedCustomerRouteRoute: protectedCustomerRouteRoute,
+  protectedCustomerRouteRoute: protectedCustomerRouteRouteWithChildren,
   unauthRouteRoute: unauthRouteRouteWithChildren,
-  ProtectedRoute: ProtectedRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
