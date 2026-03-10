@@ -6,5 +6,6 @@ import { Module } from "@nestjs/common";
   imports: [AuthModule],
   controllers: [],
   providers: [DatabaseService],
+  exports: [DatabaseService],
 })
 export class DatabaseModule {}

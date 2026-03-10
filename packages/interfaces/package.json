@@ -1,0 +1,29 @@
+{
+  "name": "@repo/interfaces",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared Interfaces for Bestellando",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./address": "./src/address.interface.ts",
+    "./opening-hours": "./src/opening-hours.interface.ts",
+    "./restaurant": "./src/restaurant.interface.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^25.3.3",
+    "@types/react": "19.2.2",
+    "geojson": "^0.5.0"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.21",
+    "appwrite": "^22.4.1",
+    "class-validator": "^0.15.1",
+    "geojson": "^0.5.0",
+    "react": "^19.2.0"
+  }
+}

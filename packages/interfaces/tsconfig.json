@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../typescript-config/react-library.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "strictNullChecks": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["src", "index.ts", "types.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
