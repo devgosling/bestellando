@@ -1,20 +1,24 @@
-import { Button } from "primereact/button";
+import { Button } from "@heroui/react";
 import { useUserContext } from "../providers/useUserContext";
+import { useTheme } from "@repo/hooks";
+import { Moon, Sun } from "@gravity-ui/icons";
 
 const Header = () => {
   const { userContext } = useUserContext();
   const loggedIn = userContext !== undefined;
+  const { theme, updateTheme } = useTheme();
+
+  const prefersDark = globalThis.matchMedia(
+    "(prefers-color-scheme: dark)",
+  ).matches;
+  const isDark = theme === "DARK" || (theme === "SYSTEM" && prefersDark);
 
   return (
-    <header
-      className="flex align-items-center justify-content-between px-4 py-3 shadow-2"
-      style={{ background: "#FF6D00" }}
-    >
-      <span className="text-2xl font-bold text-white">
-        <i className="pi pi-shopping-bag mr-2" />
-        Bestellando
-      </span>
-      <nav className="hidden md:flex gap-4 align-items-center">
+    <header className="flex items-center justify-between px-4 py-3 shadow-md w-full bg-[#FF6D00]">
+      <a href="/" className="flex items-center">
+        <img className="h-8" src="/logo_text.png" alt="Bestellando" />
+      </a>
+      <nav className="hidden md:flex gap-4 items-center">
         <a
           href="#categories"
           className="text-white no-underline font-medium hover:text-orange-100"
@@ -33,11 +37,17 @@ const Header = () => {
         >
           So funktioniert's
         </a>
-        <Button
-          label={loggedIn ? "Mein Konto" : "Anmelden"}
-          className="p-button-rounded p-button-outlined"
-          style={{ color: "#fff", borderColor: "#fff" }}
-        />
+        <button
+          type="button"
+          aria-label="Toggle theme"
+          className="p-2 rounded-full text-white hover:bg-white/20 transition-colors"
+          onClick={() => updateTheme(isDark ? "LIGHT" : "DARK")}
+        >
+          {isDark ? <Moon className="size-5" /> : <Sun className="size-5" />}
+        </button>
+        <Button variant="bordered" className="text-white border-white">
+          {loggedIn ? "Mein Konto" : "Anmelden"}
+        </Button>
       </nav>
     </header>
   );

@@ -1,4 +1,9 @@
-import { IsNotEmpty, IsString, IsStrongPassword } from "class-validator";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+} from "class-validator";
 import { RestaurantEntity } from "./restaurant.interface";
 
 export class CreateRestaurantDto {
@@ -16,6 +21,11 @@ export class CreateRestaurantDto {
     minSymbols: 1,
   })
   password!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  email!: string;
 
   data!: Partial<RestaurantEntity>;
 }

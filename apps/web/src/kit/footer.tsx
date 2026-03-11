@@ -1,25 +1,31 @@
 const Footer = () => {
   return (
-    <footer
-      className="px-4 py-5 text-center"
-      style={{
-        background: "var(--surface-card)",
-        borderTop: "1px solid var(--surface-border)",
-      }}
-    >
-      <div className="mb-3 flex align-items-center justify-content-center gap-4">
-        <a href="#" className="text-500 no-underline hover:text-orange-500">
-          <i className="pi pi-facebook text-xl" />
+    <footer className="px-4 py-5 text-center w-full bg-content1 border-t border-divider">
+      <div className="mb-3 flex items-center justify-center gap-4">
+        <a
+          href="#"
+          className="text-default-500 no-underline hover:text-orange-500 text-xl"
+        >
+          <i className="fa-brands fa-facebook-f" />
         </a>
-        <a href="#" className="text-500 no-underline hover:text-orange-500">
-          <i className="pi pi-twitter text-xl" />
+        <a
+          href="#"
+          className="text-default-500 no-underline hover:text-orange-500 text-xl"
+        >
+          <i className="fa-brands fa-x-twitter" />
         </a>
-        <a href="#" className="text-500 no-underline hover:text-orange-500">
-          <i className="pi pi-instagram text-xl" />
+        <a
+          href="#"
+          className="text-default-500 no-underline hover:text-orange-500 text-xl"
+        >
+          <i className="fa-brands fa-instagram" />
         </a>
       </div>
-      <p className="text-sm text-500 m-0">
+      <p className="text-sm text-default-500 m-0">
         Ein Projekt der Karl-Hofmann-Schule BBS Worms.
+      </p>
+      <p className="text-sm text-default-500 m-2">
+        © 2026 - Steven Kukla. Alle Rechte vorbehalten.
       </p>
     </footer>
   );

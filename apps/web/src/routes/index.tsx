@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+import { Button } from "@heroui/react";
+import {
+  Magnifier,
+  ListUl,
+  Trolley,
+  MapPin,
+  StarFill,
+} from "@gravity-ui/icons";
+import type { ComponentType, SVGAttributes } from "react";
 
 const HERO_IMG =
   "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80";
@@ -62,19 +69,23 @@ const RESTAURANTS = [
   },
 ];
 
-const STEPS = [
+const STEPS: {
+  icon: ComponentType<SVGAttributes<SVGElement>>;
+  title: string;
+  desc: string;
+}[] = [
   {
-    icon: "pi pi-search",
+    icon: Magnifier,
     title: "Finden",
     desc: "Restaurants in deiner Nähe suchen",
   },
   {
-    icon: "pi pi-list",
+    icon: ListUl,
     title: "Wählen",
     desc: "Wähle deine Lieblingsgerichte",
   },
   {
-    icon: "pi pi-truck",
+    icon: Trolley,
     title: "Genießen",
     desc: "Schnelle Lieferung bis an deine Tür",
   },
@@ -82,92 +93,62 @@ const STEPS = [
 
 const Page = () => {
   return (
-    <div
-      className="overflow-x-hidden"
-      style={{ background: "var(--surface-ground)" }}
-    >
+    <div className="overflow-x-hidden bg-background text-foreground">
       {/* ── Hero ────────────────────────── */}
       <section
-        className="relative flex align-items-center justify-content-center text-center"
+        className="relative flex items-center justify-center text-center min-h-[520px]"
         style={{
-          minHeight: "520px",
           background: `linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)), url('${HERO_IMG}') center/cover no-repeat`,
         }}
       >
-        <div className="px-3" style={{ maxWidth: 720 }}>
-          <h1 className="text-5xl md:text-7xl font-bold text-white mt-0 mb-3">
+        <div className="px-3 max-w-[720px]">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mt-0 mb-3">
             Hunger?
           </h1>
           <p className="text-xl text-gray-200 mt-0 mb-5">
             Bestelle Essen von den besten Restaurants deiner Stadt — schnell an
             deine Tür geliefert.
           </p>
-          <div
-            className="flex align-items-center mx-auto border-round-3xl overflow-hidden shadow-4"
-            style={{ maxWidth: 540, background: "var(--surface-0)" }}
-          >
-            <i
-              className="pi pi-map-marker ml-4"
-              style={{ color: "#FF6D00", fontSize: "1.2rem", flexShrink: 0 }}
-            />
-            <InputText
+          <div className="flex items-center mx-auto rounded-full overflow-hidden shadow-lg max-w-[540px] bg-white dark:bg-zinc-800">
+            <span className="ml-4 text-[#FF6D00] text-xl shrink-0">
+              <MapPin className="size-5" />
+            </span>
+            <input
+              type="text"
               placeholder="Lieferadresse eingeben…"
-              className="w-full border-none shadow-none"
-              style={{
-                background: "transparent",
-                color: "var(--surface-500)",
-                height: "3.4rem",
-                paddingLeft: "0.75rem",
-                fontSize: "1rem",
-              }}
+              className="flex-1 h-14 bg-transparent border-none outline-none text-base px-3 text-foreground placeholder:text-default-400"
             />
             <Button
-              label="Essen finden"
-              icon="pi pi-search"
-              className="border-noround-left"
-              style={{
-                background: "#FF6D00",
-                borderColor: "#FF6D00",
-                height: "3.4rem",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            />
+              radius="none"
+              size="lg"
+              className="h-14 shrink-0 !bg-[#FF6D00] !text-white px-8 text-base font-semibold"
+              startContent={<Magnifier className="size-4" />}
+            >
+              Essen finden
+            </Button>
           </div>
         </div>
       </section>
 
       {/* ── Categories ──────────────────── */}
-      <section
-        id="categories"
-        className="px-4 py-6"
-        style={{ maxWidth: 1200, margin: "0 auto" }}
-      >
-        <h2 className="text-3xl font-bold text-center mt-0 mb-5">
+      <section id="categories" className="px-4 py-12 max-w-[1200px] mx-auto">
+        <h2 className="text-3xl font-bold text-center mt-0 mb-8">
           Worauf hast du Lust?
         </h2>
-        <div className="grid">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
           {CATEGORIES.map((c) => (
-            <div key={c.name} className="col-6 sm:col-4 md:col-2">
-              <div
-                className="border-round-2xl overflow-hidden shadow-2 cursor-pointer transition-all transition-duration-200 hover:shadow-5"
-                style={{ position: "relative" }}
-              >
-                <img
-                  src={c.img}
-                  alt={c.name}
-                  style={{ width: "100%", height: 160, objectFit: "cover" }}
-                  loading="lazy"
-                />
-                <div
-                  className="absolute bottom-0 left-0 w-full text-center py-2 font-semibold text-white"
-                  style={{
-                    background: "linear-gradient(transparent, rgba(0,0,0,.7))",
-                    position: "absolute",
-                  }}
-                >
-                  {c.name}
-                </div>
+            <div
+              key={c.name}
+              className="relative rounded-2xl overflow-hidden shadow-md cursor-pointer transition-shadow hover:shadow-xl"
+            >
+              <img
+                src={c.img}
+                alt={c.name}
+                className="w-full h-40 object-cover"
+                loading="lazy"
+              />
+              <div className="absolute bottom-0 left-0 w-full text-center py-2 font-semibold text-white bg-gradient-to-t from-black/70 to-transparent">
+                {c.name}
               </div>
             </div>
           ))}
@@ -175,50 +156,34 @@ const Page = () => {
       </section>
 
       {/* ── Popular restaurants ────────── */}
-      <section
-        id="restaurants"
-        className="px-4 py-6"
-        style={{ maxWidth: 1200, margin: "0 auto" }}
-      >
-        <h2 className="text-3xl font-bold text-center mt-0 mb-5">
+      <section id="restaurants" className="px-4 py-12 max-w-[1200px] mx-auto">
+        <h2 className="text-3xl font-bold text-center mt-0 mb-8">
           Beliebt in deiner Nähe
         </h2>
-        <div className="grid">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {RESTAURANTS.map((r) => (
-            <div key={r.name} className="col-12 sm:col-6 lg:col-3">
-              <div
-                className="border-round-2xl overflow-hidden shadow-2 cursor-pointer transition-all transition-duration-200 hover:shadow-6"
-                style={{ background: "var(--surface-card)" }}
-              >
-                <img
-                  src={r.img}
-                  alt={r.name}
-                  style={{ width: "100%", height: 180, objectFit: "cover" }}
-                  loading="lazy"
-                />
-                <div className="p-3">
-                  <h3 className="mt-0 mb-1 text-lg">{r.name}</h3>
-                  <div className="flex align-items-center gap-2 text-sm text-500">
-                    <span
-                      className="flex align-items-center gap-1 font-semibold"
-                      style={{ color: "#FF6D00" }}
-                    >
-                      <i className="pi pi-star-fill text-xs" />
-                      {r.rating}
-                    </span>
-                    <span>·</span>
-                    <span>{r.time}</span>
-                    <span>·</span>
-                    <span
-                      className="border-round px-2 py-1"
-                      style={{
-                        background: "var(--surface-100)",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      {r.tag}
-                    </span>
-                  </div>
+            <div
+              key={r.name}
+              className="rounded-2xl overflow-hidden shadow-md cursor-pointer transition-shadow hover:shadow-xl bg-content1"
+            >
+              <img
+                src={r.img}
+                alt={r.name}
+                className="w-full h-44 object-cover"
+                loading="lazy"
+              />
+              <div className="p-3">
+                <h3 className="mt-0 mb-1 text-lg">{r.name}</h3>
+                <div className="flex items-center gap-2 text-sm text-default-500">
+                  <span className="flex items-center gap-1 font-semibold text-[#FF6D00]">
+                    <StarFill className="size-3" /> {r.rating}
+                  </span>
+                  <span>·</span>
+                  <span>{r.time}</span>
+                  <span>·</span>
+                  <span className="rounded px-2 py-0.5 bg-default-100 text-xs">
+                    {r.tag}
+                  </span>
                 </div>
               </div>
             </div>
@@ -227,82 +192,63 @@ const Page = () => {
       </section>
 
       {/* ── How it works ────────────────── */}
-      <section
-        id="how"
-        className="px-4 py-7 text-center"
-        style={{ background: "#FF6D00" }}
-      >
-        <h2 className="text-3xl font-bold text-white mt-0 mb-5">
+      <section id="how" className="px-4 py-16 text-center bg-[#FF6D00]">
+        <h2 className="text-3xl font-bold text-white mt-0 mb-8">
           So funktioniert's
         </h2>
-        <div
-          className="grid justify-content-center"
-          style={{ maxWidth: 900, margin: "0 auto" }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[900px] mx-auto">
           {STEPS.map((s, i) => (
-            <div key={i} className="col-12 md:col-4 mb-4 md:mb-0">
-              <div
-                className="flex flex-column align-items-center gap-3 p-4 border-round-2xl"
-                style={{ background: "rgba(255,255,255,.15)" }}
-              >
-                <div
-                  className="flex align-items-center justify-content-center border-circle"
-                  style={{
-                    width: 72,
-                    height: 72,
-                    background: "#fff",
-                    color: "#FF6D00",
-                  }}
-                >
-                  <i className={`${s.icon} text-3xl`} />
-                </div>
-                <h3 className="text-xl font-bold text-white m-0">{s.title}</h3>
-                <p className="text-white m-0" style={{ opacity: 0.9 }}>
-                  {s.desc}
-                </p>
+            <div
+              key={i}
+              className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/15"
+            >
+              <div className="flex items-center justify-center rounded-full w-[72px] h-[72px] bg-white text-[#FF6D00] text-3xl">
+                <s.icon className="size-8" />
               </div>
+              <h3 className="text-xl font-bold text-white m-0">{s.title}</h3>
+              <p className="text-white m-0 opacity-90">{s.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── App download banner ─────────── */}
-      <section
-        className="px-4 py-6"
-        style={{ maxWidth: 1200, margin: "0 auto" }}
-      >
-        <div
-          className="flex flex-column md:flex-row align-items-center gap-5 p-5 border-round-3xl shadow-3"
-          style={{ background: "var(--surface-card)" }}
-        >
+      <section className="px-4 py-12 max-w-[1200px] mx-auto">
+        <div className="flex flex-col md:flex-row items-center gap-5 p-5 rounded-3xl shadow-lg bg-content1">
           <img
             src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=500&q=80"
             alt="Mobile App"
-            className="border-round-2xl shadow-2"
-            style={{ width: 280, height: 280, objectFit: "cover" }}
+            className="rounded-2xl shadow-md w-[280px] h-[280px] object-cover"
             loading="lazy"
           />
           <div className="text-center md:text-left">
             <h2 className="text-3xl font-bold mt-0 mb-2">
               Hol dir die Bestellando App
             </h2>
-            <p className="text-lg text-500 mt-0 mb-4">
+            <p className="text-lg text-default-500 mt-0 mb-4">
               Verfolge deine Bestellung in Echtzeit, sammle Prämien und genieße
               exklusive Angebote — alles von deinem Handy.
             </p>
-            <div className="flex gap-3 justify-content-center md:justify-content-start">
+            <div className="flex gap-3 justify-center md:justify-start">
               <Button
-                label="App Store"
-                icon="pi pi-apple"
-                className="p-button-rounded p-button-lg"
-                style={{ background: "#FF6D00", borderColor: "#FF6D00" }}
-              />
+                radius="full"
+                size="lg"
+                className="!bg-[#FF6D00] !text-white px-8 py-3 text-base font-semibold min-w-[160px]"
+                startContent={<i className="fa-brands fa-apple text-lg mr-2" />}
+              >
+                App Store
+              </Button>
               <Button
-                label="Google Play"
-                icon="pi pi-google"
-                className="p-button-rounded p-button-lg p-button-outlined"
-                style={{ color: "#FF6D00", borderColor: "#FF6D00" }}
-              />
+                radius="full"
+                size="lg"
+                variant="bordered"
+                className="!text-[#FF6D00] !border-[#FF6D00] px-8 py-3 text-base font-semibold min-w-[160px]"
+                startContent={
+                  <i className="fa-brands fa-google-play text-lg mr-2" />
+                }
+              >
+                Google Play
+              </Button>
             </div>
           </div>
         </div>

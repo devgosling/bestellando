@@ -4,10 +4,19 @@ https://docs.nestjs.com/providers#services
 
 import { Injectable } from "@nestjs/common";
 import { DatabaseService } from "src/database/service/database.service";
-import { CreateRestaurantDto } from "@repo/interfaces";
-import { ID, Permission, Role, TablesDB, Teams, Users } from "node-appwrite";
+import { CreateRestaurantDto, RestaurantEntity } from "@repo/interfaces";
+import {
+  ID,
+  Permission,
+  Query,
+  Role,
+  TablesDB,
+  Teams,
+  Users,
+} from "node-appwrite";
 import { ConfigService } from "@nestjs/config";
 import { AppwriteService } from "src/auth/service/appwrite.service";
+import { ActorContextService } from "src/auth/service/actor-context.service";
 
 @Injectable()
 export class RestaurantService {
@@ -19,6 +28,7 @@ export class RestaurantService {
     private readonly databaseService: DatabaseService,
     private readonly configService: ConfigService,
     private readonly appwriteService: AppwriteService,
+    private readonly actorContextService: ActorContextService,
   ) {
     this.dataBase = this.databaseService.getDatabase();
     this.teams = new Teams(this.appwriteService.getSDKClient());
@@ -31,6 +41,7 @@ export class RestaurantService {
     const user = await this.users.create({
       userId: ID.unique(),
       name: username,
+      email: params.email,
       password: params.password,
     });
 
@@ -53,8 +64,46 @@ export class RestaurantService {
       permissions: [
         Permission.read(Role.any()),
         Permission.update(Role.team(team.$id, "owner")),
-        Permission.delete(Role.team(team.$id, "owner")),
       ],
     });
+
+    return { success: true };
+  }
+
+  public async getRestaurantFromUser() {
+    const actorContext = this.actorContextService.get();
+    const userId = actorContext.user.id;
+
+    const { memberships } = await this.users.listMemberships({ userId });
+    const teamIds = memberships.map((m) => m.teamId);
+
+    if (!teamIds.length) return { total: 0, documents: [] };
+
+    const restaurants = await this.dataBase.listRows({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "restaurant",
+      queries: [
+        Query.contains(
+          "$permissions",
+          teamIds.map((id) => `update("team:${id}/owner")`),
+        ),
+      ],
+    });
+
+    return restaurants;
+  }
+
+  public async updateRestaurant(
+    restaurantId: string,
+    patch: Partial<RestaurantEntity>,
+  ) {
+    await this.dataBase.updateRow({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "restaurant",
+      rowId: restaurantId,
+      data: patch as object as Record<string, unknown>,
+    });
+
+    return { success: true };
   }
 }

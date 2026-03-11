@@ -9,7 +9,7 @@ const UnauthLayout = () => {
   return <Outlet />;
 };
 
-export const Route = createFileRoute("/(unauth)")({
+export const Route = createFileRoute("/auth")({
   component: UnauthLayout,
   beforeLoad: async (options) => {
     let loggedIn = options.context.userContext !== undefined;

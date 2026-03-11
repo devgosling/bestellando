@@ -9,14 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as unauthRouteRouteImport } from './routes/(unauth)/route'
+import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as protectedCustomerRouteRouteImport } from './routes/(protected-customer)/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as unauthLoginRouteImport } from './routes/(unauth)/login'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as protectedCustomerProtectedRouteImport } from './routes/(protected-customer)/protected'
+import { Route as AuthRegisterRestaurantRouteImport } from './routes/auth/register/restaurant'
 
-const unauthRouteRoute = unauthRouteRouteImport.update({
-  id: '/(unauth)',
+const AuthRouteRoute = AuthRouteRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const protectedCustomerRouteRoute = protectedCustomerRouteRouteImport.update({
@@ -28,10 +30,10 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const unauthLoginRoute = unauthLoginRouteImport.update({
+const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => unauthRouteRoute,
+  getParentRoute: () => AuthRouteRoute,
 } as any)
 const protectedCustomerProtectedRoute =
   protectedCustomerProtectedRouteImport.update({
@@ -39,52 +41,68 @@ const protectedCustomerProtectedRoute =
     path: '/protected',
     getParentRoute: () => protectedCustomerRouteRoute,
   } as any)
+const AuthRegisterRestaurantRoute = AuthRegisterRestaurantRouteImport.update({
+  id: '/register/restaurant',
+  path: '/register/restaurant',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteRouteWithChildren
   '/protected': typeof protectedCustomerProtectedRoute
-  '/login': typeof unauthLoginRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteRouteWithChildren
   '/protected': typeof protectedCustomerProtectedRoute
-  '/login': typeof unauthLoginRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/(protected-customer)': typeof protectedCustomerRouteRouteWithChildren
-  '/(unauth)': typeof unauthRouteRouteWithChildren
+  '/auth': typeof AuthRouteRouteWithChildren
   '/(protected-customer)/protected': typeof protectedCustomerProtectedRoute
-  '/(unauth)/login': typeof unauthLoginRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/protected' | '/login'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/protected'
+    | '/auth/login'
+    | '/auth/register/restaurant'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/protected' | '/login'
+  to: '/' | '/auth' | '/protected' | '/auth/login' | '/auth/register/restaurant'
   id:
     | '__root__'
     | '/'
     | '/(protected-customer)'
-    | '/(unauth)'
+    | '/auth'
     | '/(protected-customer)/protected'
-    | '/(unauth)/login'
+    | '/auth/login'
+    | '/auth/register/restaurant'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   protectedCustomerRouteRoute: typeof protectedCustomerRouteRouteWithChildren
-  unauthRouteRoute: typeof unauthRouteRouteWithChildren
+  AuthRouteRoute: typeof AuthRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/(unauth)': {
-      id: '/(unauth)'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof unauthRouteRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(protected-customer)': {
@@ -101,12 +119,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(unauth)/login': {
-      id: '/(unauth)/login'
+    '/auth/login': {
+      id: '/auth/login'
       path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof unauthLoginRouteImport
-      parentRoute: typeof unauthRouteRoute
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
     '/(protected-customer)/protected': {
       id: '/(protected-customer)/protected'
@@ -114,6 +132,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/protected'
       preLoaderRoute: typeof protectedCustomerProtectedRouteImport
       parentRoute: typeof protectedCustomerRouteRoute
+    }
+    '/auth/register/restaurant': {
+      id: '/auth/register/restaurant'
+      path: '/register/restaurant'
+      fullPath: '/auth/register/restaurant'
+      preLoaderRoute: typeof AuthRegisterRestaurantRouteImport
+      parentRoute: typeof AuthRouteRoute
     }
   }
 }
@@ -132,22 +157,24 @@ const protectedCustomerRouteRouteWithChildren =
     protectedCustomerRouteRouteChildren,
   )
 
-interface unauthRouteRouteChildren {
-  unauthLoginRoute: typeof unauthLoginRoute
+interface AuthRouteRouteChildren {
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRestaurantRoute: typeof AuthRegisterRestaurantRoute
 }
 
-const unauthRouteRouteChildren: unauthRouteRouteChildren = {
-  unauthLoginRoute: unauthLoginRoute,
+const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRestaurantRoute: AuthRegisterRestaurantRoute,
 }
 
-const unauthRouteRouteWithChildren = unauthRouteRoute._addFileChildren(
-  unauthRouteRouteChildren,
+const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
+  AuthRouteRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   protectedCustomerRouteRoute: protectedCustomerRouteRouteWithChildren,
-  unauthRouteRoute: unauthRouteRouteWithChildren,
+  AuthRouteRoute: AuthRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
