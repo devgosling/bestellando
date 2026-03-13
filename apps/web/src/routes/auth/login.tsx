@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Input } from "@heroui/react";
+import { Button, Input, Surface } from "@heroui/react";
 import Subheading from "../../kit/subheading";
 import z from "zod";
 import { useForm } from "@tanstack/react-form";
@@ -44,7 +44,9 @@ const Page = () => {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-6 bg-default-50">
+    <div className="min-h-screen flex items-center justify-center px-4 py-6">
+      <Surface variant="secondary" className="p-4 rounded-3xl shadow-lg w-[25vw]">
+        
       <div className="bg-content1 rounded-2xl shadow-lg p-5 w-full flex flex-col items-center gap-3 max-w-[25rem]">
         <img
           src="/public/logo_text.png"
@@ -91,6 +93,7 @@ const Page = () => {
           )}
         </form.Subscribe>
       </div>
+      </Surface>
     </div>
   );
 };

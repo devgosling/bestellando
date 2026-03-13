@@ -45,7 +45,7 @@ const Header = () => {
         >
           {isDark ? <Moon className="size-5" /> : <Sun className="size-5" />}
         </button>
-        <Button variant="bordered" className="text-white border-white">
+        <Button variant="outline" className="text-white border-white">
           {loggedIn ? "Mein Konto" : "Anmelden"}
         </Button>
       </nav>

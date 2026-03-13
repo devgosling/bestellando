@@ -132,6 +132,9 @@ importers:
       '@repo/hooks':
         specifier: workspace:^
         version: link:../../packages/hooks
+      '@repo/interfaces':
+        specifier: workspace:^
+        version: link:../../packages/interfaces
       '@repo/lib':
         specifier: workspace:^
         version: link:../../packages/lib

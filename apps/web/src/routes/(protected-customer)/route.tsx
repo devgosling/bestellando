@@ -30,7 +30,7 @@ export const Route = createFileRoute("/(protected-customer)")({
 
     if (!loggedIn && !options.location.pathname.includes("/login")) {
       throw redirect({
-        to: "/login",
+        to: "/auth/login",
         search: {
           redirectUrl: location.pathname,
         },

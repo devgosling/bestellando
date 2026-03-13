@@ -231,22 +231,18 @@ const Page = () => {
             </p>
             <div className="flex gap-3 justify-center md:justify-start">
               <Button
-                radius="full"
                 size="lg"
                 className="!bg-[#FF6D00] !text-white px-8 py-3 text-base font-semibold min-w-[160px]"
-                startContent={<i className="fa-brands fa-apple text-lg mr-2" />}
               >
+                <i className="fa-brands fa-apple text-lg" />
                 App Store
               </Button>
               <Button
-                radius="full"
                 size="lg"
-                variant="bordered"
+                variant="outline"
                 className="!text-[#FF6D00] !border-[#FF6D00] px-8 py-3 text-base font-semibold min-w-[160px]"
-                startContent={
-                  <i className="fa-brands fa-google-play text-lg mr-2" />
-                }
               >
+                <i className="fa-brands fa-google-play text-lg" />
                 Google Play
               </Button>
             </div>
