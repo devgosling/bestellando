@@ -1,4 +1,4 @@
-import { RestaurantEntity } from "./restaurant.interface";
+import type { RestaurantEntity } from "./restaurant.interface.js";
 
 export interface OpeningHoursEntity {
   $id: string;

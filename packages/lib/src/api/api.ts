@@ -1,6 +1,6 @@
 import type { PaginateOptions, PaginateResponse } from "./interfaces/Paginate";
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
-import { UseMutationOptions } from "@tanstack/react-query";
+import type { UseMutationOptions } from "@tanstack/react-query";
 import { appwriteAccount } from "../appwrite";
 import { properties } from "../../consts/properties";
 
@@ -107,11 +107,43 @@ export async function authenticatedFetch(
   }
 }
 
+export async function unauthenticatedFetch(
+  url: string,
+  init?: RequestInit,
+): Promise<any> {
+  const headers = new Headers(init?.headers);
+  if (!(init?.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  const response = await fetch(properties.apiUrl + url, { ...init, headers });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const error: any = new Error(
+      errorData.message || `Request failed with status ${response.status}`,
+    );
+    error.status = response.status;
+    error.data = errorData;
+    error.badRequestCode = errorData.badRequestCode;
+    error.badRequestAdditional = errorData.badRequestAdditional;
+    throw error;
+  }
+
+  return await response.json();
+}
+
 export const getInfiniteQueryOptions = <TData>(
   url: string,
   options?: Partial<PaginateOptions>,
   queryKey?: unknown[],
+  requestOptions?: {
+    requiresAuth?: boolean;
+    autoLogout?: boolean;
+  },
 ) => {
+  const { requiresAuth = true, autoLogout = true } = requestOptions ?? {};
+
   return infiniteQueryOptions({
     queryKey: [...(queryKey ?? [url]), options],
     queryFn: ({ pageParam }) => {
@@ -134,9 +166,15 @@ export const getInfiniteQueryOptions = <TData>(
 
       const separator = url.includes("?") ? "&" : "?";
       return (
-        authenticatedFetch(
-          `${url}${separator}${searchParams.toString()}`,
-        ) as Promise<PaginateResponse<TData>>
+        (requiresAuth
+          ? authenticatedFetch(
+              `${url}${separator}${searchParams.toString()}`,
+              undefined,
+              autoLogout,
+            )
+          : unauthenticatedFetch(
+              `${url}${separator}${searchParams.toString()}`,
+            )) as Promise<PaginateResponse<TData>>
       ).then((res) => ({
         ...res,
         meta: { ...res.meta, currentPage: Number(res.meta.currentPage) },
@@ -150,10 +188,22 @@ export const getInfiniteQueryOptions = <TData>(
   });
 };
 
-export const getQueryOptions = <TData>(url: string, queryKey?: unknown[]) => {
+export const getQueryOptions = <TData>(
+  url: string,
+  queryKey?: unknown[],
+  requestOptions?: {
+    requiresAuth?: boolean;
+    autoLogout?: boolean;
+  },
+) => {
+  const { requiresAuth = true, autoLogout = true } = requestOptions ?? {};
+
   return queryOptions({
     queryKey: queryKey ?? [url],
-    queryFn: () => authenticatedFetch(url) as Promise<TData>,
+    queryFn: () =>
+      (requiresAuth
+        ? authenticatedFetch(url, undefined, autoLogout)
+        : unauthenticatedFetch(url)) as Promise<TData>,
   });
 };
 
@@ -161,16 +211,38 @@ export const getMutationOptions = <TData, TVariables = any>(
   url: string,
   method: "POST" | "PUT" | "PATCH" | "DELETE" = "POST",
   bodyBuilder?: (variables: TVariables) => BodyInit | undefined,
+  requestOptions?: {
+    requiresAuth?: boolean;
+    autoLogout?: boolean;
+    init?: Omit<RequestInit, "method" | "body">;
+  },
 ): UseMutationOptions<TData, Error, TVariables> => {
+  const { requiresAuth = true, autoLogout = true, init } = requestOptions ?? {};
+
   return {
     mutationFn: (variables: TVariables) =>
-      authenticatedFetch(url, {
-        method,
-        body: bodyBuilder
-          ? bodyBuilder(variables)
-          : variables
-            ? JSON.stringify(variables)
-            : undefined,
-      }) as Promise<TData>,
+      (requiresAuth
+        ? authenticatedFetch(
+            url,
+            {
+              ...init,
+              method,
+              body: bodyBuilder
+                ? bodyBuilder(variables)
+                : variables
+                  ? JSON.stringify(variables)
+                  : undefined,
+            },
+            autoLogout,
+          )
+        : unauthenticatedFetch(url, {
+            ...init,
+            method,
+            body: bodyBuilder
+              ? bodyBuilder(variables)
+              : variables
+                ? JSON.stringify(variables)
+                : undefined,
+          })) as Promise<TData>,
   };
 };

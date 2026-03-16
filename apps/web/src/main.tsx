@@ -3,6 +3,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toast } from "@heroui/react";
 import { ThemeProvider } from "./providers/ThemeProvider.tsx";
 import { AuthProvider } from "./providers/AuthProvider.tsx";
 import { routeTree } from "./routeTree.gen";
@@ -39,9 +40,10 @@ declare module "@tanstack/react-router" {
 createRoot(document.getElementById("root")!).render(
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+        <AuthProvider>
+          <Toast.Provider />
+          <App />
+        </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>,
 );

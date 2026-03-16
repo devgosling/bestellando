@@ -14,8 +14,9 @@ import {
   TextField,
   Button,
 } from "@heroui/react";
-import { RestaurantTypeNames } from "@repo/interfaces";
-import { Check } from "@gravity-ui/icons";
+import { CreateRestaurantDto, RestaurantTypeNames, type RestaurantType } from "@repo/interfaces";
+import { getMutationOptions } from "@repo/lib";
+import { useApiMutation, useNotification } from "@repo/hooks";
 
 export const Route = createFileRoute("/auth/register/restaurant")({
   component: Page,
@@ -26,7 +27,23 @@ export const Route = createFileRoute("/auth/register/restaurant")({
 });
 
 function Page() {
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const { addNotification } = useNotification();
+
+  const registerRestaurantAction = useApiMutation({
+    ...getMutationOptions("/v1/restaurant/register", "POST", undefined, {
+      requiresAuth: false,
+    }),
+    success: (response) => {
+      console.log(response);
+      addNotification({
+        type: "SUCCESS",
+        title: "Restaurant registriert",
+        description: "Dein Restaurant wurde erfolgreich registriert.",
+      });
+    },
+  });
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data: Record<string, string> = {};
@@ -35,7 +52,19 @@ function Page() {
       data[key] = value.toString();
     });
 
-    alert(`Form submitted with: ${JSON.stringify(data, null, 2)}`);
+    console.log(data);
+
+    registerRestaurantAction.mutate({
+      name: data.restaurantName,
+      email: data.email,
+      password: data.password,
+      partialAddress: {
+        street: data.street.split(" ").slice(0, -1).join(" ") || undefined,
+        streetNumber: data.street.split(" ").slice(-1)[0] || undefined,
+        zipCode: data.plz,
+        city: data.city,
+      }
+    } as CreateRestaurantDto)
   };
 
   return (
@@ -66,43 +95,32 @@ function Page() {
               <Input placeholder="Gib die E-Mail Adresse deines Restaurants ein" />
               <FieldError></FieldError>
             </TextField>
-            <Select name="type" placeholder="Typ des Restaurants">
-              <Label>Restaurant Typ</Label>
-              <Select.Trigger>
-                <Select.Value />
-                <Select.Indicator />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox>
-                  {Object.entries(RestaurantTypeNames).map(([key, value]) => (
-                    <ListBox.Item id={key} textValue={value}>
-                      {value}
-                    </ListBox.Item>
-                  ))}
-                </ListBox>
-              </Select.Popover>
-            </Select>
+            <TextField name="password" type="password" isRequired>
+              <Label>Passwort</Label>
+              <Input placeholder="Gebe ein Passwort ein" />
+              <FieldError></FieldError>
+            </TextField>
             <TextField name="street" type="text" isRequired>
               <Label>Straße und Hausnummer</Label>
               <Input placeholder="Straße und Hausnummer des Restaurants" />
               <FieldError></FieldError>
             </TextField>
             <div className="flex items-center gap-2 w-full">
-              <TextField name="city" type="text" isRequired className='w-full'>
-              <Label>Stadt</Label>
-              <Input placeholder="Stadtnamen" />
-              <FieldError></FieldError>
-            </TextField>
-            <TextField name="plz" type="number" isRequired>
-              <Label>Postleitzahl</Label>
-              <Input placeholder="PLZ" />
-              <FieldError></FieldError>
-            </TextField>
+              <TextField name="city" type="text" isRequired className="w-full">
+                <Label>Stadt</Label>
+                <Input placeholder="Stadtnamen" />
+                <FieldError></FieldError>
+              </TextField>
+              <TextField name="plz" type="number" isRequired>
+                <Label>Postleitzahl</Label>
+                <Input placeholder="PLZ" />
+                <FieldError></FieldError>
+              </TextField>
             </div>
             <Button type="submit" className="w-full">
               <i className="fa-regular fa-fork-knife"></i>
               Restaurant registrieren
-              </Button>
+            </Button>
           </FieldGroup>
         </Form>
       </Surface>

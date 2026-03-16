@@ -11,7 +11,7 @@ import { PassportModule } from "@nestjs/passport";
 import { CooldownService } from "./service/cooldown.service";
 import { APP_GUARD } from "@nestjs/core/constants";
 import { JwtAuthGuard } from "./guard/jwt.guard";
-import { UserModule } from "src/user/user.module";
+import { UserModule } from "../user/user.module";
 
 @Module({
   imports: [UserModule, ConfigModule.forRoot(), PassportModule],

@@ -1,3 +1,4 @@
+import { AddressModule } from "./address/address.module";
 import { RestaurantModule } from "./restaurant/restaurant.module";
 import { DatabaseModule } from "./database/database.module";
 import { UserModule } from "./user/user.module";
@@ -10,6 +11,7 @@ import { ClsModule } from "nestjs-cls/dist/src/lib/cls-module/cls.module";
 
 @Module({
   imports: [
+    AddressModule,
     RestaurantModule,
     DatabaseModule,
     AuthModule,

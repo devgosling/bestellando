@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { TablesDB } from "node-appwrite";
-import { AppwriteService } from "src/auth/service/appwrite.service";
+import { AppwriteService } from "../../auth/service/appwrite.service";
 
 @Injectable()
 export class DatabaseService {

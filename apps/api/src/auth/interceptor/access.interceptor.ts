@@ -19,8 +19,8 @@ import { CooldownService } from "../service/cooldown.service";
 import { COOLDOWN_KEY } from "../decorator/cooldown.decorator";
 import { ActorContextService } from "../service/actor-context.service";
 import { USER_TYPE_KEY } from "../decorator/user-type.decorator";
-import { UserType } from "src/user/interface/user.interface";
-import { UserService } from "src/user/service/user.service";
+import { UserType } from "../../user/interface/user.interface";
+import { UserService } from "../../user/service/user.service";
 
 @Injectable({ scope: Scope.REQUEST })
 export class AccessInterceptor implements NestInterceptor {

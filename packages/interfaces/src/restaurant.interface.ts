@@ -1,4 +1,4 @@
-import { AddressEntity } from "./address.interface";
+import type { AddressEntity } from "./address.interface.js";
 
 export const RestaurantTypeNames: Record<RestaurantType, string> = {
   italian: "Italienisch",
@@ -13,7 +13,17 @@ export const RestaurantTypeNames: Record<RestaurantType, string> = {
   other: "Andere",
 };
 
-export type RestaurantType = "italian" | "chinese" | "fast_food" | "vegetarian" | "vegan" | "dessert" | "mexican" | "indian" | "asian" | "other";
+export type RestaurantType =
+  | "italian"
+  | "chinese"
+  | "fast_food"
+  | "vegetarian"
+  | "vegan"
+  | "dessert"
+  | "mexican"
+  | "indian"
+  | "asian"
+  | "other";
 
 export interface RestaurantEntity {
   $id: string;

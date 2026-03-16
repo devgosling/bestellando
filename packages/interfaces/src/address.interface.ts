@@ -1,8 +1,10 @@
 import { Point } from "geojson";
 
+export type AddressOwnerType = "RESTAURANT" | "CUSTOMER";
+
 export interface AddressEntity {
   $id: string;
-  ownerType: "RESTAURANT" | "CUSTOMER";
+  ownerType: AddressOwnerType;
   street: string;
   streetNumber: string;
   zipCode: string;

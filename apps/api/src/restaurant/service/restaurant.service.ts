@@ -3,7 +3,7 @@ https://docs.nestjs.com/providers#services
 */
 
 import { Injectable } from "@nestjs/common";
-import { DatabaseService } from "src/database/service/database.service";
+import { DatabaseService } from "../../database/service/database.service";
 import { CreateRestaurantDto, RestaurantEntity } from "@repo/interfaces";
 import {
   ID,
@@ -15,8 +15,8 @@ import {
   Users,
 } from "node-appwrite";
 import { ConfigService } from "@nestjs/config";
-import { AppwriteService } from "src/auth/service/appwrite.service";
-import { ActorContextService } from "src/auth/service/actor-context.service";
+import { AppwriteService } from "../../auth/service/appwrite.service";
+import { ActorContextService } from "../../auth/service/actor-context.service";
 
 @Injectable()
 export class RestaurantService {

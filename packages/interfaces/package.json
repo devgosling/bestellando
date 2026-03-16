@@ -2,19 +2,35 @@
   "name": "@repo/interfaces",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Shared Interfaces for Bestellando",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
   "exports": {
-    ".": "./src/index.ts",
-    "./address": "./src/address.interface.ts",
-    "./opening-hours": "./src/opening-hours.interface.ts",
-    "./restaurant": "./src/restaurant.interface.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./address": {
+      "types": "./dist/address.interface.d.ts",
+      "default": "./dist/address.interface.js"
+    },
+    "./opening-hours": {
+      "types": "./dist/opening-hours.interface.d.ts",
+      "default": "./dist/opening-hours.interface.js"
+    },
+    "./restaurant": {
+      "types": "./dist/restaurant.interface.d.ts",
+      "default": "./dist/restaurant.interface.js"
+    }
   },
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:^",
+    "@types/geojson": "^7946.0.16",
     "@types/node": "^25.3.3",
     "@types/react": "19.2.2",
     "geojson": "^0.5.0"
