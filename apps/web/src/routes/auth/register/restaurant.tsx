@@ -14,7 +14,7 @@ import {
   TextField,
   Button,
 } from "@heroui/react";
-import { CreateRestaurantDto, RestaurantTypeNames, type RestaurantType } from "@repo/interfaces";
+import { CreateRestaurantDto, type RestaurantType } from "@repo/interfaces";
 import { getMutationOptions } from "@repo/lib";
 import { useApiMutation, useNotification } from "@repo/hooks";
 

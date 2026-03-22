@@ -24,6 +24,8 @@ export class AddressService {
   }
 
   public async createAddress(type: AddressOwnerType): Promise<void> {
+    const actorContext = this.actorContextService.get();
+
     
   }
 }
