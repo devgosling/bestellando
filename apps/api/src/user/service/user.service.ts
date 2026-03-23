@@ -1,15 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { ActorContextService } from "../../auth/service/actor-context.service";
 import { UserType } from "../interface/user.interface";
-import sdk, { Teams } from "node-appwrite";
+import sdk, { Account, Client, Teams, Users } from "node-appwrite";
 import { ConfigService } from "@nestjs/config";
+import { RegisterDTO } from "@repo/interfaces";
+import { AppwriteService } from "src/auth/service/appwrite.service";
 
 @Injectable()
 export class UserService {
+  private readonly users: Users;
+
   constructor(
     private readonly actorContextService: ActorContextService,
     private readonly configService: ConfigService,
-  ) {}
+    private readonly appwriteService: AppwriteService,
+  ) {
+    this.users = new Users(this.appwriteService.getSDKClient());
+  }
 
   public async getUserType(): Promise<UserType | null> {
     const context = this.actorContextService.get();
@@ -64,4 +71,25 @@ export class UserService {
 
     return "CUSTOMER";
   }
+
+  public async registerUser(data: RegisterDTO): Promise<void> {
+    const user = await this.users.create({
+      userId: sdk.ID.unique(),
+      name: `${data.firstName} ${data.lastName}`,
+      email: data.email,
+      password: data.password,
+    })
+
+    const jwt = await this.users.createJWT({ userId: user.$id });
+
+    this.actorContextService.set({
+      ...this.actorContextService.get(),
+      user: {
+        id: user.$id,
+        appwrite: user,
+        jwt: jwt.jwt,
+        client: this.appwriteService.createUserClient(jwt.jwt),
+      },
+    })
+  };
 }
