@@ -2,7 +2,8 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Post, Body } from "@nestjs/common";
+import { RegisterDTO } from "@repo/interfaces";
 import { UserService } from "../service/user.service";
 
 @Controller({
@@ -17,5 +18,10 @@ export class UserController {
     return {
       role: await this.userService.getUserType(),
     };
+  }
+
+  @Post("register")
+  public async registerUser(@Body() body: RegisterDTO) {
+    return this.userService.registerUser(body);
   }
 }

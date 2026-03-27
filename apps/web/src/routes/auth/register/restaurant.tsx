@@ -63,8 +63,8 @@ function Page() {
         streetNumber: data.street.split(" ").slice(-1)[0] || undefined,
         zipCode: data.plz,
         city: data.city,
-      }
-    } as CreateRestaurantDto)
+      },
+    } as CreateRestaurantDto);
   };
 
   return (
