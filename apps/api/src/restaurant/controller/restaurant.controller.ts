@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Body, Controller, Post, Get, Patch, Param, Req } from "@nestjs/common";
+import { Body, Controller, Post, Get, Patch, Param, Req, ImATeapotException } from "@nestjs/common";
 import { RestaurantService } from "../service/restaurant.service";
 import { Public } from "../../auth/decorator/public.decorator";
 import { CreateRestaurantDto } from "@repo/interfaces";
@@ -22,7 +22,8 @@ export class RestaurantController {
 
   @Get("list")
   public async listRestaurants() {
-    return this.restaurantService.listRestaurants();
+    //return this.restaurantService.listRestaurants();
+    throw new ImATeapotException("Not implemented yet");
   }
 
   @Get("mine")

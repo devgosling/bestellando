@@ -1,14 +1,3 @@
-  public async registerUser(params: RegisterDTO) {
-    // Implement user registration logic here (Appwrite or custom logic)
-    // Example: create user in Appwrite
-    const user = await this.users.create({
-      userId: params.userId || undefined,
-      name: params.name,
-      email: params.email,
-      password: params.password,
-    });
-    return { success: true, user };
-  }
 import { Injectable } from "@nestjs/common";
 import { ActorContextService } from "../../auth/service/actor-context.service";
 import { UserType } from "../interface/user.interface";

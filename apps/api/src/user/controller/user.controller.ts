@@ -1,9 +1,5 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import { Controller, Get, Post, Body } from "@nestjs/common";
-import { RegisterDTO } from "@repo/interfaces";
+import { type RegisterDTO } from "@repo/interfaces";
 import { UserService } from "../service/user.service";
 
 @Controller({

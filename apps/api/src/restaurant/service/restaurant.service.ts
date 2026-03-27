@@ -1,13 +1,3 @@
-  public async listRestaurants() {
-    return this.dataBase.listRows({
-      databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "restaurant",
-    });
-  }
-/*
-https://docs.nestjs.com/providers#services
-*/
-
 import { Injectable } from "@nestjs/common";
 import { DatabaseService } from "../../database/service/database.service";
 import { CreateRestaurantDto, RestaurantEntity } from "@repo/interfaces";
