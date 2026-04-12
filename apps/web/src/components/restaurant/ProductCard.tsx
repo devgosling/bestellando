@@ -1,4 +1,4 @@
-import { Card, CardBody, Button } from "@heroui/react";
+import { Button } from "@heroui/react";
 import type { ProductEntity } from "@repo/interfaces";
 import { PriceDisplay } from "../shared/PriceDisplay";
 
@@ -9,45 +9,40 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onSelect }: ProductCardProps) {
   return (
-    <Card
-      isPressable={product.isAvailable}
-      onPress={() => product.isAvailable && onSelect(product)}
-      className={`overflow-hidden ${!product.isAvailable ? "opacity-50" : "transition-transform hover:scale-[1.02]"}`}
+    <div
+      className={`flex items-center justify-between py-3 px-1 border-b border-border last:border-b-0 ${!product.isAvailable ? "opacity-50" : "cursor-pointer"}`}
+      role={product.isAvailable ? "button" : undefined}
+      tabIndex={product.isAvailable ? 0 : undefined}
+      onClick={(e) => {
+        if (product.isAvailable && e.target === e.currentTarget) onSelect(product);
+      }}
+      onKeyDown={(e) => {
+        if (product.isAvailable && (e.key === "Enter" || e.key === " ")) onSelect(product);
+      }}
     >
-      {product.imageUrl && (
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="h-32 w-full object-cover"
+      <div className="flex-1 min-w-0 mr-4">
+        <span className="font-semibold text-foreground">{product.name}</span>
+        {product.description && (
+          <p className="text-xs text-muted line-clamp-1 mt-0.5">
+            {product.description}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center gap-3 shrink-0">
+        <PriceDisplay
+          amount={product.basePrice}
+          className="font-bold text-accent"
         />
-      )}
-      <CardBody className="flex flex-col gap-2">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1">
-            <h3 className="font-semibold">{product.name}</h3>
-            {product.description && (
-              <p className="mt-1 line-clamp-2 text-sm text-default-500">
-                {product.description}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <PriceDisplay
-            amount={product.basePrice}
-            className="font-semibold text-primary"
-          />
-          <Button
-            size="sm"
-            color="primary"
-            variant="flat"
-            isDisabled={!product.isAvailable}
-            onPress={() => onSelect(product)}
-          >
-            {product.isAvailable ? "Hinzuf\u00fcgen" : "Nicht verf\u00fcgbar"}
-          </Button>
-        </div>
-      </CardBody>
-    </Card>
+        <Button
+          isIconOnly
+          size="sm"
+          className="rounded-full bg-accent text-accent-foreground w-7 h-7 min-w-7"
+          isDisabled={!product.isAvailable}
+          onPress={() => onSelect(product)}
+        >
+          +
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -1,11 +1,11 @@
 import {
   Modal,
-  ModalContent,
+  ModalDialog,
   ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
-  Textarea,
+  TextArea,
 } from "@heroui/react";
 import { useState } from "react";
 import type { ProductEntity } from "@repo/interfaces";
@@ -39,7 +39,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="lg">
-      <ModalContent>
+      <ModalDialog>
         <ModalHeader className="flex flex-col gap-1">
           {product.name}
         </ModalHeader>
@@ -84,7 +84,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
             </div>
           </div>
 
-          <Textarea
+          <TextArea
             label="Sonderhinweise"
             placeholder="z.B. ohne Zwiebeln, extra scharf..."
             value={instructions}
@@ -95,12 +95,15 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
           <Button variant="light" onPress={handleClose}>
             Abbrechen
           </Button>
-          <Button color="primary" onPress={handleAddToCart}>
+          <Button
+            className="bg-accent text-accent-foreground"
+            onPress={handleAddToCart}
+          >
             In den Warenkorb ({quantity}x{" "}
             <PriceDisplay amount={product.basePrice * quantity} />)
           </Button>
         </ModalFooter>
-      </ModalContent>
+      </ModalDialog>
     </Modal>
   );
 }

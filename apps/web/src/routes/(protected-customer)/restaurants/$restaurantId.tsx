@@ -8,13 +8,14 @@ import { RestaurantHero } from "../../../components/restaurant/RestaurantHero";
 import { MenuSection } from "../../../components/restaurant/MenuSection";
 import { ProductCard } from "../../../components/restaurant/ProductCard";
 import { ProductModal } from "../../../components/restaurant/ProductModal";
+import { CartSidebar } from "../../../components/cart/CartSidebar";
+import { CartBottomBar } from "../../../components/cart/CartBottomBar";
 
 const RestaurantDetailPage = () => {
   const { restaurantId } = Route.useParams();
   const [selectedProduct, setSelectedProduct] = useState<ProductEntity | null>(
     null,
   );
-
   const { data: restaurant, isLoading: isLoadingRestaurant } =
     useApiQuery<RestaurantEntity>({
       request: {
@@ -41,7 +42,7 @@ const RestaurantDetailPage = () => {
 
   if (isLoading) {
     return (
-      <AnimatedPage className="mx-auto max-w-7xl px-4 py-6">
+      <AnimatedPage className="mx-auto max-w-[1280px] px-4 py-6">
         <LoadingSkeleton count={1} type="card" />
         <div className="mt-6">
           <LoadingSkeleton count={6} type="card" />
@@ -53,39 +54,54 @@ const RestaurantDetailPage = () => {
   if (!restaurant) return null;
 
   return (
-    <AnimatedPage className="mx-auto max-w-7xl px-4 py-6">
-      <RestaurantHero restaurant={restaurant} />
+    <AnimatedPage>
+      <div className="max-w-[1280px] mx-auto">
+        <RestaurantHero restaurant={restaurant} />
+        <div className="flex">
+          {/* Menu area */}
+          <div className="flex-1 lg:w-[60%] px-4 py-6">
+            {/* Menu sections */}
+            <div className="flex flex-col gap-8">
+              {featuredProducts.length > 0 && (
+                <MenuSection title="Empfehlungen">
+                  {featuredProducts.map((product) => (
+                    <ProductCard
+                      key={product.$id}
+                      product={product}
+                      onSelect={setSelectedProduct}
+                    />
+                  ))}
+                </MenuSection>
+              )}
 
-      <div className="mt-8 flex flex-col gap-8">
-        {featuredProducts.length > 0 && (
-          <MenuSection title="Empfehlungen">
-            {featuredProducts.map((product) => (
-              <ProductCard
-                key={product.$id}
-                product={product}
-                onSelect={setSelectedProduct}
-              />
-            ))}
-          </MenuSection>
-        )}
+              {regularProducts.length > 0 && (
+                <MenuSection title="Speisekarte">
+                  {regularProducts.map((product) => (
+                    <ProductCard
+                      key={product.$id}
+                      product={product}
+                      onSelect={setSelectedProduct}
+                    />
+                  ))}
+                </MenuSection>
+              )}
 
-        {regularProducts.length > 0 && (
-          <MenuSection title="Speisekarte">
-            {regularProducts.map((product) => (
-              <ProductCard
-                key={product.$id}
-                product={product}
-                onSelect={setSelectedProduct}
-              />
-            ))}
-          </MenuSection>
-        )}
+              {products.length === 0 && (
+                <p className="py-12 text-center text-muted">
+                  Keine Produkte verfügbar.
+                </p>
+              )}
+            </div>
+          </div>
 
-        {products.length === 0 && (
-          <p className="py-12 text-center text-default-400">
-            Keine Produkte verf&uuml;gbar.
-          </p>
-        )}
+          {/* Cart sidebar - desktop only */}
+          <div className="hidden lg:block w-[40%] border-l border-border sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto">
+            <CartSidebar deliveryFee={restaurant.deliveryFee} />
+          </div>
+        </div>
+
+        {/* Cart bottom bar - mobile only */}
+        <CartBottomBar />
       </div>
 
       <ProductModal
