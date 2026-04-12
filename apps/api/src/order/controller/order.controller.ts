@@ -5,43 +5,52 @@ import {
   Body,
   Param,
   Patch,
-  Delete,
+  Query,
 } from "@nestjs/common";
-import { type OrderEntity } from "@repo/interfaces";
 import { OrderService } from "../service/order.service";
-import { ActorContextService } from "../../auth/service/actor-context.service";
+import { CreateOrderDto } from "../dto/create-order.dto";
+import { UpdateOrderStatusDto } from "../dto/update-order-status.dto";
 
 @Controller({ path: "order", version: "1" })
 export class OrderController {
-  constructor(
-    private readonly orderService: OrderService,
-    private readonly actorContextService: ActorContextService,
-  ) {}
+  constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  create(@Body() order: OrderEntity) {
-    return this.orderService.createOrder(order);
+  async create(@Body() dto: CreateOrderDto) {
+    return this.orderService.createOrder(dto);
+  }
+
+  @Get("mine")
+  async getMyOrders(
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return this.orderService.getMyOrders(
+      page ? parseInt(page) : 1,
+      limit ? parseInt(limit) : 25,
+    );
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    const userId = this.actorContextService.get().user.id;
-    return this.orderService.getOrderById(id, userId);
+  async getById(@Param("id") id: string) {
+    return this.orderService.getOrderById(id);
   }
 
-  @Get()
-  findAll() {
-    const userId = this.actorContextService.get().user.id;
-    return this.orderService.getAllOrders(userId);
+  @Patch(":id/status")
+  async updateStatus(
+    @Param("id") id: string,
+    @Body() dto: UpdateOrderStatusDto,
+  ) {
+    return this.orderService.transitionStatus(id, dto);
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() order: Partial<OrderEntity>) {
-    return this.orderService.updateOrder(id, order);
+  @Get(":id/items")
+  async getItems(@Param("id") id: string) {
+    return this.orderService.getOrderItems(id);
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.orderService.deleteOrder(id);
+  @Get(":id/history")
+  async getHistory(@Param("id") id: string) {
+    return this.orderService.getStatusHistory(id);
   }
 }
