@@ -53,11 +53,26 @@ export class RestaurantService {
       roles: ["owner"],
     });
 
+    const restaurantData: Record<string, unknown> = {
+      name: params.name,
+      description: "",
+      phone: "",
+      type: "other",
+      isActive: false,
+      minOrderValue: 0,
+      deliveryFee: 0,
+      estimatedDeliveryMinutes: 30,
+    };
+
+    if (params.partialAddress) {
+      restaurantData.address = params.partialAddress;
+    }
+
     await this.dataBase.createRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
       tableId: "restaurant",
       rowId: ID.unique(),
-      data: params.data as object as Record<string, unknown>,
+      data: restaurantData,
       permissions: [
         Permission.read(Role.any()),
         Permission.update(Role.team(team.$id, "owner")),

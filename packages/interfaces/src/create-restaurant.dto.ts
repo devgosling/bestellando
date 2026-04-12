@@ -27,7 +27,5 @@ export class CreateRestaurantDto {
   @IsEmail()
   email!: string;
 
-  partialAddress!: Partial<RestaurantEntity["address"]>;
-
-  data!: Partial<RestaurantEntity>;
+  partialAddress?: Partial<RestaurantEntity["address"]>;
 }
