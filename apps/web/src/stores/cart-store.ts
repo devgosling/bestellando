@@ -12,6 +12,11 @@ interface CartState {
   items: CartItem[];
   restaurantId: string | null;
   restaurantName: string | null;
+  pendingItem: {
+    product: ProductEntity;
+    quantity: number;
+    instructions?: string;
+  } | null;
 
   addItem: (
     product: ProductEntity,
@@ -21,6 +26,13 @@ interface CartState {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  setPendingItem: (
+    product: ProductEntity,
+    quantity: number,
+    instructions?: string,
+  ) => void;
+  confirmPendingItem: () => void;
+  cancelPendingItem: () => void;
 
   getTotalItems: () => number;
   getSubtotal: () => number;
@@ -32,20 +44,19 @@ export const useCartStore = create<CartState>()(
       items: [],
       restaurantId: null,
       restaurantName: null,
+      pendingItem: null,
 
       addItem: (product, quantity, instructions) => {
         const state = get();
         const incomingRestaurantId = product.restaurant.$id;
 
-        // Single-restaurant enforcement: clear cart if switching restaurants
+        // Single-restaurant enforcement: set pending item if switching restaurants
         if (
           state.restaurantId !== null &&
           state.restaurantId !== incomingRestaurantId
         ) {
           set({
-            items: [{ product, quantity, specialInstructions: instructions }],
-            restaurantId: incomingRestaurantId,
-            restaurantName: product.restaurant.name,
+            pendingItem: { product, quantity, instructions },
           });
           return;
         }
@@ -101,6 +112,31 @@ export const useCartStore = create<CartState>()(
         set({ items: [], restaurantId: null, restaurantName: null });
       },
 
+      setPendingItem: (product, quantity, instructions) => {
+        set({ pendingItem: { product, quantity, instructions } });
+      },
+
+      confirmPendingItem: () => {
+        const pending = get().pendingItem;
+        if (!pending) return;
+        set({
+          items: [
+            {
+              product: pending.product,
+              quantity: pending.quantity,
+              specialInstructions: pending.instructions,
+            },
+          ],
+          restaurantId: pending.product.restaurant.$id,
+          restaurantName: pending.product.restaurant.name,
+          pendingItem: null,
+        });
+      },
+
+      cancelPendingItem: () => {
+        set({ pendingItem: null });
+      },
+
       getTotalItems: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
       },
@@ -114,6 +150,11 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "bestellando-cart",
+      partialize: (state) => ({
+        items: state.items,
+        restaurantId: state.restaurantId,
+        restaurantName: state.restaurantName,
+      }),
     },
   ),
 );
