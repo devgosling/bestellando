@@ -25,18 +25,31 @@ export class OrderService {
     });
   }
 
-  async getOrderById(id: string) {
-    return this.dataBase.getRow({
+  async getOrderById(id: string, userId?: string) {
+    const order = await this.dataBase.getRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
       tableId: "order",
       rowId: id,
     });
+
+    if (
+      userId &&
+      order &&
+      (order as unknown as Record<string, unknown>).customerId !== userId
+    ) {
+      return null;
+    }
+
+    return order;
   }
 
-  async getAllOrders() {
+  async getAllOrders(userId?: string) {
     return this.dataBase.listRows({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
       tableId: "order",
+      ...(userId
+        ? { queries: [Query.equal("customerId", userId)] }
+        : {}),
     });
   }
 

@@ -9,10 +9,14 @@ import {
 } from "@nestjs/common";
 import { type OrderEntity } from "@repo/interfaces";
 import { OrderService } from "../service/order.service";
+import { ActorContextService } from "../../auth/service/actor-context.service";
 
 @Controller({ path: "order", version: "1" })
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly actorContextService: ActorContextService,
+  ) {}
 
   @Post()
   create(@Body() order: OrderEntity) {
@@ -21,12 +25,14 @@ export class OrderController {
 
   @Get(":id")
   findOne(@Param("id") id: string) {
-    return this.orderService.getOrderById(id);
+    const userId = this.actorContextService.get().user.id;
+    return this.orderService.getOrderById(id, userId);
   }
 
   @Get()
   findAll() {
-    return this.orderService.getAllOrders();
+    const userId = this.actorContextService.get().user.id;
+    return this.orderService.getAllOrders(userId);
   }
 
   @Patch(":id")
