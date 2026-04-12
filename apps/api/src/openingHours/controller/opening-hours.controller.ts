@@ -10,7 +10,7 @@ import {
 import { OpeningHoursService } from "../service/opening-hours.service";
 import { type OpeningHoursEntity } from "@repo/interfaces";
 
-@Controller("opening-hours")
+@Controller({ path: "opening-hours", version: "1" })
 export class OpeningHoursController {
   constructor(private readonly openingHoursService: OpeningHoursService) {}
 

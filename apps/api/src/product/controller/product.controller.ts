@@ -10,7 +10,7 @@ import {
 import { ProductService } from "../service/product.service";
 import { type ProductEntity } from "@repo/interfaces";
 
-@Controller("product")
+@Controller({ path: "product", version: "1" })
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
