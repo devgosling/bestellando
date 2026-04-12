@@ -1,10 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Button, Input, Surface } from "@heroui/react";
-import Subheading from "../../kit/subheading";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Button, Input } from "@heroui/react";
 import z from "zod";
 import { useForm } from "@tanstack/react-form";
 import { appwriteAccount } from "@repo/lib";
 import { AppwriteException } from "appwrite";
+import { AnimatedPage } from "../../components/shared/AnimatedPage";
 
 const Page = () => {
   const formValidator = z.object({
@@ -44,45 +44,52 @@ const Page = () => {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-6">
-      <Surface
-        variant="secondary"
-        className="p-4 rounded-3xl shadow-lg w-[25vw]"
-      >
-        <div className="bg-content1 rounded-2xl shadow-lg p-5 w-full flex flex-col items-center gap-3 max-w-[25rem]">
-          <img
-            src="/public/logo_text.png"
-            className="h-8 w-auto mx-auto"
-            alt="Logo"
-          />
-          <Subheading>Anmelden</Subheading>
-          <div className="flex flex-col gap-3 w-full">
-            <form.Field name="email">
-              {(field) => (
+    <AnimatedPage className="min-h-screen flex items-center justify-center px-4">
+      <div className="max-w-[420px] w-full bg-surface border border-border rounded-2xl shadow-lg p-8">
+        <h1 className="text-2xl font-extrabold text-accent text-center">
+          bestellando
+        </h1>
+        <p className="text-muted text-center text-sm mt-1 mb-6">
+          Willkommen zurueck
+        </p>
+
+        <div className="flex flex-col gap-4">
+          <form.Field name="email">
+            {(field) => (
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-foreground">
+                  E-Mail
+                </label>
                 <Input
-                  placeholder="E-Mail Adresse"
                   type="email"
+                  placeholder="E-Mail Adresse"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   autoComplete="email"
                 />
-              )}
-            </form.Field>
-            <form.Field name="password">
-              {(field) => (
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="password">
+            {(field) => (
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-foreground">
+                  Passwort
+                </label>
                 <Input
-                  placeholder="Passwort"
                   type="password"
+                  placeholder="Passwort"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
-              )}
-            </form.Field>
-          </div>
+              </div>
+            )}
+          </form.Field>
+
           <form.Subscribe selector={(state) => [state.canSubmit]}>
             {([canSubmit]) => (
               <Button
-                className="w-full"
+                className="w-full bg-accent text-accent-foreground font-semibold"
                 isDisabled={!canSubmit}
                 onPress={() => form.handleSubmit()}
               >
@@ -90,9 +97,19 @@ const Page = () => {
               </Button>
             )}
           </form.Subscribe>
+
+          <p className="text-center text-sm text-muted">
+            Noch kein Konto?{" "}
+            <Link
+              to="/auth/register/user"
+              className="text-accent font-medium hover:underline"
+            >
+              Registrieren
+            </Link>
+          </p>
         </div>
-      </Surface>
-    </div>
+      </div>
+    </AnimatedPage>
   );
 };
 

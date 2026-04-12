@@ -1,22 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import TwoPartPage from "../../../kit/twopart-page";
-import {
-  Description,
-  FieldError,
-  FieldGroup,
-  Fieldset,
-  Form,
-  Input,
-  Label,
-  Select,
-  Surface,
-  ListBox,
-  TextField,
-  Button,
-} from "@heroui/react";
-import { CreateRestaurantDto, type RestaurantType } from "@repo/interfaces";
+import { Input, Button } from "@heroui/react";
+import { CreateRestaurantDto } from "@repo/interfaces";
 import { getMutationOptions } from "@repo/lib";
 import { useApiMutation, useNotification } from "@repo/hooks";
+import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 
 export const Route = createFileRoute("/auth/register/restaurant")({
   component: Page,
@@ -33,8 +20,7 @@ function Page() {
     ...getMutationOptions("/v1/restaurant/register", "POST", undefined, {
       requiresAuth: false,
     }),
-    success: (response) => {
-      console.log(response);
+    success: () => {
       addNotification({
         type: "SUCCESS",
         title: "Restaurant registriert",
@@ -52,15 +38,13 @@ function Page() {
       data[key] = value.toString();
     });
 
-    console.log(data);
-
     registerRestaurantAction.mutate({
       name: data.restaurantName,
       email: data.email,
       password: data.password,
       partialAddress: {
-        street: data.street.split(" ").slice(0, -1).join(" ") || undefined,
-        streetNumber: data.street.split(" ").slice(-1)[0] || undefined,
+        street: data.street || undefined,
+        streetNumber: data.streetNumber || undefined,
         zipCode: data.plz,
         city: data.city,
       },
@@ -68,62 +52,105 @@ function Page() {
   };
 
   return (
-    <TwoPartPage
-      title="Registriere dein Restaurant"
-      subtitle="Und es beginnt genau hier: Mit Bestellando!"
-    >
-      <Surface
-        className="p-4 rounded-3xl shadow-lg max-w-120"
-        variant="secondary"
-      >
-        <Form className="flex w-full flex-col gap-4" onSubmit={onSubmit}>
-          <Fieldset>
-            <Fieldset.Legend>Restaurant Erstellen</Fieldset.Legend>
-            <Description>
-              Fülle die folgenden Informationen aus, um dein Restaurant zu
-              registrieren.
-            </Description>
-          </Fieldset>
-          <FieldGroup className="flex flex-col gap-4">
-            <TextField name="restaurantName" type="text" isRequired>
-              <Label>Restaurant Name</Label>
-              <Input placeholder="Gib den Namen deines Restaurants ein" />
-              <FieldError></FieldError>
-            </TextField>
-            <TextField name="email" type="email" isRequired>
-              <Label>E-Mail Adresse</Label>
-              <Input placeholder="Gib die E-Mail Adresse deines Restaurants ein" />
-              <FieldError></FieldError>
-            </TextField>
-            <TextField name="password" type="password" isRequired>
-              <Label>Passwort</Label>
-              <Input placeholder="Gebe ein Passwort ein" />
-              <FieldError></FieldError>
-            </TextField>
-            <TextField name="street" type="text" isRequired>
-              <Label>Straße und Hausnummer</Label>
-              <Input placeholder="Straße und Hausnummer des Restaurants" />
-              <FieldError></FieldError>
-            </TextField>
-            <div className="flex items-center gap-2 w-full">
-              <TextField name="city" type="text" isRequired className="w-full">
-                <Label>Stadt</Label>
-                <Input placeholder="Stadtnamen" />
-                <FieldError></FieldError>
-              </TextField>
-              <TextField name="plz" type="number" isRequired>
-                <Label>Postleitzahl</Label>
-                <Input placeholder="PLZ" />
-                <FieldError></FieldError>
-              </TextField>
+    <AnimatedPage className="min-h-screen flex items-center justify-center px-4">
+      <div className="max-w-[420px] w-full bg-surface border border-border rounded-2xl shadow-lg p-8">
+        <h1 className="text-2xl font-extrabold text-accent text-center">
+          bestellando
+        </h1>
+        <p className="text-muted text-center text-sm mt-1 mb-6">
+          Restaurant registrieren
+        </p>
+
+        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground">
+              Restaurant Name
+            </label>
+            <Input
+              name="restaurantName"
+              placeholder="Name deines Restaurants"
+              type="text"
+              isRequired
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground">
+              E-Mail
+            </label>
+            <Input
+              name="email"
+              placeholder="E-Mail Adresse"
+              type="email"
+              isRequired
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground">
+              Passwort
+            </label>
+            <Input
+              name="password"
+              placeholder="Passwort"
+              type="password"
+              isRequired
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-foreground">
+                Strasse
+              </label>
+              <Input
+                name="street"
+                placeholder="Strassenname"
+                type="text"
+                isRequired
+              />
             </div>
-            <Button type="submit" className="w-full">
-              <i className="fa-regular fa-fork-knife"></i>
-              Restaurant registrieren
-            </Button>
-          </FieldGroup>
-        </Form>
-      </Surface>
-    </TwoPartPage>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-foreground">
+                Hausnummer
+              </label>
+              <Input
+                name="streetNumber"
+                placeholder="Nr."
+                type="text"
+                isRequired
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-foreground">
+                Stadt
+              </label>
+              <Input
+                name="city"
+                placeholder="Stadt"
+                type="text"
+                isRequired
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-foreground">PLZ</label>
+              <Input
+                name="plz"
+                placeholder="PLZ"
+                type="number"
+                isRequired
+              />
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-accent text-accent-foreground font-semibold"
+            isLoading={registerRestaurantAction.isPending}
+          >
+            Restaurant registrieren
+          </Button>
+        </form>
+      </div>
+    </AnimatedPage>
   );
 }

@@ -1,116 +1,103 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  Description,
-  FieldError,
-  FieldGroup,
-  Fieldset,
-  Form,
-  Input,
-  Label,
-  Surface,
-  TextField,
-  Button,
-} from "@heroui/react";
-import z from "zod";
-import { useForm } from "@tanstack/react-form";
-
-const registerSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+import { Input, Button } from "@heroui/react";
+import { unauthenticatedFetch } from "@repo/lib";
+import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 
 const Page = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const form = useForm({
-    defaultValues: { name: "", email: "", password: "" },
-    validators: { onChange: registerSchema },
-    onSubmit: async (props) => {
-      setError(null);
-      setSuccess(false);
-      try {
-        const res = await fetch("/v1/user/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(props.value),
-        });
-        if (!res.ok) throw new Error("Registration failed");
-        setSuccess(true);
-      } catch (e: any) {
-        setError(e.message || "Unknown error");
-      }
-    },
-  });
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+    const formData = new FormData(e.currentTarget);
+    const data: Record<string, string> = {};
+    formData.forEach((value, key) => {
+      data[key] = value.toString();
+    });
+    try {
+      await unauthenticatedFetch("/v1/user/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      setSuccess(true);
+    } catch (e: any) {
+      setError(e.message || "Unknown error");
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-6">
-      <Surface
-        className="p-4 rounded-3xl shadow-lg max-w-120"
-        variant="secondary"
-      >
-        <Form
-          className="flex w-full flex-col gap-4"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setError(null);
-            setSuccess(false);
-            const formData = new FormData(e.currentTarget);
-            const data: Record<string, string> = {};
-            formData.forEach((value, key) => {
-              data[key] = value.toString();
-            });
-            try {
-              const res = await fetch("/v1/user/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
-              });
-              if (!res.ok) throw new Error("Registration failed");
-              setSuccess(true);
-            } catch (e: any) {
-              setError(e.message || "Unknown error");
-            }
-          }}
-        >
-          <Fieldset>
-            <Fieldset.Legend>Benutzer erstellen</Fieldset.Legend>
-            <Description>
-              Fülle die folgenden Informationen aus, um einen Benutzer zu
-              registrieren.
-            </Description>
-          </Fieldset>
-          <FieldGroup className="flex flex-col gap-4">
-            <TextField name="name" type="text">
-              <Label>Name</Label>
-              <Input placeholder="Name" />
-              <FieldError></FieldError>
-            </TextField>
-            <TextField name="email" type="email">
-              <Label>E-Mail Adresse</Label>
-              <Input placeholder="E-Mail Adresse" autoComplete="email" />
-              <FieldError></FieldError>
-            </TextField>
-            <TextField name="password" type="password">
-              <Label>Passwort</Label>
-              <Input placeholder="Passwort" />
-              <FieldError></FieldError>
-            </TextField>
-            <Button type="submit" className="w-full mt-4">
-              Registrieren
-            </Button>
-          </FieldGroup>
-          {error && <div className="text-red-500 mb-2">{error}</div>}
+    <AnimatedPage className="min-h-screen flex items-center justify-center px-4">
+      <div className="max-w-[420px] w-full bg-surface border border-border rounded-2xl shadow-lg p-8">
+        <h1 className="text-2xl font-extrabold text-accent text-center">
+          bestellando
+        </h1>
+        <p className="text-muted text-center text-sm mt-1 mb-6">
+          Konto erstellen
+        </p>
+
+        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-foreground">
+                Vorname
+              </label>
+              <Input name="firstName" placeholder="Vorname" type="text" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-foreground">
+                Nachname
+              </label>
+              <Input name="lastName" placeholder="Nachname" type="text" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground">
+              E-Mail
+            </label>
+            <Input
+              name="email"
+              placeholder="E-Mail Adresse"
+              type="email"
+              autoComplete="email"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground">
+              Passwort
+            </label>
+            <Input name="password" placeholder="Passwort" type="password" />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-accent text-accent-foreground font-semibold"
+          >
+            Registrieren
+          </Button>
+
+          {error && <div className="text-red-500 text-sm">{error}</div>}
           {success && (
-            <div className="text-green-600 mb-2">
+            <div className="text-green-600 text-sm">
               Registrierung erfolgreich!
             </div>
           )}
-        </Form>
-      </Surface>
-    </div>
+
+          <p className="text-center text-sm text-muted">
+            Bereits ein Konto?{" "}
+            <Link
+              to="/auth/login"
+              search={{ redirectUrl: "/" }}
+              className="text-accent font-medium hover:underline"
+            >
+              Anmelden
+            </Link>
+          </p>
+        </form>
+      </div>
+    </AnimatedPage>
   );
 };
 

@@ -1,22 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import TwoPartPage from "../../../kit/twopart-page";
-import {
-  Description,
-  FieldError,
-  FieldGroup,
-  Fieldset,
-  Form,
-  Input,
-  Label,
-  Select,
-  SelectItem,
-  Surface,
-  TextField,
-  Button,
-} from "@heroui/react";
+import { Input, Select, ListBoxItem, Button } from "@heroui/react";
 import { getMutationOptions } from "@repo/lib";
 import { useApiMutation, useNotification } from "@repo/hooks";
 import type { VehicleType } from "@repo/interfaces";
+import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 
 export const Route = createFileRoute("/auth/register/delivery")({
   component: DeliveryRegistrationPage,
@@ -65,53 +52,56 @@ function DeliveryRegistrationPage() {
   };
 
   return (
-    <TwoPartPage
-      title="Werde Fahrer bei Bestellando"
-      subtitle="Liefere Essen aus und verdiene Geld!"
-    >
-      <Surface
-        className="p-4 rounded-3xl shadow-lg max-w-120"
-        variant="secondary"
-      >
-        <Form className="flex w-full flex-col gap-4" onSubmit={onSubmit}>
-          <Fieldset>
-            <Fieldset.Legend>Fahrer Registrierung</Fieldset.Legend>
-            <Description>
-              Gib deine Daten ein, um dich als Fahrer zu registrieren.
-            </Description>
-          </Fieldset>
-          <FieldGroup className="flex flex-col gap-4">
-            <TextField name="name" type="text" isRequired>
-              <Label>Vollstaendiger Name</Label>
-              <Input placeholder="Dein vollstaendiger Name" />
-              <FieldError />
-            </TextField>
-            <TextField name="phone" type="tel" isRequired>
-              <Label>Telefonnummer</Label>
-              <Input placeholder="+49 123 456 7890" />
-              <FieldError />
-            </TextField>
-            <Select
-              name="vehicleType"
-              label="Fahrzeugtyp"
-              placeholder="Waehle dein Fahrzeug"
+    <AnimatedPage className="min-h-screen flex items-center justify-center px-4">
+      <div className="max-w-[420px] w-full bg-surface border border-border rounded-2xl shadow-lg p-8">
+        <h1 className="text-2xl font-extrabold text-accent text-center">
+          bestellando
+        </h1>
+        <p className="text-muted text-center text-sm mt-1 mb-6">
+          Als Fahrer registrieren
+        </p>
+
+        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground">Name</label>
+            <Input
+              name="name"
+              placeholder="Dein vollstaendiger Name"
+              type="text"
               isRequired
-            >
-              {vehicleTypes.map((v) => (
-                <SelectItem key={v.key}>{v.label}</SelectItem>
-              ))}
-            </Select>
-            <Button
-              type="submit"
-              className="w-full"
-              isLoading={registerAction.isPending}
-            >
-              <i className="fa-regular fa-motorcycle" />
-              Als Fahrer registrieren
-            </Button>
-          </FieldGroup>
-        </Form>
-      </Surface>
-    </TwoPartPage>
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-foreground">
+              Telefonnummer
+            </label>
+            <Input
+              name="phone"
+              placeholder="+49 123 456 7890"
+              type="tel"
+              isRequired
+            />
+          </div>
+          <Select
+            name="vehicleType"
+            label="Fahrzeugtyp"
+            placeholder="Waehle dein Fahrzeug"
+            isRequired
+          >
+            {vehicleTypes.map((v) => (
+              <ListBoxItem key={v.key}>{v.label}</ListBoxItem>
+            ))}
+          </Select>
+
+          <Button
+            type="submit"
+            className="w-full bg-accent text-accent-foreground font-semibold"
+            isLoading={registerAction.isPending}
+          >
+            Als Fahrer registrieren
+          </Button>
+        </form>
+      </div>
+    </AnimatedPage>
   );
 }
