@@ -15,10 +15,10 @@ import { Route as protectedCustomerRouteRouteImport } from './routes/(protected-
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as protectedRestaurantManageRestaurantRouteImport } from './routes/(protected-restaurant)/manage-restaurant'
-import { Route as protectedCustomerProtectedRouteImport } from './routes/(protected-customer)/protected'
-import { Route as protectedCustomerListRestaurantsRouteImport } from './routes/(protected-customer)/list-restaurants'
+import { Route as protectedCustomerRestaurantsIndexRouteImport } from './routes/(protected-customer)/restaurants/index'
 import { Route as AuthRegisterUserRouteImport } from './routes/auth/register/user'
 import { Route as AuthRegisterRestaurantRouteImport } from './routes/auth/register/restaurant'
+import { Route as protectedCustomerRestaurantsRestaurantIdRouteImport } from './routes/(protected-customer)/restaurants/$restaurantId'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -50,16 +50,10 @@ const protectedRestaurantManageRestaurantRoute =
     path: '/manage-restaurant',
     getParentRoute: () => protectedRestaurantRouteRoute,
   } as any)
-const protectedCustomerProtectedRoute =
-  protectedCustomerProtectedRouteImport.update({
-    id: '/protected',
-    path: '/protected',
-    getParentRoute: () => protectedCustomerRouteRoute,
-  } as any)
-const protectedCustomerListRestaurantsRoute =
-  protectedCustomerListRestaurantsRouteImport.update({
-    id: '/list-restaurants',
-    path: '/list-restaurants',
+const protectedCustomerRestaurantsIndexRoute =
+  protectedCustomerRestaurantsIndexRouteImport.update({
+    id: '/restaurants/',
+    path: '/restaurants/',
     getParentRoute: () => protectedCustomerRouteRoute,
   } as any)
 const AuthRegisterUserRoute = AuthRegisterUserRouteImport.update({
@@ -72,26 +66,32 @@ const AuthRegisterRestaurantRoute = AuthRegisterRestaurantRouteImport.update({
   path: '/register/restaurant',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const protectedCustomerRestaurantsRestaurantIdRoute =
+  protectedCustomerRestaurantsRestaurantIdRouteImport.update({
+    id: '/restaurants/$restaurantId',
+    path: '/restaurants/$restaurantId',
+    getParentRoute: () => protectedCustomerRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
-  '/list-restaurants': typeof protectedCustomerListRestaurantsRoute
-  '/protected': typeof protectedCustomerProtectedRoute
   '/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
+  '/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
+  '/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
-  '/list-restaurants': typeof protectedCustomerListRestaurantsRoute
-  '/protected': typeof protectedCustomerProtectedRoute
   '/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
+  '/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
+  '/restaurants': typeof protectedCustomerRestaurantsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -99,46 +99,46 @@ export interface FileRoutesById {
   '/(protected-customer)': typeof protectedCustomerRouteRouteWithChildren
   '/(protected-restaurant)': typeof protectedRestaurantRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
-  '/(protected-customer)/list-restaurants': typeof protectedCustomerListRestaurantsRoute
-  '/(protected-customer)/protected': typeof protectedCustomerProtectedRoute
   '/(protected-restaurant)/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
+  '/(protected-customer)/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
+  '/(protected-customer)/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
-    | '/list-restaurants'
-    | '/protected'
     | '/manage-restaurant'
     | '/auth/login'
+    | '/restaurants/$restaurantId'
     | '/auth/register/restaurant'
     | '/auth/register/user'
+    | '/restaurants/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/list-restaurants'
-    | '/protected'
     | '/manage-restaurant'
     | '/auth/login'
+    | '/restaurants/$restaurantId'
     | '/auth/register/restaurant'
     | '/auth/register/user'
+    | '/restaurants'
   id:
     | '__root__'
     | '/'
     | '/(protected-customer)'
     | '/(protected-restaurant)'
     | '/auth'
-    | '/(protected-customer)/list-restaurants'
-    | '/(protected-customer)/protected'
     | '/(protected-restaurant)/manage-restaurant'
     | '/auth/login'
+    | '/(protected-customer)/restaurants/$restaurantId'
     | '/auth/register/restaurant'
     | '/auth/register/user'
+    | '/(protected-customer)/restaurants/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -192,18 +192,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof protectedRestaurantManageRestaurantRouteImport
       parentRoute: typeof protectedRestaurantRouteRoute
     }
-    '/(protected-customer)/protected': {
-      id: '/(protected-customer)/protected'
-      path: '/protected'
-      fullPath: '/protected'
-      preLoaderRoute: typeof protectedCustomerProtectedRouteImport
-      parentRoute: typeof protectedCustomerRouteRoute
-    }
-    '/(protected-customer)/list-restaurants': {
-      id: '/(protected-customer)/list-restaurants'
-      path: '/list-restaurants'
-      fullPath: '/list-restaurants'
-      preLoaderRoute: typeof protectedCustomerListRestaurantsRouteImport
+    '/(protected-customer)/restaurants/': {
+      id: '/(protected-customer)/restaurants/'
+      path: '/restaurants'
+      fullPath: '/restaurants/'
+      preLoaderRoute: typeof protectedCustomerRestaurantsIndexRouteImport
       parentRoute: typeof protectedCustomerRouteRoute
     }
     '/auth/register/user': {
@@ -220,19 +213,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterRestaurantRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/(protected-customer)/restaurants/$restaurantId': {
+      id: '/(protected-customer)/restaurants/$restaurantId'
+      path: '/restaurants/$restaurantId'
+      fullPath: '/restaurants/$restaurantId'
+      preLoaderRoute: typeof protectedCustomerRestaurantsRestaurantIdRouteImport
+      parentRoute: typeof protectedCustomerRouteRoute
+    }
   }
 }
 
 interface protectedCustomerRouteRouteChildren {
-  protectedCustomerListRestaurantsRoute: typeof protectedCustomerListRestaurantsRoute
-  protectedCustomerProtectedRoute: typeof protectedCustomerProtectedRoute
+  protectedCustomerRestaurantsRestaurantIdRoute: typeof protectedCustomerRestaurantsRestaurantIdRoute
+  protectedCustomerRestaurantsIndexRoute: typeof protectedCustomerRestaurantsIndexRoute
 }
 
 const protectedCustomerRouteRouteChildren: protectedCustomerRouteRouteChildren =
   {
-    protectedCustomerListRestaurantsRoute:
-      protectedCustomerListRestaurantsRoute,
-    protectedCustomerProtectedRoute: protectedCustomerProtectedRoute,
+    protectedCustomerRestaurantsRestaurantIdRoute:
+      protectedCustomerRestaurantsRestaurantIdRoute,
+    protectedCustomerRestaurantsIndexRoute:
+      protectedCustomerRestaurantsIndexRoute,
   }
 
 const protectedCustomerRouteRouteWithChildren =
