@@ -10,6 +10,7 @@ import { OrderStatusHistoryModule } from "./orderStatusHistory/order-status-hist
 import { OpeningHoursModule } from "./openingHours/opening-hours.module";
 import { PaymentModule } from "./payment/payment.module";
 import { GatewayModule } from "./gateway/gateway.module";
+import { DeliveryModule } from "./delivery/delivery.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -31,6 +32,7 @@ import { ClsModule } from "nestjs-cls/dist/src/lib/cls-module/cls.module";
     OpeningHoursModule,
     PaymentModule,
     GatewayModule,
+    DeliveryModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     ClsModule.forRoot({
