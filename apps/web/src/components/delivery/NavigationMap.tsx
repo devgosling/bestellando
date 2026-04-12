@@ -79,7 +79,7 @@ export function NavigationMap({
       {route.length > 0 && (
         <Polyline
           positions={route}
-          pathOptions={{ color: "#006FEE", weight: 4, opacity: 0.8 }}
+          pathOptions={{ color: "#E63E11", weight: 4, opacity: 0.8 }}
         />
       )}
     </MapBase>

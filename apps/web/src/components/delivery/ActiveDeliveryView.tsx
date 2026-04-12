@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, CardBody, Chip } from "@heroui/react";
+import { Card, CardContent, Chip } from "@heroui/react";
 import { getDeliverySocket } from "@repo/lib";
 import type { DeliveryEntity, OrderEntity } from "@repo/interfaces";
 import { NavigationMap } from "./NavigationMap";
@@ -103,12 +103,12 @@ export function ActiveDeliveryView({
     <div className="flex flex-col h-full pb-20">
       {/* Status header */}
       <Card className="mx-4 mt-4 mb-2">
-        <CardBody className="flex flex-row items-center justify-between">
+        <CardContent className="flex flex-row items-center justify-between">
           <div className="flex flex-col gap-1">
             <h2 className="text-lg font-semibold">
               {order.restaurant?.name ?? "Bestellung"}
             </h2>
-            <span className="text-sm text-default-500">
+            <span className="text-sm text-muted">
               {getStatusLabel(delivery.status)}
             </span>
           </div>
@@ -127,7 +127,7 @@ export function ActiveDeliveryView({
               </span>
             )}
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
 
       {/* Map */}

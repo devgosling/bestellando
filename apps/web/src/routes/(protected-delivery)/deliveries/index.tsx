@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
-import { Switch, Card, CardBody } from "@heroui/react";
+import { Switch, Card, CardContent } from "@heroui/react";
 import { useApiQuery, useApiMutation } from "@repo/hooks";
 import { getDeliverySocket } from "@repo/lib";
 import type {
@@ -130,12 +130,12 @@ function DeliveriesPage() {
     <AnimatedPage className="mx-auto max-w-2xl px-4 py-8">
       {/* Online/Offline toggle */}
       <Card className="mb-6">
-        <CardBody className="flex flex-row items-center justify-between">
+        <CardContent className="flex flex-row items-center justify-between">
           <div className="flex flex-col">
             <h1 className="text-xl font-bold">
               {isOnline ? "Online" : "Offline"}
             </h1>
-            <span className="text-sm text-default-500">
+            <span className="text-sm text-muted">
               {isOnline
                 ? "Du erhaeltst neue Lieferauftraege"
                 : "Gehe online um Auftraege zu erhalten"}
@@ -147,7 +147,7 @@ function DeliveriesPage() {
             color="success"
             size="lg"
           />
-        </CardBody>
+        </CardContent>
       </Card>
 
       {/* Available deliveries */}
@@ -156,11 +156,11 @@ function DeliveriesPage() {
           <h2 className="text-lg font-semibold">Verfuegbare Lieferungen</h2>
           {availableDeliveries.length === 0 ? (
             <Card>
-              <CardBody className="text-center py-8">
-                <p className="text-default-400">
+              <CardContent className="text-center py-8">
+                <p className="text-muted">
                   Keine verfuegbaren Lieferungen. Warte auf neue Auftraege...
                 </p>
-              </CardBody>
+              </CardContent>
             </Card>
           ) : (
             availableDeliveries.map((delivery) => (

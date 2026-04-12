@@ -1,4 +1,5 @@
-import { Button, Card, CardBody, CardFooter, Divider } from "@heroui/react";
+import { Button, Card, CardContent, CardFooter, Separator } from "@heroui/react";
+import { GeoPin } from "@gravity-ui/icons";
 import type { AddressEntity } from "@repo/interfaces";
 
 interface DeliveryCardProps {
@@ -24,30 +25,29 @@ export function DeliveryCard({
 }: DeliveryCardProps) {
   return (
     <Card className="w-full">
-      <CardBody className="flex flex-col gap-3">
+      <CardContent className="flex flex-col gap-3">
         <h3 className="text-lg font-semibold">{restaurantName}</h3>
-        <Divider />
+        <Separator />
         <div className="flex flex-col gap-2">
           <div className="flex items-start gap-2">
-            <i className="fa-regular fa-store text-primary mt-0.5" />
+            <GeoPin className="size-4 text-accent mt-0.5 shrink-0" />
             <div className="flex flex-col">
-              <span className="text-xs text-default-400">Abholung</span>
+              <span className="text-xs text-muted">Abholung</span>
               <span className="text-sm">{formatAddress(pickupAddress)}</span>
             </div>
           </div>
           <div className="flex items-start gap-2">
-            <i className="fa-regular fa-location-dot text-danger mt-0.5" />
+            <GeoPin className="size-4 text-danger mt-0.5 shrink-0" />
             <div className="flex flex-col">
-              <span className="text-xs text-default-400">Lieferung</span>
+              <span className="text-xs text-muted">Lieferung</span>
               <span className="text-sm">{formatAddress(deliveryAddress)}</span>
             </div>
           </div>
         </div>
-      </CardBody>
+      </CardContent>
       <CardFooter>
         <Button
-          color="primary"
-          className="w-full"
+          className="w-full bg-accent text-accent-foreground font-semibold"
           onPress={() => onAccept(orderId)}
           isLoading={isAccepting}
         >
