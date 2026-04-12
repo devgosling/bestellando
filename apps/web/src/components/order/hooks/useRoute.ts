@@ -23,7 +23,7 @@ export function useRoute(
     let cancelled = false;
     setIsLoading(true);
 
-    const fetchRoute = async () => {
+    const timeout = setTimeout(async () => {
       try {
         const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
         const response = await fetch(url);
@@ -46,12 +46,11 @@ export function useRoute(
           setIsLoading(false);
         }
       }
-    };
-
-    fetchRoute();
+    }, 2000); // Debounce: wait 2s before fetching route to avoid rapid OSRM calls
 
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
     };
   }, [start?.[0], start?.[1], end?.[0], end?.[1]]);
 

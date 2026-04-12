@@ -133,6 +133,7 @@ export class DeliveryService {
   }
 
   async markPickedUp(deliveryId: string) {
+    const userId = this.actorContextService.get().user.id;
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
 
     const delivery = await this.dataBase.getRow({
@@ -143,6 +144,17 @@ export class DeliveryService {
     if (!delivery) {
       throw new NotFoundException("Delivery not found");
     }
+
+    // Verify the delivery person owns this delivery
+    const dpResult = await this.dataBase.listRows({
+      databaseId,
+      tableId: "deliveryPerson",
+      queries: [Query.equal("userId", userId), Query.limit(1)],
+    });
+    if (dpResult.total === 0 || dpResult.rows[0].$id !== delivery.deliveryPerson) {
+      throw new BadRequestException("This delivery is not assigned to you");
+    }
+
     if (delivery.status !== "ASSIGNED") {
       throw new BadRequestException(
         "Delivery must be in ASSIGNED status to mark as picked up",
@@ -168,6 +180,7 @@ export class DeliveryService {
   }
 
   async markDelivered(deliveryId: string) {
+    const userId = this.actorContextService.get().user.id;
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
 
     const delivery = await this.dataBase.getRow({
@@ -178,6 +191,17 @@ export class DeliveryService {
     if (!delivery) {
       throw new NotFoundException("Delivery not found");
     }
+
+    // Verify the delivery person owns this delivery
+    const dpResult = await this.dataBase.listRows({
+      databaseId,
+      tableId: "deliveryPerson",
+      queries: [Query.equal("userId", userId), Query.limit(1)],
+    });
+    if (dpResult.total === 0 || dpResult.rows[0].$id !== delivery.deliveryPerson) {
+      throw new BadRequestException("This delivery is not assigned to you");
+    }
+
     if (delivery.status !== "PICKED_UP") {
       throw new BadRequestException(
         "Delivery must be in PICKED_UP status to mark as delivered",

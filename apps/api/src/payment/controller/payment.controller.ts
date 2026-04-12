@@ -45,6 +45,7 @@ export class PaymentController {
 
     const session = await this.stripeService.createCheckoutSession({
       orderId,
+      restaurantId: order.restaurant,
       amount: Math.round(order.totalAmount * 100),
       lineItems,
     });

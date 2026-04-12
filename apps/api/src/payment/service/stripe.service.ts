@@ -16,6 +16,7 @@ export class StripeService {
 
   async createCheckoutSession(params: {
     orderId: string;
+    restaurantId: string;
     amount: number; // in cents
     customerEmail?: string;
     lineItems: { name: string; quantity: number; unitAmount: number }[];
@@ -35,7 +36,7 @@ export class StripeService {
         },
         quantity: item.quantity,
       })),
-      metadata: { orderId: params.orderId },
+      metadata: { orderId: params.orderId, restaurantId: params.restaurantId },
       customer_email: params.customerEmail,
       success_url: `${frontendUrl}/orders/${params.orderId}?payment=success`,
       cancel_url: `${frontendUrl}/orders/${params.orderId}?payment=cancelled`,

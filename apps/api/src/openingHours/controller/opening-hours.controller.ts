@@ -30,8 +30,9 @@ export class OpeningHoursController {
 
   @Get()
   @Public()
-  findAll() {
-    return this.openingHoursService.getAllOpeningHours();
+  async findAll() {
+    const result = await this.openingHoursService.getAllOpeningHours();
+    return result.rows;
   }
 
   @Patch(":id")

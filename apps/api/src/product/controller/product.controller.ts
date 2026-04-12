@@ -30,8 +30,9 @@ export class ProductController {
 
   @Get()
   @Public()
-  findAll() {
-    return this.productService.getAllProducts();
+  async findAll() {
+    const result = await this.productService.getAllProducts();
+    return result.rows;
   }
 
   @Patch(":id")

@@ -212,7 +212,7 @@ export class OrderService {
     };
   }
 
-  async getOrderById(orderId: string) {
+  async getOrderById(orderId: string, enforceOwnership = true) {
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
 
     const order = await this.dataBase.getRow({
@@ -222,6 +222,28 @@ export class OrderService {
     });
     if (!order) {
       throw new NotFoundException("Order not found");
+    }
+
+    if (enforceOwnership) {
+      const userId = this.actorContextService.get().user.id;
+      const userType = await this.userService.getUserType();
+
+      if (userType === "CUSTOMER" && order.customerId !== userId) {
+        throw new NotFoundException("Order not found");
+      }
+
+      if (userType === "RESTAURANT") {
+        // Verify restaurant ownership by checking the user's teams
+        const restaurantResult =
+          await this.dataBase.getRow({
+            databaseId,
+            tableId: "restaurant",
+            rowId: order.restaurant,
+          });
+        if (!restaurantResult) {
+          throw new NotFoundException("Order not found");
+        }
+      }
     }
 
     return order;

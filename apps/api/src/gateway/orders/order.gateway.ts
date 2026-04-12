@@ -9,17 +9,30 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { AppwriteService } from "../../auth/service/appwrite.service";
-import { Account } from "node-appwrite";
+import { DatabaseService } from "../../database/service/database.service";
+import { ConfigService } from "@nestjs/config";
+import { Account, Query, Users } from "node-appwrite";
 
 @WebSocketGateway({
   namespace: "/orders",
-  cors: { origin: "*" },
+  cors: {
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "https://localhost:5173",
+    ],
+    credentials: true,
+  },
 })
 export class OrderGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly appwriteService: AppwriteService) {}
+  constructor(
+    private readonly appwriteService: AppwriteService,
+    private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async handleConnection(client: Socket) {
     try {
@@ -45,21 +58,88 @@ export class OrderGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage("subscribe:order")
-  handleSubscribeOrder(
+  async handleSubscribeOrder(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { orderId: string },
   ) {
-    // TODO: verify ownership before joining
+    const userId = client.data.userId;
+    if (!userId) return { event: "error", data: { message: "Not authenticated" } };
+
+    // Verify the user has access to this order (is the customer, restaurant owner, or delivery person)
+    const databaseId = this.configService.get<string>("DATABASE_ID")!;
+    const dataBase = this.databaseService.getDatabase();
+    try {
+      const order = await dataBase.getRow({
+        databaseId,
+        tableId: "order",
+        rowId: data.orderId,
+      });
+      if (!order) return { event: "error", data: { message: "Order not found" } };
+
+      const isCustomer = order.customerId === userId;
+      const isDeliveryPerson = order.deliveryPersonId === userId;
+
+      // Check restaurant ownership via team memberships
+      let isRestaurantOwner = false;
+      if (!isCustomer && !isDeliveryPerson) {
+        const users = new Users(this.appwriteService.getSDKClient());
+        const { memberships } = await users.listMemberships({ userId });
+        const teamIds = memberships.map((m) => m.teamId);
+
+        const restaurant = await dataBase.getRow({
+          databaseId,
+          tableId: "restaurant",
+          rowId: order.restaurant,
+        });
+        if (restaurant) {
+          const perms = JSON.stringify(restaurant.$permissions || []);
+          isRestaurantOwner = teamIds.some((id) => perms.includes(`team:${id}`));
+        }
+      }
+
+      if (!isCustomer && !isRestaurantOwner && !isDeliveryPerson) {
+        return { event: "error", data: { message: "Access denied" } };
+      }
+    } catch {
+      return { event: "error", data: { message: "Verification failed" } };
+    }
+
     client.join(`order:${data.orderId}`);
     return { event: "subscribed", data: { room: `order:${data.orderId}` } };
   }
 
   @SubscribeMessage("subscribe:restaurant")
-  handleSubscribeRestaurant(
+  async handleSubscribeRestaurant(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { restaurantId: string },
   ) {
-    // TODO: verify restaurant ownership
+    const userId = client.data.userId;
+    if (!userId) return { event: "error", data: { message: "Not authenticated" } };
+
+    // Verify user owns this restaurant via team memberships
+    const databaseId = this.configService.get<string>("DATABASE_ID")!;
+    const dataBase = this.databaseService.getDatabase();
+    try {
+      const users = new Users(this.appwriteService.getSDKClient());
+      const { memberships } = await users.listMemberships({ userId });
+      const teamIds = memberships.map((m) => m.teamId);
+
+      const restaurant = await dataBase.getRow({
+        databaseId,
+        tableId: "restaurant",
+        rowId: data.restaurantId,
+      });
+      if (!restaurant) return { event: "error", data: { message: "Restaurant not found" } };
+
+      const perms = JSON.stringify(restaurant.$permissions || []);
+      const ownsRestaurant = teamIds.some((id) => perms.includes(`team:${id}`));
+      if (!ownsRestaurant) {
+        return { event: "error", data: { message: "Access denied" } };
+      }
+    } catch {
+      return { event: "error", data: { message: "Verification failed" } };
+    }
+
     client.join(`restaurant:${data.restaurantId}:orders`);
     return {
       event: "subscribed",

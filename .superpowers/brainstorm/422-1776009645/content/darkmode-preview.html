@@ -1,0 +1,590 @@
+<style>
+  :root {
+    --primary: #E63E11;
+    --primary-hover: #CC3510;
+    --secondary: #FF8B5A;
+    --dark: #2D2D2D;
+    --bg: #FFF8F0;
+    --surface: #FFFFFF;
+    --muted: #7A7A7A;
+    --success: #2E7D32;
+    --error: #D32F2F;
+    --border: #F0E8E0;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  h2 { font-size: 22px; color: var(--dark); margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .section-label {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .screen-divider {
+    border: none;
+    border-top: 2px dashed var(--border);
+    margin: 40px 0;
+  }
+
+  .mode-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .mode-label {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding: 4px 12px;
+    border-radius: 4px;
+  }
+  .mode-label.light { color: var(--dark); background: #FFF8F0; border: 1px solid var(--border); }
+  .mode-label.dark-label { color: #E8E0D8; background: #1A1A1A; border: 1px solid #333; }
+
+  /* ===== SHARED COMPONENT STYLES ===== */
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ===== LIGHT MODE CARD ===== */
+  .light-card {
+    background: #FFF8F0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid #F0E8E0;
+  }
+  .light-card .l-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #F0E8E0;
+  }
+  .light-card .l-logo { font-size: 16px; font-weight: 800; color: #E63E11; }
+  .light-card .l-nav { display: flex; gap: 10px; align-items: center; }
+  .light-card .l-nav a { color: #2D2D2D; text-decoration: none; font-size: 11px; }
+
+  .light-card .l-hero { padding: 16px; display: flex; gap: 12px; align-items: center; }
+  .light-card .l-hero h1 { font-size: 16px; color: #2D2D2D; margin-bottom: 4px; }
+  .light-card .l-hero p { font-size: 11px; color: #7A7A7A; margin-bottom: 8px; }
+
+  .light-card .l-search {
+    display: flex;
+    background: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid #F0E8E0;
+  }
+  .light-card .l-search input {
+    flex: 1; padding: 8px 12px; border: none; font-size: 11px; outline: none; background: transparent;
+  }
+  .light-card .l-search button {
+    background: #E63E11; color: white; border: none; padding: 8px 14px; font-size: 11px; font-weight: 600;
+  }
+
+  .light-card .l-chips { display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto; }
+  .light-card .l-chip {
+    display: flex; align-items: center; gap: 4px;
+    background: #FFFFFF; border: 1px solid #F0E8E0;
+    padding: 5px 10px; border-radius: 16px;
+    font-size: 10px; font-weight: 500; color: #2D2D2D; white-space: nowrap;
+  }
+
+  .light-card .l-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 12px; }
+  .light-card .r-card {
+    background: #FFFFFF; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .light-card .r-img { height: 48px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .light-card .r-body { padding: 6px 8px; }
+  .light-card .r-body h4 { font-size: 10px; color: #2D2D2D; margin-bottom: 1px; }
+  .light-card .r-meta { font-size: 9px; color: #7A7A7A; display: flex; justify-content: space-between; }
+  .light-card .r-rating { color: #E63E11; font-weight: 600; }
+
+  .light-card .l-tabs {
+    display: flex; justify-content: space-around; align-items: center;
+    background: #FFFFFF; border-top: 1px solid #F0E8E0; padding: 6px 0 4px;
+  }
+  .light-card .l-tab { text-align: center; font-size: 8px; color: #7A7A7A; }
+  .light-card .l-tab.active { color: #E63E11; }
+  .light-card .l-tab-icon { font-size: 14px; display: block; }
+
+  /* ===== DARK MODE CARD ===== */
+  .dark-card {
+    background: #121212;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid #2A2A2A;
+  }
+  .dark-card .d-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #1E1E1E;
+    border-bottom: 1px solid #2A2A2A;
+  }
+  .dark-card .d-logo { font-size: 16px; font-weight: 800; color: #FF6B3A; }
+  .dark-card .d-nav { display: flex; gap: 10px; align-items: center; }
+  .dark-card .d-nav a { color: #E0D8D0; text-decoration: none; font-size: 11px; }
+
+  .dark-card .d-hero { padding: 16px; display: flex; gap: 12px; align-items: center; }
+  .dark-card .d-hero h1 { font-size: 16px; color: #F5F0EB; margin-bottom: 4px; }
+  .dark-card .d-hero p { font-size: 11px; color: #8A8A8A; margin-bottom: 8px; }
+
+  .dark-card .d-search {
+    display: flex;
+    background: #1E1E1E;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    overflow: hidden;
+    border: 1px solid #333;
+  }
+  .dark-card .d-search input {
+    flex: 1; padding: 8px 12px; border: none; font-size: 11px; outline: none;
+    background: transparent; color: #F5F0EB;
+  }
+  .dark-card .d-search button {
+    background: #FF6B3A; color: white; border: none; padding: 8px 14px; font-size: 11px; font-weight: 600;
+  }
+
+  .dark-card .d-chips { display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto; }
+  .dark-card .d-chip {
+    display: flex; align-items: center; gap: 4px;
+    background: #1E1E1E; border: 1px solid #333;
+    padding: 5px 10px; border-radius: 16px;
+    font-size: 10px; font-weight: 500; color: #E0D8D0; white-space: nowrap;
+  }
+
+  .dark-card .d-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 16px 12px; }
+  .dark-card .rd-card {
+    background: #1E1E1E; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .dark-card .rd-img { height: 48px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: #2A2A2A; }
+  .dark-card .rd-body { padding: 6px 8px; }
+  .dark-card .rd-body h4 { font-size: 10px; color: #F5F0EB; margin-bottom: 1px; }
+  .dark-card .rd-meta { font-size: 9px; color: #8A8A8A; display: flex; justify-content: space-between; }
+  .dark-card .rd-rating { color: #FF6B3A; font-weight: 600; }
+
+  .dark-card .d-tabs {
+    display: flex; justify-content: space-around; align-items: center;
+    background: #1E1E1E; border-top: 1px solid #2A2A2A; padding: 6px 0 4px;
+  }
+  .dark-card .d-tab { text-align: center; font-size: 8px; color: #8A8A8A; }
+  .dark-card .d-tab.active { color: #FF6B3A; }
+  .dark-card .d-tab-icon { font-size: 14px; display: block; }
+
+  /* ===== DARK MODE DETAIL ===== */
+  .dark-detail {
+    background: #121212;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid #2A2A2A;
+    display: flex;
+  }
+  .dark-detail .dm-menu { flex: 6; border-right: 1px solid #2A2A2A; }
+  .dark-detail .dm-cart { flex: 4; background: #1E1E1E; padding: 12px; }
+  .dark-detail .dm-banner {
+    background: linear-gradient(135deg, #CC3510 0%, #8B2508 100%);
+    padding: 12px 16px; color: white;
+  }
+  .dark-detail .dm-banner h3 { font-size: 15px; }
+  .dark-detail .dm-banner-meta { font-size: 10px; opacity: 0.9; margin-top: 3px; display: flex; gap: 10px; }
+  .dark-detail .dm-cats {
+    display: flex; background: #1E1E1E; border-bottom: 1px solid #2A2A2A;
+  }
+  .dark-detail .dm-cat {
+    padding: 8px 12px; font-size: 10px; color: #8A8A8A;
+    border-bottom: 2px solid transparent;
+  }
+  .dark-detail .dm-cat.active { color: #FF6B3A; border-bottom-color: #FF6B3A; }
+  .dark-detail .dm-items { padding: 12px 16px; }
+  .dark-detail .dm-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid #2A2A2A;
+  }
+  .dark-detail .dm-item h5 { font-size: 11px; color: #F5F0EB; margin-bottom: 1px; }
+  .dark-detail .dm-item p { font-size: 9px; color: #8A8A8A; }
+  .dark-detail .dm-price { font-size: 11px; font-weight: 700; color: #FF6B3A; }
+  .dark-detail .dm-add {
+    background: #FF6B3A; color: white; border: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 13px; cursor: pointer; margin-left: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dark-detail .dm-cart-title { font-size: 13px; font-weight: 700; color: #F5F0EB; margin-bottom: 8px; }
+  .dark-detail .dm-cart-item {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid #2A2A2A;
+    font-size: 11px; color: #E0D8D0;
+  }
+  .dark-detail .dm-cart-qty {
+    background: #3A1A0A; color: #FF6B3A; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px; margin-right: 6px; font-size: 10px;
+  }
+  .dark-detail .dm-cart-total {
+    display: flex; justify-content: space-between;
+    padding: 10px 0; font-size: 13px; font-weight: 700;
+    color: #F5F0EB; border-top: 2px solid #F5F0EB; margin-top: 6px;
+  }
+
+  /* ===== LIGHT DETAIL ===== */
+  .light-detail {
+    background: #FFF8F0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid #F0E8E0;
+    display: flex;
+  }
+  .light-detail .lm-menu { flex: 6; border-right: 1px solid #F0E8E0; }
+  .light-detail .lm-cart { flex: 4; background: #FFFFFF; padding: 12px; }
+  .light-detail .lm-banner {
+    background: linear-gradient(135deg, #FF6B35 0%, #E63E11 100%);
+    padding: 12px 16px; color: white;
+  }
+  .light-detail .lm-banner h3 { font-size: 15px; }
+  .light-detail .lm-banner-meta { font-size: 10px; opacity: 0.9; margin-top: 3px; display: flex; gap: 10px; }
+  .light-detail .lm-cats {
+    display: flex; background: #FFFFFF; border-bottom: 1px solid #F0E8E0;
+  }
+  .light-detail .lm-cat {
+    padding: 8px 12px; font-size: 10px; color: #7A7A7A;
+    border-bottom: 2px solid transparent;
+  }
+  .light-detail .lm-cat.active { color: #E63E11; border-bottom-color: #E63E11; }
+  .light-detail .lm-items { padding: 12px 16px; }
+  .light-detail .lm-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid #F0E8E0;
+  }
+  .light-detail .lm-item h5 { font-size: 11px; color: #2D2D2D; margin-bottom: 1px; }
+  .light-detail .lm-item p { font-size: 9px; color: #7A7A7A; }
+  .light-detail .lm-price { font-size: 11px; font-weight: 700; color: #E63E11; }
+  .light-detail .lm-add {
+    background: #E63E11; color: white; border: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    font-size: 13px; cursor: pointer; margin-left: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .light-detail .lm-cart-title { font-size: 13px; font-weight: 700; color: #2D2D2D; margin-bottom: 8px; }
+  .light-detail .lm-cart-item {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid #F0E8E0;
+    font-size: 11px; color: #2D2D2D;
+  }
+  .light-detail .lm-cart-qty {
+    background: #FFF0E8; color: #E63E11; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px; margin-right: 6px; font-size: 10px;
+  }
+  .light-detail .lm-cart-total {
+    display: flex; justify-content: space-between;
+    padding: 10px 0; font-size: 13px; font-weight: 700;
+    color: #2D2D2D; border-top: 2px solid #2D2D2D; margin-top: 6px;
+  }
+
+  /* ===== COLOR PALETTE TABLE ===== */
+  .palette-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 12px;
+  }
+  .palette-table th {
+    text-align: left; padding: 8px 12px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--muted); border-bottom: 2px solid var(--border);
+  }
+  .palette-table td {
+    padding: 6px 12px; border-bottom: 1px solid var(--border);
+  }
+  .swatch {
+    display: inline-block; width: 20px; height: 20px; border-radius: 4px;
+    vertical-align: middle; margin-right: 8px; border: 1px solid rgba(0,0,0,0.1);
+  }
+</style>
+
+<h2>Dark Mode Support</h2>
+<p class="subtitle">Side-by-side comparison of light and dark themes. System preference detection + manual toggle.</p>
+
+<!-- COLOR PALETTE COMPARISON -->
+<div class="section-label">Color Tokens</div>
+<table class="palette-table">
+  <tr>
+    <th>Token</th>
+    <th>Light</th>
+    <th>Dark</th>
+  </tr>
+  <tr>
+    <td>Primary</td>
+    <td><span class="swatch" style="background:#E63E11"></span>#E63E11</td>
+    <td><span class="swatch" style="background:#FF6B3A"></span>#FF6B3A</td>
+  </tr>
+  <tr>
+    <td>Secondary</td>
+    <td><span class="swatch" style="background:#FF8B5A"></span>#FF8B5A</td>
+    <td><span class="swatch" style="background:#FF9B6E"></span>#FF9B6E</td>
+  </tr>
+  <tr>
+    <td>Background</td>
+    <td><span class="swatch" style="background:#FFF8F0"></span>#FFF8F0</td>
+    <td><span class="swatch" style="background:#121212"></span>#121212</td>
+  </tr>
+  <tr>
+    <td>Surface</td>
+    <td><span class="swatch" style="background:#FFFFFF"></span>#FFFFFF</td>
+    <td><span class="swatch" style="background:#1E1E1E"></span>#1E1E1E</td>
+  </tr>
+  <tr>
+    <td>Text</td>
+    <td><span class="swatch" style="background:#2D2D2D"></span>#2D2D2D</td>
+    <td><span class="swatch" style="background:#F5F0EB"></span>#F5F0EB</td>
+  </tr>
+  <tr>
+    <td>Muted</td>
+    <td><span class="swatch" style="background:#7A7A7A"></span>#7A7A7A</td>
+    <td><span class="swatch" style="background:#8A8A8A"></span>#8A8A8A</td>
+  </tr>
+  <tr>
+    <td>Border</td>
+    <td><span class="swatch" style="background:#F0E8E0"></span>#F0E8E0</td>
+    <td><span class="swatch" style="background:#2A2A2A"></span>#2A2A2A</td>
+  </tr>
+  <tr>
+    <td>Success</td>
+    <td><span class="swatch" style="background:#2E7D32"></span>#2E7D32</td>
+    <td><span class="swatch" style="background:#4CAF50"></span>#4CAF50</td>
+  </tr>
+  <tr>
+    <td>Error</td>
+    <td><span class="swatch" style="background:#D32F2F"></span>#D32F2F</td>
+    <td><span class="swatch" style="background:#EF5350"></span>#EF5350</td>
+  </tr>
+</table>
+
+<hr class="screen-divider" />
+
+<!-- LANDING PAGE COMPARISON -->
+<div class="section-label">Landing Page</div>
+<div class="mode-comparison">
+  <div>
+    <div class="mode-label light">☀️ Light</div>
+    <div class="light-card">
+      <div class="l-header">
+        <div class="l-logo">bestellando</div>
+        <div class="l-nav">
+          <a>Restaurants</a>
+          <button class="btn-primary" style="font-size:10px;padding:5px 10px">Anmelden</button>
+        </div>
+      </div>
+      <div class="l-hero">
+        <div style="flex:1">
+          <h1>Hunger? Bestell dir was Gutes.</h1>
+          <p>Entdecke die besten Restaurants</p>
+          <div class="l-search">
+            <input placeholder="Deine Adresse..." />
+            <button>Suchen</button>
+          </div>
+        </div>
+      </div>
+      <div class="l-chips">
+        <div class="l-chip">🍕 Pizza</div>
+        <div class="l-chip">🍔 Burger</div>
+        <div class="l-chip">🍣 Sushi</div>
+        <div class="l-chip">🥙 Döner</div>
+      </div>
+      <div class="l-grid">
+        <div class="r-card">
+          <div class="r-img" style="background:#FFF0E8">🍕</div>
+          <div class="r-body"><h4>Pizza Napoli</h4><div class="r-meta"><span class="r-rating">★ 4.7</span><span>25 min</span></div></div>
+        </div>
+        <div class="r-card">
+          <div class="r-img" style="background:#E8F5E9">🍔</div>
+          <div class="r-body"><h4>Burger Meister</h4><div class="r-meta"><span class="r-rating">★ 4.5</span><span>20 min</span></div></div>
+        </div>
+        <div class="r-card">
+          <div class="r-img" style="background:#E3F2FD">🍣</div>
+          <div class="r-body"><h4>Sushi Garden</h4><div class="r-meta"><span class="r-rating">★ 4.9</span><span>30 min</span></div></div>
+        </div>
+      </div>
+      <div class="l-tabs">
+        <div class="l-tab active"><span class="l-tab-icon">🏠</span>Home</div>
+        <div class="l-tab"><span class="l-tab-icon">🔍</span>Suche</div>
+        <div class="l-tab"><span class="l-tab-icon">📋</span>Bestellungen</div>
+        <div class="l-tab"><span class="l-tab-icon">🛒</span>Warenkorb</div>
+        <div class="l-tab"><span class="l-tab-icon">👤</span>Profil</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="mode-label dark-label">🌙 Dark</div>
+    <div class="dark-card">
+      <div class="d-header">
+        <div class="d-logo">bestellando</div>
+        <div class="d-nav">
+          <a>Restaurants</a>
+          <button style="background:#FF6B3A;color:white;border:none;padding:5px 10px;border-radius:6px;font-size:10px;font-weight:600">Anmelden</button>
+        </div>
+      </div>
+      <div class="d-hero">
+        <div style="flex:1">
+          <h1>Hunger? Bestell dir was Gutes.</h1>
+          <p>Entdecke die besten Restaurants</p>
+          <div class="d-search">
+            <input placeholder="Deine Adresse..." />
+            <button>Suchen</button>
+          </div>
+        </div>
+      </div>
+      <div class="d-chips">
+        <div class="d-chip">🍕 Pizza</div>
+        <div class="d-chip">🍔 Burger</div>
+        <div class="d-chip">🍣 Sushi</div>
+        <div class="d-chip">🥙 Döner</div>
+      </div>
+      <div class="d-grid">
+        <div class="rd-card">
+          <div class="rd-img">🍕</div>
+          <div class="rd-body"><h4>Pizza Napoli</h4><div class="rd-meta"><span class="rd-rating">★ 4.7</span><span>25 min</span></div></div>
+        </div>
+        <div class="rd-card">
+          <div class="rd-img">🍔</div>
+          <div class="rd-body"><h4>Burger Meister</h4><div class="rd-meta"><span class="rd-rating">★ 4.5</span><span>20 min</span></div></div>
+        </div>
+        <div class="rd-card">
+          <div class="rd-img">🍣</div>
+          <div class="rd-body"><h4>Sushi Garden</h4><div class="rd-meta"><span class="rd-rating">★ 4.9</span><span>30 min</span></div></div>
+        </div>
+      </div>
+      <div class="d-tabs">
+        <div class="d-tab active"><span class="d-tab-icon">🏠</span>Home</div>
+        <div class="d-tab"><span class="d-tab-icon">🔍</span>Suche</div>
+        <div class="d-tab"><span class="d-tab-icon">📋</span>Bestellungen</div>
+        <div class="d-tab"><span class="d-tab-icon">🛒</span>Warenkorb</div>
+        <div class="d-tab"><span class="d-tab-icon">👤</span>Profil</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="screen-divider" />
+
+<!-- RESTAURANT DETAIL COMPARISON -->
+<div class="section-label">Restaurant Detail — Split View</div>
+<div class="mode-comparison">
+  <div>
+    <div class="mode-label light">☀️ Light</div>
+    <div class="light-detail">
+      <div class="lm-menu">
+        <div class="lm-banner">
+          <h3>Pizza Napoli</h3>
+          <div class="lm-banner-meta"><span>★ 4.7</span><span>25-35 min</span></div>
+        </div>
+        <div class="lm-cats">
+          <div class="lm-cat active">Beliebt</div>
+          <div class="lm-cat">Pizza</div>
+          <div class="lm-cat">Pasta</div>
+          <div class="lm-cat">Desserts</div>
+        </div>
+        <div class="lm-items">
+          <div class="lm-item">
+            <div><h5>Margherita</h5><p>Tomatensoße, Mozzarella</p></div>
+            <div style="display:flex;align-items:center"><span class="lm-price">8,50 €</span><button class="lm-add">+</button></div>
+          </div>
+          <div class="lm-item">
+            <div><h5>Diavola</h5><p>Scharfe Salami</p></div>
+            <div style="display:flex;align-items:center"><span class="lm-price">10,50 €</span><button class="lm-add">+</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="lm-cart">
+        <div class="lm-cart-title">🛒 Warenkorb</div>
+        <div class="lm-cart-item"><div><span class="lm-cart-qty">2x</span>Margherita</div><div style="font-weight:600">17,00 €</div></div>
+        <div class="lm-cart-item"><div><span class="lm-cart-qty">1x</span>Diavola</div><div style="font-weight:600">10,50 €</div></div>
+        <div class="lm-cart-total"><span>Gesamt</span><span>27,50 €</span></div>
+        <button class="btn-primary" style="width:100%;margin-top:8px;font-size:11px">Zur Kasse →</button>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="mode-label dark-label">🌙 Dark</div>
+    <div class="dark-detail">
+      <div class="dm-menu">
+        <div class="dm-banner">
+          <h3>Pizza Napoli</h3>
+          <div class="dm-banner-meta"><span>★ 4.7</span><span>25-35 min</span></div>
+        </div>
+        <div class="dm-cats">
+          <div class="dm-cat active">Beliebt</div>
+          <div class="dm-cat">Pizza</div>
+          <div class="dm-cat">Pasta</div>
+          <div class="dm-cat">Desserts</div>
+        </div>
+        <div class="dm-items">
+          <div class="dm-item">
+            <div><h5>Margherita</h5><p>Tomatensoße, Mozzarella</p></div>
+            <div style="display:flex;align-items:center"><span class="dm-price">8,50 €</span><button class="dm-add">+</button></div>
+          </div>
+          <div class="dm-item">
+            <div><h5>Diavola</h5><p>Scharfe Salami</p></div>
+            <div style="display:flex;align-items:center"><span class="dm-price">10,50 €</span><button class="dm-add">+</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="dm-cart">
+        <div class="dm-cart-title">🛒 Warenkorb</div>
+        <div class="dm-cart-item"><div><span class="dm-cart-qty">2x</span>Margherita</div><div style="font-weight:600">17,00 €</div></div>
+        <div class="dm-cart-item"><div><span class="dm-cart-qty">1x</span>Diavola</div><div style="font-weight:600">10,50 €</div></div>
+        <div class="dm-cart-total"><span>Gesamt</span><span>27,50 €</span></div>
+        <button style="width:100%;margin-top:8px;font-size:11px;background:#FF6B3A;color:white;border:none;padding:8px;border-radius:6px;font-weight:600">Zur Kasse →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="screen-divider" />
+
+<div class="section-label">Implementation</div>
+<div style="background:var(--surface);border-radius:var(--radius);padding:16px;border:1px solid var(--border);font-size:13px;line-height:1.6">
+  <strong>Theme switching:</strong>
+  <ul style="margin-top:6px;padding-left:20px;color:var(--dark)">
+    <li>CSS custom properties on <code>:root</code> (light) and <code>[data-theme="dark"]</code></li>
+    <li>Tailwind CSS <code>dark:</code> variant with <code>class</code> strategy</li>
+    <li>Respects <code>prefers-color-scheme</code> on first visit</li>
+    <li>Manual toggle in profile and header — persisted in localStorage</li>
+    <li>Existing <code>@repo/contexts/ThemeProvider</code> + <code>@repo/hooks/useTheme</code> already in place — extend them</li>
+    <li>Primary color shifts from <code>#E63E11</code> → <code>#FF6B3A</code> in dark mode for WCAG contrast compliance</li>
+  </ul>
+</div>

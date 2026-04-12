@@ -108,7 +108,7 @@ export class AccessInterceptor implements NestInterceptor {
     this.clsService.set(CLS_ID, crypto.randomUUID());
 
     if (request.method === "POST") {
-      response.status(200);
+      response.status(201);
     }
 
     return next.handle().pipe(

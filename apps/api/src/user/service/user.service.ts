@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { ActorContextService } from "../../auth/service/actor-context.service";
 import { UserType } from "../interface/user.interface";
 import sdk, { Account, Client, Teams, Users } from "node-appwrite";
@@ -72,13 +72,21 @@ export class UserService {
     return "CUSTOMER";
   }
 
-  public async registerUser(data: RegisterDTO): Promise<void> {
-    const user = await this.users.create({
-      userId: sdk.ID.unique(),
-      name: `${data.firstName} ${data.lastName}`,
-      email: data.email,
-      password: data.password,
-    })
+  public async registerUser(data: RegisterDTO) {
+    let user;
+    try {
+      user = await this.users.create({
+        userId: sdk.ID.unique(),
+        name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        password: data.password,
+      });
+    } catch (error: any) {
+      if (error?.type === "user_already_exists") {
+        throw new BadRequestException("Ein Benutzer mit dieser E-Mail existiert bereits.");
+      }
+      throw error;
+    }
 
     const jwt = await this.users.createJWT({ userId: user.$id });
 
@@ -91,5 +99,7 @@ export class UserService {
         client: this.appwriteService.createUserClient(jwt.jwt),
       },
     })
+
+    return { success: true };
   };
 }

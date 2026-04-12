@@ -16,7 +16,7 @@ export function useDeliverySocket({
 
   useEffect(() => {
     if (!socket) return;
-    socket.emit("subscribe:delivery", { orderId });
+    socket.emit("subscribe:delivery-tracking", { orderId });
 
     return () => {
       socket.emit("unsubscribe:delivery", { orderId });

@@ -15,5 +15,17 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@nestjs/platform-socket.io": "^11.1.18",
+    "@nestjs/schedule": "^6.1.1",
+    "@nestjs/websockets": "^11.1.18",
+    "@types/leaflet": "^1.9.21",
+    "leaflet": "^1.9.4",
+    "react-leaflet": "^5.0.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "stripe": "^22.0.1",
+    "zustand": "^5.0.12"
   }
 }

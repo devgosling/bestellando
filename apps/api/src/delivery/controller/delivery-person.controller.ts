@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { DeliveryPersonService } from "../service/delivery-person.service";
 import { RequireUserType } from "../../auth/decorator/user-type.decorator";
+import { Public } from "../../auth/decorator/public.decorator";
 
 @Controller({
   version: "1",
@@ -17,8 +18,8 @@ export class DeliveryPersonController {
     private readonly deliveryPersonService: DeliveryPersonService,
   ) {}
 
+  @Public()
   @Post("register")
-  @RequireUserType(["DELIVERY_PERSON"])
   async register(
     @Body() body: { name: string; phone: string; vehicleType: string },
   ) {

@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body } from "@nestjs/common";
 import { type RegisterDTO } from "@repo/interfaces";
 import { UserService } from "../service/user.service";
+import { Public } from "../../auth/decorator/public.decorator";
 
 @Controller({
   path: "user",
@@ -16,6 +17,7 @@ export class UserController {
     };
   }
 
+  @Public()
   @Post("register")
   public async registerUser(@Body() body: RegisterDTO) {
     return this.userService.registerUser(body);

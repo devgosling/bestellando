@@ -1,0 +1,28 @@
+<h2>Checkout & order tracking — how should the payment flow feel?</h2>
+<p class="subtitle">From cart to confirmed order. This is where trust and clarity matter most.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Single-Page Checkout</h3>
+      <p>Everything on one page: delivery address (with saved addresses dropdown), order summary, delivery time estimate, payment button. Stripe redirects externally for payment, then returns to a confirmation page with order timeline tracker. Simple, fast, minimal clicks.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Multi-Step Wizard</h3>
+      <p>Step 1: Confirm address → Step 2: Review order & add notes → Step 3: Payment. Progress bar at top. Each step is focused and uncluttered. After payment: animated confirmation with confetti, then live order timeline with status updates. More guided but more clicks.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Bottom Sheet Checkout (Mobile-First)</h3>
+      <p>Checkout slides up as a bottom sheet over the restaurant page. Address, summary, and pay button in a compact scrollable sheet. On desktop it becomes a modal/drawer. After payment: order tracking page with real-time status bar, map with driver location, and ETA countdown. Feels seamless — never leaves the browsing context.</p>
+    </div>
+  </div>
+</div>

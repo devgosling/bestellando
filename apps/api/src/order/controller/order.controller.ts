@@ -46,11 +46,13 @@ export class OrderController {
 
   @Get(":id/items")
   async getItems(@Param("id") id: string) {
-    return this.orderService.getOrderItems(id);
+    const result = await this.orderService.getOrderItems(id);
+    return { data: result.rows, total: result.total };
   }
 
   @Get(":id/history")
   async getHistory(@Param("id") id: string) {
-    return this.orderService.getStatusHistory(id);
+    const result = await this.orderService.getStatusHistory(id);
+    return { data: result.rows, total: result.total };
   }
 }

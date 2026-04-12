@@ -1,0 +1,28 @@
+<h2>Restaurant detail page — how should the menu be presented?</h2>
+<p class="subtitle">Users land here after tapping a restaurant. This page needs to sell the food and make ordering easy.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Hero Image + Scrollable Menu Sections</h3>
+      <p>Large restaurant hero image at top with name, rating, delivery time, minimum order overlaid. Below: sticky category tabs (Vorspeisen, Hauptgerichte, Desserts...) that scroll horizontally. Menu items as cards with photo, name, description, price. Tap to open detail modal with quantity picker and special instructions. Floating cart summary bar at bottom.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Compact Header + List View Menu</h3>
+      <p>Small restaurant info bar (logo, name, rating, delivery info) that collapses on scroll. Menu as a clean list — item name on left, price on right, small thumbnail optional. Category headers as section dividers. Quick "+" button to add items directly without opening a modal. Sidebar cart on desktop, bottom sheet on mobile. Efficient, less visual.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Split View (Desktop) / Stacked (Mobile)</h3>
+      <p>Desktop: menu on left (60%), live cart on right (40%) — always visible side by side. Mobile: full-width stacked menu with sticky bottom cart bar. Restaurant info as a collapsible banner. Category navigation as a vertical sidebar on desktop, horizontal chips on mobile. Best of both worlds but more complex.</p>
+    </div>
+  </div>
+</div>

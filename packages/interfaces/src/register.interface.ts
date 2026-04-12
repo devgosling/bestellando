@@ -6,5 +6,5 @@ export interface RegisterDTO {
    email: string;
    password: string;
    
-   address: Partial<AddressEntity>; 
+   address?: Partial<AddressEntity>;
 }

@@ -28,7 +28,7 @@ export class AddressService {
     this.users = new Users(this.appwriteService.getSDKClient());
   }
 
-  public async createAddress(type: AddressOwnerType, addressData: Partial<AddressEntity>): Promise<void> {
+  public async createAddress(type: AddressOwnerType, addressData: Partial<AddressEntity>) {
     const actorContext = this.actorContextService.get();
 
     const address = await this.dataBase.createRow({
@@ -63,6 +63,8 @@ export class AddressService {
         }
       })
     }
+
+    return address;
   }
 
   public async getMyAddresses(userId: string): Promise<AddressEntity[]> {
@@ -103,15 +105,16 @@ export class AddressService {
     return updated as unknown as AddressEntity;
   }
 
-  public async deleteAddress(id: string): Promise<void> {
+  public async deleteAddress(id: string) {
     await this.dataBase.deleteRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
       tableId: "address",
       rowId: id,
     });
+    return { success: true };
   }
 
-  public async setDefault(addressId: string, userId: string): Promise<void> {
+  public async setDefault(addressId: string, userId: string) {
     const addresses = await this.getMyAddresses(userId);
 
     const updates = addresses
@@ -132,5 +135,6 @@ export class AddressService {
       rowId: addressId,
       data: { isDefault: true },
     });
+    return { success: true };
   }
 }
