@@ -8,6 +8,7 @@ import type { Models } from "appwrite";
 import type { ThemeContextType } from "@repo/contexts";
 import Header from "../kit/header";
 import Footer from "../kit/footer";
+import BottomTabBar from "../components/shared/BottomTabBar";
 
 export interface UserContext {
   appwriteUser: Models.User;
@@ -24,7 +25,10 @@ const RootLayout = () => {
   return (
     <>
       {staticData?.showHeader && <Header />}
-      <Outlet />
+      <main className="flex-1 pb-14 lg:pb-0">
+        <Outlet />
+      </main>
+      <BottomTabBar />
       {staticData?.showFooter && <Footer />}
     </>
   );
