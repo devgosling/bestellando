@@ -15,6 +15,7 @@ import { LoadingSkeleton } from "../../../components/shared/LoadingSkeleton";
 import { PriceDisplay } from "../../../components/shared/PriceDisplay";
 import { OrderStatusBadge } from "../../../components/order/OrderStatusBadge";
 import { OrderTimeline } from "../../../components/order/OrderTimeline";
+import { DeliveryMap } from "../../../components/order/DeliveryMap";
 
 interface CheckoutSessionResponse {
   sessionUrl: string;
@@ -178,6 +179,33 @@ function OrderDetailPage() {
           />
         </CardBody>
       </Card>
+
+      {/* Live delivery tracking map */}
+      {order.deliveryPersonId &&
+        (order.currentStatus === "PICKED_UP" ||
+          order.currentStatus === "DELIVERED") &&
+        order.restaurant?.address?.coordinates &&
+        order.deliveryAddress?.coordinates && (
+          <Card className="mb-4">
+            <CardHeader>
+              <h2 className="text-lg font-semibold">Live-Tracking</h2>
+            </CardHeader>
+            <CardBody>
+              <DeliveryMap
+                orderId={orderId}
+                restaurantPosition={[
+                  order.restaurant.address.coordinates.coordinates[1],
+                  order.restaurant.address.coordinates.coordinates[0],
+                ]}
+                customerPosition={[
+                  order.deliveryAddress.coordinates.coordinates[1],
+                  order.deliveryAddress.coordinates.coordinates[0],
+                ]}
+                restaurantName={order.restaurant.name}
+              />
+            </CardBody>
+          </Card>
+        )}
 
       {/* Retry payment for PENDING orders */}
       {order.currentStatus === "PENDING" &&

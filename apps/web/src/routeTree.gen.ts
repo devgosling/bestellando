@@ -11,19 +11,28 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as protectedRestaurantRouteRouteImport } from './routes/(protected-restaurant)/route'
+import { Route as protectedDeliveryRouteRouteImport } from './routes/(protected-delivery)/route'
 import { Route as protectedCustomerRouteRouteImport } from './routes/(protected-customer)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as protectedRestaurantManageRestaurantRouteImport } from './routes/(protected-restaurant)/manage-restaurant'
 import { Route as protectedCustomerCheckoutRouteImport } from './routes/(protected-customer)/checkout'
 import { Route as protectedCustomerCartRouteImport } from './routes/(protected-customer)/cart'
+import { Route as protectedRestaurantDashboardRouteRouteImport } from './routes/(protected-restaurant)/dashboard/route'
+import { Route as protectedRestaurantDashboardIndexRouteImport } from './routes/(protected-restaurant)/dashboard/index'
+import { Route as protectedDeliveryDeliveriesIndexRouteImport } from './routes/(protected-delivery)/deliveries/index'
 import { Route as protectedCustomerRestaurantsIndexRouteImport } from './routes/(protected-customer)/restaurants/index'
 import { Route as protectedCustomerProfileIndexRouteImport } from './routes/(protected-customer)/profile/index'
 import { Route as protectedCustomerOrdersIndexRouteImport } from './routes/(protected-customer)/orders/index'
 import { Route as AuthRegisterUserRouteImport } from './routes/auth/register/user'
 import { Route as AuthRegisterRestaurantRouteImport } from './routes/auth/register/restaurant'
+import { Route as AuthRegisterDeliveryRouteImport } from './routes/auth/register/delivery'
+import { Route as protectedDeliveryDeliveriesDeliveryIdRouteImport } from './routes/(protected-delivery)/deliveries/$deliveryId'
 import { Route as protectedCustomerRestaurantsRestaurantIdRouteImport } from './routes/(protected-customer)/restaurants/$restaurantId'
 import { Route as protectedCustomerOrdersOrderIdRouteImport } from './routes/(protected-customer)/orders/$orderId'
+import { Route as protectedRestaurantDashboardSettingsIndexRouteImport } from './routes/(protected-restaurant)/dashboard/settings/index'
+import { Route as protectedRestaurantDashboardOrdersIndexRouteImport } from './routes/(protected-restaurant)/dashboard/orders/index'
+import { Route as protectedRestaurantDashboardOpeningHoursIndexRouteImport } from './routes/(protected-restaurant)/dashboard/opening-hours/index'
+import { Route as protectedRestaurantDashboardMenuIndexRouteImport } from './routes/(protected-restaurant)/dashboard/menu/index'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
@@ -35,6 +44,10 @@ const protectedRestaurantRouteRoute =
     id: '/(protected-restaurant)',
     getParentRoute: () => rootRouteImport,
   } as any)
+const protectedDeliveryRouteRoute = protectedDeliveryRouteRouteImport.update({
+  id: '/(protected-delivery)',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const protectedCustomerRouteRoute = protectedCustomerRouteRouteImport.update({
   id: '/(protected-customer)',
   getParentRoute: () => rootRouteImport,
@@ -49,12 +62,6 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const protectedRestaurantManageRestaurantRoute =
-  protectedRestaurantManageRestaurantRouteImport.update({
-    id: '/manage-restaurant',
-    path: '/manage-restaurant',
-    getParentRoute: () => protectedRestaurantRouteRoute,
-  } as any)
 const protectedCustomerCheckoutRoute =
   protectedCustomerCheckoutRouteImport.update({
     id: '/checkout',
@@ -66,6 +73,24 @@ const protectedCustomerCartRoute = protectedCustomerCartRouteImport.update({
   path: '/cart',
   getParentRoute: () => protectedCustomerRouteRoute,
 } as any)
+const protectedRestaurantDashboardRouteRoute =
+  protectedRestaurantDashboardRouteRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => protectedRestaurantRouteRoute,
+  } as any)
+const protectedRestaurantDashboardIndexRoute =
+  protectedRestaurantDashboardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => protectedRestaurantDashboardRouteRoute,
+  } as any)
+const protectedDeliveryDeliveriesIndexRoute =
+  protectedDeliveryDeliveriesIndexRouteImport.update({
+    id: '/deliveries/',
+    path: '/deliveries/',
+    getParentRoute: () => protectedDeliveryRouteRoute,
+  } as any)
 const protectedCustomerRestaurantsIndexRoute =
   protectedCustomerRestaurantsIndexRouteImport.update({
     id: '/restaurants/',
@@ -94,6 +119,17 @@ const AuthRegisterRestaurantRoute = AuthRegisterRestaurantRouteImport.update({
   path: '/register/restaurant',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthRegisterDeliveryRoute = AuthRegisterDeliveryRouteImport.update({
+  id: '/register/delivery',
+  path: '/register/delivery',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+const protectedDeliveryDeliveriesDeliveryIdRoute =
+  protectedDeliveryDeliveriesDeliveryIdRouteImport.update({
+    id: '/deliveries/$deliveryId',
+    path: '/deliveries/$deliveryId',
+    getParentRoute: () => protectedDeliveryRouteRoute,
+  } as any)
 const protectedCustomerRestaurantsRestaurantIdRoute =
   protectedCustomerRestaurantsRestaurantIdRouteImport.update({
     id: '/restaurants/$restaurantId',
@@ -106,108 +142,181 @@ const protectedCustomerOrdersOrderIdRoute =
     path: '/orders/$orderId',
     getParentRoute: () => protectedCustomerRouteRoute,
   } as any)
+const protectedRestaurantDashboardSettingsIndexRoute =
+  protectedRestaurantDashboardSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => protectedRestaurantDashboardRouteRoute,
+  } as any)
+const protectedRestaurantDashboardOrdersIndexRoute =
+  protectedRestaurantDashboardOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => protectedRestaurantDashboardRouteRoute,
+  } as any)
+const protectedRestaurantDashboardOpeningHoursIndexRoute =
+  protectedRestaurantDashboardOpeningHoursIndexRouteImport.update({
+    id: '/opening-hours/',
+    path: '/opening-hours/',
+    getParentRoute: () => protectedRestaurantDashboardRouteRoute,
+  } as any)
+const protectedRestaurantDashboardMenuIndexRoute =
+  protectedRestaurantDashboardMenuIndexRouteImport.update({
+    id: '/menu/',
+    path: '/menu/',
+    getParentRoute: () => protectedRestaurantDashboardRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/dashboard': typeof protectedRestaurantDashboardRouteRouteWithChildren
   '/cart': typeof protectedCustomerCartRoute
   '/checkout': typeof protectedCustomerCheckoutRoute
-  '/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
   '/orders/$orderId': typeof protectedCustomerOrdersOrderIdRoute
   '/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
+  '/deliveries/$deliveryId': typeof protectedDeliveryDeliveriesDeliveryIdRoute
+  '/auth/register/delivery': typeof AuthRegisterDeliveryRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
   '/orders/': typeof protectedCustomerOrdersIndexRoute
   '/profile/': typeof protectedCustomerProfileIndexRoute
   '/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
+  '/deliveries/': typeof protectedDeliveryDeliveriesIndexRoute
+  '/dashboard/': typeof protectedRestaurantDashboardIndexRoute
+  '/dashboard/menu/': typeof protectedRestaurantDashboardMenuIndexRoute
+  '/dashboard/opening-hours/': typeof protectedRestaurantDashboardOpeningHoursIndexRoute
+  '/dashboard/orders/': typeof protectedRestaurantDashboardOrdersIndexRoute
+  '/dashboard/settings/': typeof protectedRestaurantDashboardSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/cart': typeof protectedCustomerCartRoute
   '/checkout': typeof protectedCustomerCheckoutRoute
-  '/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
   '/orders/$orderId': typeof protectedCustomerOrdersOrderIdRoute
   '/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
+  '/deliveries/$deliveryId': typeof protectedDeliveryDeliveriesDeliveryIdRoute
+  '/auth/register/delivery': typeof AuthRegisterDeliveryRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
   '/orders': typeof protectedCustomerOrdersIndexRoute
   '/profile': typeof protectedCustomerProfileIndexRoute
   '/restaurants': typeof protectedCustomerRestaurantsIndexRoute
+  '/deliveries': typeof protectedDeliveryDeliveriesIndexRoute
+  '/dashboard': typeof protectedRestaurantDashboardIndexRoute
+  '/dashboard/menu': typeof protectedRestaurantDashboardMenuIndexRoute
+  '/dashboard/opening-hours': typeof protectedRestaurantDashboardOpeningHoursIndexRoute
+  '/dashboard/orders': typeof protectedRestaurantDashboardOrdersIndexRoute
+  '/dashboard/settings': typeof protectedRestaurantDashboardSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/(protected-customer)': typeof protectedCustomerRouteRouteWithChildren
+  '/(protected-delivery)': typeof protectedDeliveryRouteRouteWithChildren
   '/(protected-restaurant)': typeof protectedRestaurantRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(protected-restaurant)/dashboard': typeof protectedRestaurantDashboardRouteRouteWithChildren
   '/(protected-customer)/cart': typeof protectedCustomerCartRoute
   '/(protected-customer)/checkout': typeof protectedCustomerCheckoutRoute
-  '/(protected-restaurant)/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
   '/(protected-customer)/orders/$orderId': typeof protectedCustomerOrdersOrderIdRoute
   '/(protected-customer)/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
+  '/(protected-delivery)/deliveries/$deliveryId': typeof protectedDeliveryDeliveriesDeliveryIdRoute
+  '/auth/register/delivery': typeof AuthRegisterDeliveryRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
   '/(protected-customer)/orders/': typeof protectedCustomerOrdersIndexRoute
   '/(protected-customer)/profile/': typeof protectedCustomerProfileIndexRoute
   '/(protected-customer)/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
+  '/(protected-delivery)/deliveries/': typeof protectedDeliveryDeliveriesIndexRoute
+  '/(protected-restaurant)/dashboard/': typeof protectedRestaurantDashboardIndexRoute
+  '/(protected-restaurant)/dashboard/menu/': typeof protectedRestaurantDashboardMenuIndexRoute
+  '/(protected-restaurant)/dashboard/opening-hours/': typeof protectedRestaurantDashboardOpeningHoursIndexRoute
+  '/(protected-restaurant)/dashboard/orders/': typeof protectedRestaurantDashboardOrdersIndexRoute
+  '/(protected-restaurant)/dashboard/settings/': typeof protectedRestaurantDashboardSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/dashboard'
     | '/cart'
     | '/checkout'
-    | '/manage-restaurant'
     | '/auth/login'
     | '/orders/$orderId'
     | '/restaurants/$restaurantId'
+    | '/deliveries/$deliveryId'
+    | '/auth/register/delivery'
     | '/auth/register/restaurant'
     | '/auth/register/user'
     | '/orders/'
     | '/profile/'
     | '/restaurants/'
+    | '/deliveries/'
+    | '/dashboard/'
+    | '/dashboard/menu/'
+    | '/dashboard/opening-hours/'
+    | '/dashboard/orders/'
+    | '/dashboard/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/cart'
     | '/checkout'
-    | '/manage-restaurant'
     | '/auth/login'
     | '/orders/$orderId'
     | '/restaurants/$restaurantId'
+    | '/deliveries/$deliveryId'
+    | '/auth/register/delivery'
     | '/auth/register/restaurant'
     | '/auth/register/user'
     | '/orders'
     | '/profile'
     | '/restaurants'
+    | '/deliveries'
+    | '/dashboard'
+    | '/dashboard/menu'
+    | '/dashboard/opening-hours'
+    | '/dashboard/orders'
+    | '/dashboard/settings'
   id:
     | '__root__'
     | '/'
     | '/(protected-customer)'
+    | '/(protected-delivery)'
     | '/(protected-restaurant)'
     | '/auth'
+    | '/(protected-restaurant)/dashboard'
     | '/(protected-customer)/cart'
     | '/(protected-customer)/checkout'
-    | '/(protected-restaurant)/manage-restaurant'
     | '/auth/login'
     | '/(protected-customer)/orders/$orderId'
     | '/(protected-customer)/restaurants/$restaurantId'
+    | '/(protected-delivery)/deliveries/$deliveryId'
+    | '/auth/register/delivery'
     | '/auth/register/restaurant'
     | '/auth/register/user'
     | '/(protected-customer)/orders/'
     | '/(protected-customer)/profile/'
     | '/(protected-customer)/restaurants/'
+    | '/(protected-delivery)/deliveries/'
+    | '/(protected-restaurant)/dashboard/'
+    | '/(protected-restaurant)/dashboard/menu/'
+    | '/(protected-restaurant)/dashboard/opening-hours/'
+    | '/(protected-restaurant)/dashboard/orders/'
+    | '/(protected-restaurant)/dashboard/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   protectedCustomerRouteRoute: typeof protectedCustomerRouteRouteWithChildren
+  protectedDeliveryRouteRoute: typeof protectedDeliveryRouteRouteWithChildren
   protectedRestaurantRouteRoute: typeof protectedRestaurantRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
 }
@@ -226,6 +335,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof protectedRestaurantRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(protected-delivery)': {
+      id: '/(protected-delivery)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof protectedDeliveryRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(protected-customer)': {
@@ -249,13 +365,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/(protected-restaurant)/manage-restaurant': {
-      id: '/(protected-restaurant)/manage-restaurant'
-      path: '/manage-restaurant'
-      fullPath: '/manage-restaurant'
-      preLoaderRoute: typeof protectedRestaurantManageRestaurantRouteImport
-      parentRoute: typeof protectedRestaurantRouteRoute
-    }
     '/(protected-customer)/checkout': {
       id: '/(protected-customer)/checkout'
       path: '/checkout'
@@ -269,6 +378,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/cart'
       preLoaderRoute: typeof protectedCustomerCartRouteImport
       parentRoute: typeof protectedCustomerRouteRoute
+    }
+    '/(protected-restaurant)/dashboard': {
+      id: '/(protected-restaurant)/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof protectedRestaurantDashboardRouteRouteImport
+      parentRoute: typeof protectedRestaurantRouteRoute
+    }
+    '/(protected-restaurant)/dashboard/': {
+      id: '/(protected-restaurant)/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof protectedRestaurantDashboardIndexRouteImport
+      parentRoute: typeof protectedRestaurantDashboardRouteRoute
+    }
+    '/(protected-delivery)/deliveries/': {
+      id: '/(protected-delivery)/deliveries/'
+      path: '/deliveries'
+      fullPath: '/deliveries/'
+      preLoaderRoute: typeof protectedDeliveryDeliveriesIndexRouteImport
+      parentRoute: typeof protectedDeliveryRouteRoute
     }
     '/(protected-customer)/restaurants/': {
       id: '/(protected-customer)/restaurants/'
@@ -305,6 +435,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterRestaurantRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/auth/register/delivery': {
+      id: '/auth/register/delivery'
+      path: '/register/delivery'
+      fullPath: '/auth/register/delivery'
+      preLoaderRoute: typeof AuthRegisterDeliveryRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
+    '/(protected-delivery)/deliveries/$deliveryId': {
+      id: '/(protected-delivery)/deliveries/$deliveryId'
+      path: '/deliveries/$deliveryId'
+      fullPath: '/deliveries/$deliveryId'
+      preLoaderRoute: typeof protectedDeliveryDeliveriesDeliveryIdRouteImport
+      parentRoute: typeof protectedDeliveryRouteRoute
+    }
     '/(protected-customer)/restaurants/$restaurantId': {
       id: '/(protected-customer)/restaurants/$restaurantId'
       path: '/restaurants/$restaurantId'
@@ -318,6 +462,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/orders/$orderId'
       preLoaderRoute: typeof protectedCustomerOrdersOrderIdRouteImport
       parentRoute: typeof protectedCustomerRouteRoute
+    }
+    '/(protected-restaurant)/dashboard/settings/': {
+      id: '/(protected-restaurant)/dashboard/settings/'
+      path: '/settings'
+      fullPath: '/dashboard/settings/'
+      preLoaderRoute: typeof protectedRestaurantDashboardSettingsIndexRouteImport
+      parentRoute: typeof protectedRestaurantDashboardRouteRoute
+    }
+    '/(protected-restaurant)/dashboard/orders/': {
+      id: '/(protected-restaurant)/dashboard/orders/'
+      path: '/orders'
+      fullPath: '/dashboard/orders/'
+      preLoaderRoute: typeof protectedRestaurantDashboardOrdersIndexRouteImport
+      parentRoute: typeof protectedRestaurantDashboardRouteRoute
+    }
+    '/(protected-restaurant)/dashboard/opening-hours/': {
+      id: '/(protected-restaurant)/dashboard/opening-hours/'
+      path: '/opening-hours'
+      fullPath: '/dashboard/opening-hours/'
+      preLoaderRoute: typeof protectedRestaurantDashboardOpeningHoursIndexRouteImport
+      parentRoute: typeof protectedRestaurantDashboardRouteRoute
+    }
+    '/(protected-restaurant)/dashboard/menu/': {
+      id: '/(protected-restaurant)/dashboard/menu/'
+      path: '/menu'
+      fullPath: '/dashboard/menu/'
+      preLoaderRoute: typeof protectedRestaurantDashboardMenuIndexRouteImport
+      parentRoute: typeof protectedRestaurantDashboardRouteRoute
     }
   }
 }
@@ -350,14 +522,59 @@ const protectedCustomerRouteRouteWithChildren =
     protectedCustomerRouteRouteChildren,
   )
 
+interface protectedDeliveryRouteRouteChildren {
+  protectedDeliveryDeliveriesDeliveryIdRoute: typeof protectedDeliveryDeliveriesDeliveryIdRoute
+  protectedDeliveryDeliveriesIndexRoute: typeof protectedDeliveryDeliveriesIndexRoute
+}
+
+const protectedDeliveryRouteRouteChildren: protectedDeliveryRouteRouteChildren =
+  {
+    protectedDeliveryDeliveriesDeliveryIdRoute:
+      protectedDeliveryDeliveriesDeliveryIdRoute,
+    protectedDeliveryDeliveriesIndexRoute:
+      protectedDeliveryDeliveriesIndexRoute,
+  }
+
+const protectedDeliveryRouteRouteWithChildren =
+  protectedDeliveryRouteRoute._addFileChildren(
+    protectedDeliveryRouteRouteChildren,
+  )
+
+interface protectedRestaurantDashboardRouteRouteChildren {
+  protectedRestaurantDashboardIndexRoute: typeof protectedRestaurantDashboardIndexRoute
+  protectedRestaurantDashboardMenuIndexRoute: typeof protectedRestaurantDashboardMenuIndexRoute
+  protectedRestaurantDashboardOpeningHoursIndexRoute: typeof protectedRestaurantDashboardOpeningHoursIndexRoute
+  protectedRestaurantDashboardOrdersIndexRoute: typeof protectedRestaurantDashboardOrdersIndexRoute
+  protectedRestaurantDashboardSettingsIndexRoute: typeof protectedRestaurantDashboardSettingsIndexRoute
+}
+
+const protectedRestaurantDashboardRouteRouteChildren: protectedRestaurantDashboardRouteRouteChildren =
+  {
+    protectedRestaurantDashboardIndexRoute:
+      protectedRestaurantDashboardIndexRoute,
+    protectedRestaurantDashboardMenuIndexRoute:
+      protectedRestaurantDashboardMenuIndexRoute,
+    protectedRestaurantDashboardOpeningHoursIndexRoute:
+      protectedRestaurantDashboardOpeningHoursIndexRoute,
+    protectedRestaurantDashboardOrdersIndexRoute:
+      protectedRestaurantDashboardOrdersIndexRoute,
+    protectedRestaurantDashboardSettingsIndexRoute:
+      protectedRestaurantDashboardSettingsIndexRoute,
+  }
+
+const protectedRestaurantDashboardRouteRouteWithChildren =
+  protectedRestaurantDashboardRouteRoute._addFileChildren(
+    protectedRestaurantDashboardRouteRouteChildren,
+  )
+
 interface protectedRestaurantRouteRouteChildren {
-  protectedRestaurantManageRestaurantRoute: typeof protectedRestaurantManageRestaurantRoute
+  protectedRestaurantDashboardRouteRoute: typeof protectedRestaurantDashboardRouteRouteWithChildren
 }
 
 const protectedRestaurantRouteRouteChildren: protectedRestaurantRouteRouteChildren =
   {
-    protectedRestaurantManageRestaurantRoute:
-      protectedRestaurantManageRestaurantRoute,
+    protectedRestaurantDashboardRouteRoute:
+      protectedRestaurantDashboardRouteRouteWithChildren,
   }
 
 const protectedRestaurantRouteRouteWithChildren =
@@ -367,12 +584,14 @@ const protectedRestaurantRouteRouteWithChildren =
 
 interface AuthRouteRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterDeliveryRoute: typeof AuthRegisterDeliveryRoute
   AuthRegisterRestaurantRoute: typeof AuthRegisterRestaurantRoute
   AuthRegisterUserRoute: typeof AuthRegisterUserRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterDeliveryRoute: AuthRegisterDeliveryRoute,
   AuthRegisterRestaurantRoute: AuthRegisterRestaurantRoute,
   AuthRegisterUserRoute: AuthRegisterUserRoute,
 }
@@ -384,6 +603,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   protectedCustomerRouteRoute: protectedCustomerRouteRouteWithChildren,
+  protectedDeliveryRouteRoute: protectedDeliveryRouteRouteWithChildren,
   protectedRestaurantRouteRoute: protectedRestaurantRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
 }
