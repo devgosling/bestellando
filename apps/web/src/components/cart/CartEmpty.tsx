@@ -10,10 +10,10 @@ export function CartEmpty() {
     <EmptyState
       icon={<ShoppingCart className="size-12" />}
       title="Dein Warenkorb ist leer"
-      description="Entdecke unsere Restaurants und fuege leckere Gerichte hinzu."
+      description="Füge Gerichte von einem Restaurant hinzu."
       action={
         <Button
-          color="primary"
+          className="bg-accent text-accent-foreground"
           onPress={() => navigate({ to: "/restaurants" })}
         >
           Restaurants entdecken

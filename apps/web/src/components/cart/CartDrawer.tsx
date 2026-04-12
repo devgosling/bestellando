@@ -20,7 +20,6 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             className="fixed inset-0 z-40 bg-black/40"
             initial={{ opacity: 0 }}
@@ -28,8 +27,6 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
-
-          {/* Drawer */}
           <motion.aside
             className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-background shadow-xl"
             initial={{ x: "100%" }}
@@ -37,17 +34,18 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-divider px-4 py-3">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <div>
-                <h2 className="text-lg font-semibold">Warenkorb</h2>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Warenkorb
+                </h2>
                 {restaurantName && (
-                  <p className="text-xs text-default-400">{restaurantName}</p>
+                  <p className="text-xs text-muted">{restaurantName}</p>
                 )}
               </div>
               <Button
                 isIconOnly
-                variant="light"
+                variant="ghost"
                 aria-label="Warenkorb schliessen"
                 onPress={onClose}
               >
@@ -55,7 +53,6 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </Button>
             </div>
 
-            {/* Content */}
             <div className="flex-1 overflow-y-auto px-4">
               {hasItems ? (
                 items.map((item) => (
@@ -68,9 +65,8 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               )}
             </div>
 
-            {/* Summary */}
             {hasItems && (
-              <div className="border-t border-divider px-4 pb-4">
+              <div className="border-t border-border px-4 pb-4">
                 <CartSummary />
               </div>
             )}

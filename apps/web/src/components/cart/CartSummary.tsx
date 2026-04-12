@@ -1,4 +1,4 @@
-import { Button, Divider } from "@heroui/react";
+import { Button, Separator } from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
 import { PriceDisplay } from "../shared/PriceDisplay";
 import { useCartStore } from "../../stores/cart-store";
@@ -9,24 +9,22 @@ export function CartSummary() {
 
   return (
     <div className="flex flex-col gap-3 pt-2">
-      <Divider />
       <div className="flex justify-between text-sm">
-        <span className="text-default-500">Zwischensumme</span>
+        <span className="text-muted">Zwischensumme</span>
         <PriceDisplay amount={subtotal} className="font-medium" />
       </div>
       <div className="flex justify-between text-sm">
-        <span className="text-default-500">Liefergebuehr</span>
-        <span className="text-default-400 text-xs">wird berechnet</span>
+        <span className="text-muted">Liefergebuehr</span>
+        <span className="text-muted text-xs">wird berechnet</span>
       </div>
-      <Divider />
-      <div className="flex justify-between text-base font-semibold">
+      <Separator />
+      <div className="flex justify-between text-base font-bold text-foreground">
         <span>Gesamt</span>
         <PriceDisplay amount={subtotal} />
       </div>
       <Button
-        color="primary"
         size="lg"
-        className="w-full mt-2"
+        className="w-full mt-2 bg-accent text-accent-foreground font-semibold"
         onPress={() => navigate({ to: "/checkout" })}
       >
         Zur Kasse
