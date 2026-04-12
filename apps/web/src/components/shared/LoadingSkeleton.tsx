@@ -1,4 +1,4 @@
-import { Card, CardBody, Skeleton } from "@heroui/react";
+import { Card, CardContent, Skeleton } from "@heroui/react";
 
 interface LoadingSkeletonProps {
   count?: number;
@@ -9,18 +9,18 @@ function SkeletonCard() {
   return (
     <Card>
       <Skeleton className="h-40 w-full rounded-t-lg" />
-      <CardBody className="flex flex-col gap-3">
+      <CardContent className="flex flex-col gap-3">
         <Skeleton className="h-4 w-3/4 rounded-lg" />
         <Skeleton className="h-3 w-1/2 rounded-lg" />
         <Skeleton className="h-3 w-1/3 rounded-lg" />
-      </CardBody>
+      </CardContent>
     </Card>
   );
 }
 
 function SkeletonRow() {
   return (
-    <div className="flex items-center gap-4 rounded-lg bg-content1 p-4">
+    <div className="flex items-center gap-4 rounded-lg bg-surface p-4">
       <Skeleton className="h-12 w-12 flex-shrink-0 rounded-lg" />
       <div className="flex flex-1 flex-col gap-2">
         <Skeleton className="h-4 w-3/4 rounded-lg" />
