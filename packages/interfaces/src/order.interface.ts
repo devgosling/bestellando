@@ -11,4 +11,9 @@ export interface OrderEntity {
     deliveryFee: number;
     totalAmount: number;
     specialInstructions?: string;
+    customerId: string;
+    paymentStatus: "UNPAID" | "PAID" | "FAILED" | "REFUNDED";
+    stripeSessionId?: string;
+    deliveryPersonId?: string;
+    createdAt?: string;
 }
