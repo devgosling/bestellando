@@ -13,6 +13,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { AppwriteService } from "../../auth/service/appwrite.service";
 import { ActorContextService } from "../../auth/service/actor-context.service";
+import { RestaurantFilterDto } from "../dto/restaurant-filter.dto";
 
 @Injectable()
 export class RestaurantService {
@@ -101,5 +102,56 @@ export class RestaurantService {
     });
 
     return { success: true };
+  }
+
+  public async listRestaurants(filters: RestaurantFilterDto) {
+    const queries: string[] = [];
+
+    if (filters.search) {
+      queries.push(Query.search("name", filters.search));
+    }
+    if (filters.type) {
+      queries.push(Query.equal("type", filters.type));
+    }
+    if (filters.isActive !== undefined) {
+      queries.push(Query.equal("isActive", filters.isActive));
+    }
+
+    const limit = filters.limit ?? 25;
+    const page = filters.page ?? 1;
+    const offset = (page - 1) * limit;
+
+    queries.push(Query.limit(limit));
+    queries.push(Query.offset(offset));
+
+    if (filters.sortBy) {
+      queries.push(
+        filters.sortOrder === "asc"
+          ? Query.orderAsc(filters.sortBy)
+          : Query.orderDesc(filters.sortBy),
+      );
+    }
+
+    const result = await this.dataBase.listRows({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "restaurant",
+      queries,
+    });
+
+    return {
+      data: result.rows,
+      total: result.total,
+      page,
+      limit,
+      totalPages: Math.ceil(result.total / limit),
+    };
+  }
+
+  public async getRestaurantById(id: string) {
+    return this.dataBase.getRow({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "restaurant",
+      rowId: id,
+    });
   }
 }

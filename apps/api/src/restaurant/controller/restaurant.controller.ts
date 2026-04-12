@@ -2,10 +2,11 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Body, Controller, Post, Get, Patch, Param, Req, ImATeapotException } from "@nestjs/common";
+import { Body, Controller, Post, Get, Patch, Param, Query, Req } from "@nestjs/common";
 import { RestaurantService } from "../service/restaurant.service";
 import { Public } from "../../auth/decorator/public.decorator";
 import { CreateRestaurantDto } from "@repo/interfaces";
+import { RestaurantFilterDto } from "../dto/restaurant-filter.dto";
 
 @Controller({
   version: "1",
@@ -20,10 +21,10 @@ export class RestaurantController {
     return this.restaurantService.createRestaurant(body);
   }
 
+  @Public()
   @Get("list")
-  public async listRestaurants() {
-    //return this.restaurantService.listRestaurants();
-    throw new ImATeapotException("Not implemented yet");
+  public async listRestaurants(@Query() filters: RestaurantFilterDto) {
+    return this.restaurantService.listRestaurants(filters);
   }
 
   @Get("mine")
@@ -37,5 +38,11 @@ export class RestaurantController {
     @Body() patch: Partial<CreateRestaurantDto>,
   ) {
     return this.restaurantService.updateRestaurant(id, patch);
+  }
+
+  @Public()
+  @Get(":id")
+  public async getRestaurantById(@Param("id") id: string) {
+    return this.restaurantService.getRestaurantById(id);
   }
 }
