@@ -1,4 +1,4 @@
-import { Select, SelectItem, Skeleton } from "@heroui/react";
+import { Select, ListBoxItem, Skeleton } from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useApiQuery } from "@repo/hooks";
 import type { AddressEntity } from "@repo/interfaces";
@@ -44,16 +44,16 @@ export function AddressSelector({
     >
       {[
         ...addresses.map((address) => (
-          <SelectItem key={address.$id}>
+          <ListBoxItem key={address.$id}>
             {address.street} {address.streetNumber}, {address.city}
-          </SelectItem>
+          </ListBoxItem>
         )),
-        <SelectItem
+        <ListBoxItem
           key="__add_new__"
-          className="text-primary"
+          className="text-accent"
         >
           Neue Adresse hinzufuegen
-        </SelectItem>,
+        </ListBoxItem>,
       ]}
     </Select>
   );
