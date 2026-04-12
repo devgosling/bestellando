@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config/dist/config.service";
 import { AddressEntity, type AddressOwnerType } from "@repo/interfaces";
 import { ID, Query, TablesDB, Teams, Users } from "node-appwrite";
@@ -61,5 +65,72 @@ export class AddressService {
     }
   }
 
-  
+  public async getMyAddresses(userId: string): Promise<AddressEntity[]> {
+    const result = await this.dataBase.listRows({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "address",
+      queries: [Query.equal("ownerId", userId)],
+    });
+    return result.rows as unknown as AddressEntity[];
+  }
+
+  public async getAddressById(id: string): Promise<AddressEntity> {
+    const address = await this.dataBase.getRow({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "address",
+      rowId: id,
+    });
+    if (!address) {
+      throw new NotFoundException("Address not found");
+    }
+    return address as unknown as AddressEntity;
+  }
+
+  public async verifyOwnership(addressId: string, userId: string): Promise<void> {
+    const address = await this.getAddressById(addressId);
+    if (address.ownerId !== userId) {
+      throw new ForbiddenException("You do not own this address");
+    }
+  }
+
+  public async updateAddress(id: string, patch: Partial<AddressEntity>): Promise<AddressEntity> {
+    const updated = await this.dataBase.updateRow({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "address",
+      rowId: id,
+      data: { ...patch },
+    });
+    return updated as unknown as AddressEntity;
+  }
+
+  public async deleteAddress(id: string): Promise<void> {
+    await this.dataBase.deleteRow({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "address",
+      rowId: id,
+    });
+  }
+
+  public async setDefault(addressId: string, userId: string): Promise<void> {
+    const addresses = await this.getMyAddresses(userId);
+
+    const updates = addresses
+      .filter((addr) => addr.isDefault)
+      .map((addr) =>
+        this.dataBase.updateRow({
+          databaseId: this.configService.get<string>("DATABASE_ID")!,
+          tableId: "address",
+          rowId: addr.$id,
+          data: { isDefault: false },
+        }),
+      );
+    await Promise.all(updates);
+
+    await this.dataBase.updateRow({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "address",
+      rowId: addressId,
+      data: { isDefault: true },
+    });
+  }
 }
