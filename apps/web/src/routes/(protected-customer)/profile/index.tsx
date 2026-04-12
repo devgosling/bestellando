@@ -2,13 +2,13 @@ import { useState } from "react";
 import {
   Button,
   Card,
-  CardBody,
+  CardContent,
   CardHeader,
   Chip,
   Input,
   Modal,
   ModalBody,
-  ModalContent,
+  ModalDialog,
   ModalFooter,
   ModalHeader,
 } from "@heroui/react";
@@ -145,46 +145,46 @@ function ProfilePage() {
       {/* User Info */}
       <Card className="mb-6">
         <CardHeader className="flex gap-3">
-          <Person className="size-6 text-primary" />
+          <Person className="size-6 text-accent" />
           <h1 className="text-xl font-bold">Profil</h1>
         </CardHeader>
-        <CardBody className="flex flex-col gap-2">
+        <CardContent className="flex flex-col gap-2">
           <div className="flex justify-between">
-            <span className="text-default-500 text-sm">Name</span>
+            <span className="text-muted text-sm">Name</span>
             <span className="text-sm font-medium">
               {userContext?.appwriteUser.name || "-"}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-default-500 text-sm">E-Mail</span>
+            <span className="text-muted text-sm">E-Mail</span>
             <span className="text-sm font-medium">
               {userContext?.appwriteUser.email || "-"}
             </span>
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
 
       {/* Addresses */}
       <Card>
         <CardHeader className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <GeoPin className="size-6 text-primary" />
+            <GeoPin className="size-6 text-accent" />
             <h2 className="text-xl font-bold">Meine Adressen</h2>
           </div>
           <Button
-            color="primary"
             size="sm"
+            className="bg-accent text-accent-foreground font-semibold"
             startContent={<CirclePlus className="size-4" />}
             onPress={openCreateForm}
           >
             Neue Adresse
           </Button>
         </CardHeader>
-        <CardBody>
+        <CardContent>
           {isLoading ? (
-            <p className="text-sm text-default-400">Laden...</p>
+            <p className="text-sm text-muted">Laden...</p>
           ) : addresses.length === 0 ? (
-            <p className="text-sm text-default-400">
+            <p className="text-sm text-muted">
               Du hast noch keine Adressen gespeichert.
             </p>
           ) : (
@@ -192,7 +192,7 @@ function ProfilePage() {
               {addresses.map((address) => (
                 <div
                   key={address.$id}
-                  className="flex items-start justify-between rounded-lg border border-divider p-3"
+                  className="flex items-start justify-between rounded-lg border border-border p-3"
                 >
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
@@ -200,12 +200,12 @@ function ProfilePage() {
                         {address.street} {address.streetNumber}
                       </span>
                       {address.isDefault && (
-                        <Chip size="sm" color="primary" variant="flat">
+                        <Chip size="sm" className="bg-accent/10 text-accent">
                           Standardadresse
                         </Chip>
                       )}
                     </div>
-                    <span className="text-xs text-default-500">
+                    <span className="text-xs text-muted">
                       {address.zipCode} {address.city}
                     </span>
                   </div>
@@ -243,12 +243,12 @@ function ProfilePage() {
               ))}
             </div>
           )}
-        </CardBody>
+        </CardContent>
       </Card>
 
       {/* Address Form Modal */}
       <Modal isOpen={formOpen} onClose={closeForm} size="lg">
-        <ModalContent>
+        <ModalDialog>
           <ModalHeader>
             {editingId ? "Adresse bearbeiten" : "Neue Adresse"}
           </ModalHeader>
@@ -295,14 +295,14 @@ function ProfilePage() {
               Abbrechen
             </Button>
             <Button
-              color="primary"
+              className="bg-accent text-accent-foreground font-semibold"
               onPress={handleSubmit}
               isLoading={isSaving}
             >
               {editingId ? "Speichern" : "Hinzufuegen"}
             </Button>
           </ModalFooter>
-        </ModalContent>
+        </ModalDialog>
       </Modal>
 
       {/* Delete Confirmation */}
