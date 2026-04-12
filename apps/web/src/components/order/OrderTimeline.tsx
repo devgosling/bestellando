@@ -57,10 +57,10 @@ export function OrderTimeline({ history, currentStatus }: OrderTimelineProps) {
               <div
                 className={`size-3 rounded-full border-2 ${
                   isCurrent
-                    ? "border-primary bg-primary"
+                    ? "border-accent bg-accent"
                     : isPast
                       ? "border-success bg-success"
-                      : "border-default-300 bg-default-100"
+                      : "border-border bg-surface"
                 }`}
               />
               {index < steps.length - 1 && (
@@ -68,7 +68,7 @@ export function OrderTimeline({ history, currentStatus }: OrderTimelineProps) {
                   className={`w-0.5 flex-1 min-h-8 ${
                     isPast && index < currentIndex
                       ? "bg-success"
-                      : "bg-default-200"
+                      : "bg-border"
                   }`}
                 />
               )}
@@ -78,13 +78,13 @@ export function OrderTimeline({ history, currentStatus }: OrderTimelineProps) {
             <div className="pb-6">
               <p
                 className={`text-sm font-medium ${
-                  isPast ? "text-foreground" : "text-default-400"
+                  isPast ? "text-foreground" : "text-muted"
                 }`}
               >
                 {statusLabelMap[status]}
               </p>
               {entry && (
-                <p className="text-xs text-default-500 mt-0.5">
+                <p className="text-xs text-muted mt-0.5">
                   {dateFormatter.format(new Date(entry.changedAt))}
                 </p>
               )}

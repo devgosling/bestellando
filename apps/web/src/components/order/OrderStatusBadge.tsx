@@ -1,12 +1,12 @@
 import { Chip } from "@heroui/react";
 import type { OrderStatus } from "@repo/interfaces";
 
-const statusColorMap: Record<OrderStatus, "warning" | "primary" | "secondary" | "success" | "danger"> = {
+const statusColorMap: Record<OrderStatus, "warning" | "default" | "secondary" | "success" | "danger"> = {
   PENDING: "warning",
-  CONFIRMED: "primary",
-  PREPARING: "secondary",
-  READY: "success",
-  PICKED_UP: "primary",
+  CONFIRMED: "default",
+  PREPARING: "default",
+  READY: "secondary",
+  PICKED_UP: "secondary",
   DELIVERED: "success",
   CANCELLED: "danger",
 };

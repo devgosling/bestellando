@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Divider } from "@heroui/react";
+import { Button, Card, CardContent, CardHeader, Separator } from "@heroui/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useApiQuery } from "@repo/hooks";
 import { authenticatedFetch, getOrderSocket } from "@repo/lib";
@@ -109,7 +109,7 @@ function OrderDetailPage() {
             {order.restaurant?.name ?? "Bestellung"}
           </h1>
           {order.createdAt && (
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {dateFormatter.format(new Date(order.createdAt))}
             </p>
           )}
@@ -122,14 +122,14 @@ function OrderDetailPage() {
         <CardHeader>
           <h2 className="text-lg font-semibold">Artikel</h2>
         </CardHeader>
-        <CardBody className="flex flex-col gap-3">
+        <CardContent className="flex flex-col gap-3">
           {items.map((item) => (
             <div
               key={item.$id}
               className="flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm text-default-500">
+                <span className="text-sm text-muted">
                   {item.quantity}x
                 </span>
                 <span className="text-sm">
@@ -143,24 +143,24 @@ function OrderDetailPage() {
             </div>
           ))}
 
-          <Divider />
+          <Separator />
 
           <div className="flex justify-between text-sm">
-            <span className="text-default-500">Zwischensumme</span>
+            <span className="text-muted">Zwischensumme</span>
             <PriceDisplay amount={order.subtotal} className="font-medium" />
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-default-500">Liefergebuehr</span>
+            <span className="text-muted">Liefergebuehr</span>
             <PriceDisplay amount={order.deliveryFee} className="font-medium" />
           </div>
 
-          <Divider />
+          <Separator />
 
           <div className="flex justify-between text-base font-semibold">
             <span>Gesamt</span>
             <PriceDisplay amount={order.totalAmount} />
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
 
       {/* Status Timeline */}
@@ -168,7 +168,7 @@ function OrderDetailPage() {
         <CardHeader>
           <h2 className="text-lg font-semibold">Statusverlauf</h2>
         </CardHeader>
-        <CardBody>
+        <CardContent>
           <OrderTimeline
             history={history.map((h) => ({
               status: h.status,
@@ -177,7 +177,7 @@ function OrderDetailPage() {
             }))}
             currentStatus={order.currentStatus}
           />
-        </CardBody>
+        </CardContent>
       </Card>
 
       {/* Live delivery tracking map */}
@@ -190,7 +190,7 @@ function OrderDetailPage() {
             <CardHeader>
               <h2 className="text-lg font-semibold">Live-Tracking</h2>
             </CardHeader>
-            <CardBody>
+            <CardContent>
               <DeliveryMap
                 orderId={orderId}
                 restaurantPosition={[
@@ -203,7 +203,7 @@ function OrderDetailPage() {
                 ]}
                 restaurantName={order.restaurant.name}
               />
-            </CardBody>
+            </CardContent>
           </Card>
         )}
 
@@ -211,9 +211,8 @@ function OrderDetailPage() {
       {order.currentStatus === "PENDING" &&
         order.paymentStatus !== "PAID" && (
           <Button
-            color="primary"
             size="lg"
-            className="w-full"
+            className="w-full bg-accent text-accent-foreground font-semibold"
             isLoading={isPayLoading}
             onPress={handleRetryPayment}
           >
