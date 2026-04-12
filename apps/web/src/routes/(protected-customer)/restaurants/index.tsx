@@ -6,30 +6,11 @@ import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 import { LoadingSkeleton } from "../../../components/shared/LoadingSkeleton";
 import { EmptyState } from "../../../components/shared/EmptyState";
 import { RestaurantCard } from "../../../components/restaurant/RestaurantCard";
-import {
-  RestaurantFilters,
-  type RestaurantFiltersState,
-} from "../../../components/restaurant/RestaurantFilters";
-
-interface RestaurantSearchParams {
-  search?: string;
-  type?: string;
-}
-
-function buildQueryUrl(filters: RestaurantFiltersState): string {
-  const params = new URLSearchParams();
-  params.set("isActive", "true");
-  if (filters.search) params.set("search", filters.search);
-  if (filters.type) params.set("type", filters.type);
-  return `/v1/restaurant/list?${params.toString()}`;
-}
+import { RestaurantFilters } from "../../../components/restaurant/RestaurantFilters";
 
 const RestaurantsPage = () => {
-  const searchParams = Route.useSearch();
-  const [filters, setFilters] = useState<RestaurantFiltersState>({
-    search: searchParams.search ?? "",
-    type: (searchParams.type as RestaurantFiltersState["type"]) ?? "",
-  });
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<string[]>([]);
 
   const { data, isLoading } = useApiQuery<{
     data: RestaurantEntity[];
@@ -39,34 +20,38 @@ const RestaurantsPage = () => {
     totalPages: number;
   }>({
     request: {
-      url: buildQueryUrl(filters),
+      url: `/v1/restaurant/list?isActive=true`,
       requiresAuth: false,
     },
-    queryKey: ["restaurants", filters.search, filters.type],
+    queryKey: ["restaurants"],
   });
 
-  const restaurants = data?.data ?? [];
+  const allRestaurants = data?.data ?? [];
+
+  const filtered = allRestaurants.filter((r) => {
+    if (search && !r.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filters.includes("open") && !r.isActive) return false;
+    if (filters.includes("free-delivery") && r.deliveryFee > 0) return false;
+    return true;
+  });
 
   return (
-    <AnimatedPage className="mx-auto max-w-7xl px-4 py-6">
-      <h1 className="mb-6 text-2xl font-bold">Restaurants</h1>
-      <RestaurantFilters filters={filters} onFiltersChange={setFilters} />
+    <AnimatedPage>
+      <div className="max-w-[1280px] mx-auto px-4 lg:px-8 py-6">
+        <h1 className="text-2xl font-bold text-foreground mt-0 mb-4">Restaurants</h1>
+        <RestaurantFilters onSearchChange={setSearch} onFilterChange={setFilters} />
 
-      <div className="mt-6">
         {isLoading ? (
-          <LoadingSkeleton count={6} type="card" />
-        ) : restaurants.length === 0 ? (
+          <LoadingSkeleton type="card" count={6} />
+        ) : filtered.length === 0 ? (
           <EmptyState
             title="Keine Restaurants gefunden"
-            description="Versuche andere Suchbegriffe oder Filter."
+            description="Versuche andere Suchbegriffe oder Filter"
           />
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {restaurants.map((restaurant) => (
-              <RestaurantCard
-                key={restaurant.$id}
-                restaurant={restaurant}
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((r) => (
+              <RestaurantCard key={r.$id} restaurant={r} />
             ))}
           </div>
         )}
@@ -75,16 +60,10 @@ const RestaurantsPage = () => {
   );
 };
 
-export const Route = createFileRoute(
-  "/(protected-customer)/restaurants/",
-)({
+export const Route = createFileRoute("/(protected-customer)/restaurants/")({
   component: RestaurantsPage,
   staticData: {
     showHeader: true,
     showFooter: true,
   },
-  validateSearch: (search: Record<string, unknown>): RestaurantSearchParams => ({
-    search: typeof search.search === "string" ? search.search : undefined,
-    type: typeof search.type === "string" ? search.type : undefined,
-  }),
 });

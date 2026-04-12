@@ -1,60 +1,56 @@
-import { Chip } from "@heroui/react";
-import {
-  RestaurantTypeNames,
-  type RestaurantType,
-} from "@repo/interfaces";
-import { SearchInput } from "../shared/SearchInput";
-
-export interface RestaurantFiltersState {
-  search: string;
-  type: RestaurantType | "";
-}
+import { Input, Chip } from "@heroui/react";
+import { Magnifier } from "@gravity-ui/icons";
+import { useState } from "react";
 
 interface RestaurantFiltersProps {
-  filters: RestaurantFiltersState;
-  onFiltersChange: (filters: RestaurantFiltersState) => void;
+  onSearchChange: (search: string) => void;
+  onFilterChange: (filters: string[]) => void;
 }
 
-const restaurantTypes = Object.entries(RestaurantTypeNames) as [
-  RestaurantType,
-  string,
-][];
+const QUICK_FILTERS = [
+  { key: "open", label: "Geöffnet" },
+  { key: "free-delivery", label: "Gratis Lieferung" },
+  { key: "top-rated", label: "Beste Bewertung" },
+];
 
-export function RestaurantFilters({
-  filters,
-  onFiltersChange,
-}: RestaurantFiltersProps) {
-  const handleSearchChange = (search: string) => {
-    onFiltersChange({ ...filters, search });
-  };
+export function RestaurantFilters({ onSearchChange, onFilterChange }: RestaurantFiltersProps) {
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [search, setSearch] = useState("");
 
-  const handleTypeToggle = (type: RestaurantType) => {
-    onFiltersChange({
-      ...filters,
-      type: filters.type === type ? "" : type,
-    });
+  const toggleFilter = (key: string) => {
+    const updated = activeFilters.includes(key)
+      ? activeFilters.filter((f) => f !== key)
+      : [...activeFilters, key];
+    setActiveFilters(updated);
+    onFilterChange(updated);
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <SearchInput
-        value={filters.search}
-        onChange={handleSearchChange}
+    <div className="flex flex-wrap items-center gap-3 mb-6">
+      <Input
         placeholder="Restaurant suchen..."
+        startContent={<Magnifier className="size-4 text-muted" />}
+        isClearable
+        className="max-w-xs"
+        size="sm"
+        value={search}
+        onValueChange={(val) => {
+          setSearch(val);
+          onSearchChange(val);
+        }}
       />
-      <div className="flex flex-wrap gap-2">
-        {restaurantTypes.map(([key, label]) => (
-          <Chip
-            key={key}
-            variant={filters.type === key ? "solid" : "flat"}
-            color={filters.type === key ? "primary" : "default"}
-            className="cursor-pointer"
-            onClick={() => handleTypeToggle(key)}
-          >
-            {label}
-          </Chip>
-        ))}
-      </div>
+      {QUICK_FILTERS.map((f) => (
+        <Chip
+          key={f.key}
+          variant={activeFilters.includes(f.key) ? "solid" : "outline"}
+          className={`cursor-pointer transition-colors ${
+            activeFilters.includes(f.key) ? "bg-accent text-accent-foreground" : ""
+          }`}
+          onClick={() => toggleFilter(f.key)}
+        >
+          {f.label}
+        </Chip>
+      ))}
     </div>
   );
 }
