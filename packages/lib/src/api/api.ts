@@ -88,22 +88,38 @@ export async function authenticatedFetch(
 
     return await response.json();
   } catch (error: any) {
-    if (
-      !autoLogout ||
-      error.status === 400 ||
-      error.status === 404 ||
-      error.status === 403
-    ) {
-      throw error;
+    // Only auto-logout on explicit 401 (unauthorized / session expired)
+    if (autoLogout && error.status === 401) {
+      // Clear cached JWT so next attempt fetches a fresh one
+      cachedJwt = null;
+      cachedJwtExpMs = null;
+
+      // Try once more with a fresh JWT before giving up
+      try {
+        const freshJwt = await getValidJwt();
+        const retryHeaders = new Headers(init?.headers);
+        retryHeaders.set("Authorization", `Bearer ${freshJwt}`);
+        if (!(init?.body instanceof FormData) && !retryHeaders.has("Content-Type")) {
+          retryHeaders.set("Content-Type", "application/json");
+        }
+        const retryResponse = await fetch(properties.apiUrl + url, { ...init, headers: retryHeaders });
+        if (retryResponse.ok) {
+          return await retryResponse.json();
+        }
+      } catch {
+        // Retry failed — fall through to logout
+      }
+
+      appwriteAccount
+        .deleteSession({ sessionId: "current" })
+        .catch(() => {})
+        .finally(() => {
+          location.href = "/";
+        });
+      return;
     }
 
-    appwriteAccount
-      .deleteSession({
-        sessionId: "current",
-      })
-      .then(() => {
-        location.href = "/";
-      });
+    throw error;
   }
 }
 

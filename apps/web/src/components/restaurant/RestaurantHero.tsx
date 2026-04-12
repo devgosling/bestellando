@@ -12,11 +12,7 @@ interface RestaurantHeroProps {
 export function RestaurantHero({ restaurant }: RestaurantHeroProps) {
   return (
     <div
-      className="relative overflow-hidden rounded-xl"
-      style={{
-        background:
-          "linear-gradient(135deg, var(--color-secondary), var(--color-primary))",
-      }}
+      className="relative overflow-hidden rounded-xl bg-linear-to-br from-accent/80 to-accent"
     >
       <div className="px-6 py-8 sm:py-12">
         <div className="absolute top-4 right-4">

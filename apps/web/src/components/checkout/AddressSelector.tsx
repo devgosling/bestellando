@@ -1,4 +1,4 @@
-import { Select, ListBoxItem, Skeleton } from "@heroui/react";
+import { Select, Label, ListBoxItem, Skeleton } from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useApiQuery } from "@repo/hooks";
 import type { AddressEntity } from "@repo/interfaces";
@@ -33,7 +33,6 @@ export function AddressSelector({
 
   return (
     <Select
-      label="Lieferadresse"
       placeholder="Adresse auswaehlen"
       selectedKeys={selectedId ? [selectedId] : []}
       onSelectionChange={(keys) => {
@@ -42,6 +41,7 @@ export function AddressSelector({
       }}
       isRequired
     >
+      <Label>Lieferadresse</Label>
       {[
         ...addresses.map((address) => (
           <ListBoxItem key={address.$id}>

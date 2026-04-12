@@ -1,5 +1,6 @@
 import { Chip } from "@heroui/react";
 import { StarFill, Clock } from "@gravity-ui/icons";
+import { UtensilsCrossed } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import type { RestaurantEntity } from "@repo/interfaces";
 import { PriceDisplay } from "../shared/PriceDisplay";
@@ -28,7 +29,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
             loading="lazy"
           />
         ) : (
-          <span className="text-5xl">🍽️</span>
+          <UtensilsCrossed className="size-12 text-muted" />
         )}
       </div>
 

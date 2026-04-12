@@ -1,10 +1,12 @@
 import {
   Button,
   Input,
+  Label,
   Select,
   ListBoxItem,
   Switch,
   TextArea,
+  TextField,
 } from "@heroui/react";
 import type { RestaurantEntity, RestaurantType } from "@repo/interfaces";
 import { RestaurantTypeNames } from "@repo/interfaces";
@@ -74,32 +76,36 @@ export function RestaurantSettingsForm({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-semibold">Allgemein</h3>
-        <Input
-          label="Restaurantname"
+        <TextField
           value={form.name}
-          onValueChange={(v) => updateField("name", v)}
+          onChange={(v) => updateField("name", v)}
           isRequired
-        />
-        <TextArea
-          label="Beschreibung"
+        >
+          <Label>Restaurantname</Label>
+          <Input />
+        </TextField>
+        <TextField
           value={form.description}
-          onValueChange={(v) => updateField("description", v)}
-          minRows={3}
-        />
-        <Input
-          label="Telefon"
+          onChange={(v) => updateField("description", v)}
+        >
+          <Label>Beschreibung</Label>
+          <TextArea rows={3} />
+        </TextField>
+        <TextField
           value={form.phone}
-          onValueChange={(v) => updateField("phone", v)}
-          type="tel"
-        />
+          onChange={(v) => updateField("phone", v)}
+        >
+          <Label>Telefon</Label>
+          <Input type="tel" />
+        </TextField>
         <Select
-          label="Restauranttyp"
           selectedKeys={[form.type]}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0] as RestaurantType | undefined;
             if (selected) updateField("type", selected);
           }}
         >
+          <Label>Restauranttyp</Label>
           {restaurantTypes.map((t) => (
             <ListBoxItem key={t.key}>{t.label}</ListBoxItem>
           ))}
@@ -109,35 +115,33 @@ export function RestaurantSettingsForm({
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-semibold">Lieferung & Bestellung</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Input
-            label="Mindestbestellwert (EUR)"
-            type="number"
+          <TextField
             value={String(form.minOrderValue)}
-            onValueChange={(v) =>
-              updateField("minOrderValue", parseFloat(v) || 0)
+            onChange={(v) =>
+              updateField("minOrderValue", Number.parseFloat(v) || 0)
             }
-            min={0}
-            step={0.5}
-          />
-          <Input
-            label="Liefergebuehr (EUR)"
-            type="number"
+          >
+            <Label>Mindestbestellwert (EUR)</Label>
+            <Input type="number" min={0} step={0.5} />
+          </TextField>
+          <TextField
             value={String(form.deliveryFee)}
-            onValueChange={(v) =>
-              updateField("deliveryFee", parseFloat(v) || 0)
+            onChange={(v) =>
+              updateField("deliveryFee", Number.parseFloat(v) || 0)
             }
-            min={0}
-            step={0.5}
-          />
-          <Input
-            label="Lieferzeit (Min.)"
-            type="number"
+          >
+            <Label>Liefergebuehr (EUR)</Label>
+            <Input type="number" min={0} step={0.5} />
+          </TextField>
+          <TextField
             value={String(form.estimatedDeliveryMinutes)}
-            onValueChange={(v) =>
-              updateField("estimatedDeliveryMinutes", parseInt(v) || 0)
+            onChange={(v) =>
+              updateField("estimatedDeliveryMinutes", Number.parseInt(v) || 0)
             }
-            min={0}
-          />
+          >
+            <Label>Lieferzeit (Min.)</Label>
+            <Input type="number" min={0} />
+          </TextField>
         </div>
       </div>
 

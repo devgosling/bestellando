@@ -4,9 +4,12 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Label,
   Separator,
   TextArea,
+  TextField,
 } from "@heroui/react";
+import { ArrowLeft, ArrowRight } from "@gravity-ui/icons";
 import { useCartStore } from "../../stores/cart-store";
 import { PriceDisplay } from "../shared/PriceDisplay";
 
@@ -75,14 +78,16 @@ export function ReviewStep({ onBack, onNext }: ReviewStepProps) {
 
       <Card>
         <CardContent className="pt-5">
-          <TextArea
-            label="Anmerkungen zur Bestellung"
-            placeholder="Besondere Wünsche oder Hinweise (optional)"
+          <TextField
             value={notes}
-            onValueChange={setNotes}
-            minRows={2}
-            maxRows={4}
-          />
+            onChange={setNotes}
+          >
+            <Label>Anmerkungen zur Bestellung</Label>
+            <TextArea
+              placeholder="Besondere Wünsche oder Hinweise (optional)"
+              rows={2}
+            />
+          </TextField>
         </CardContent>
       </Card>
 
@@ -92,15 +97,17 @@ export function ReviewStep({ onBack, onNext }: ReviewStepProps) {
           size="lg"
           className="flex-1"
           onPress={onBack}
+          startContent={<ArrowLeft className="size-4" />}
         >
-          ← Zurück
+          Zurück
         </Button>
         <Button
           size="lg"
           className="flex-1 bg-accent text-accent-foreground font-semibold"
           onPress={() => onNext(notes || undefined)}
+          endContent={<ArrowRight className="size-4" />}
         >
-          Weiter zur Zahlung →
+          Weiter zur Zahlung
         </Button>
       </div>
     </div>

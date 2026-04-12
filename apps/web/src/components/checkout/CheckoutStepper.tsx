@@ -1,3 +1,5 @@
+import { Check } from "@gravity-ui/icons";
+
 const STEPS = [
   { number: 1, label: "Adresse" },
   { number: 2, label: "Überprüfen" },
@@ -18,7 +20,7 @@ export function CheckoutStepper({ currentStep }: { currentStep: number }) {
                   : "bg-default text-muted"
             }`}
           >
-            {step.number < currentStep ? "✓" : step.number}
+            {step.number < currentStep ? <Check className="size-4" /> : step.number}
           </div>
           <span
             className={`text-xs font-medium ${

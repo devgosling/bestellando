@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "@heroui/react";
+import { ArrowLeft } from "@gravity-ui/icons";
 import { authenticatedFetch } from "@repo/lib";
 import { useCartStore } from "../../stores/cart-store";
 
@@ -81,8 +82,8 @@ export function PaymentStep({
       <div className="flex flex-col items-center gap-6 py-16 text-center">
         <p className="text-sm text-danger">{error}</p>
         <div className="flex gap-3">
-          <Button variant="flat" size="lg" onPress={onBack}>
-            ← Zurück
+          <Button variant="flat" size="lg" onPress={onBack} startContent={<ArrowLeft className="size-4" />}>
+            Zurück
           </Button>
           <Button
             size="lg"

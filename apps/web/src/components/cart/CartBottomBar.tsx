@@ -1,5 +1,6 @@
 import { Badge, Button } from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
+import { ShoppingCart } from "@gravity-ui/icons";
 import { useCartStore } from "../../stores/cart-store";
 import { PriceDisplay } from "../shared/PriceDisplay";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,7 +23,7 @@ export function CartBottomBar() {
           <div className="flex items-center justify-between bg-accent text-accent-foreground rounded-xl px-4 py-3 shadow-lg">
             <div className="flex items-center gap-2">
               <Badge content={totalItems} size="sm" color="default">
-                <span className="text-lg">🛒</span>
+                <ShoppingCart className="size-5" />
               </Badge>
               <span className="font-semibold text-sm">
                 <PriceDisplay amount={subtotal} />

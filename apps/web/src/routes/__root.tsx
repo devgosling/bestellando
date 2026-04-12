@@ -8,7 +8,7 @@ import type { Models } from "appwrite";
 import type { ThemeContextType } from "@repo/contexts";
 import Header from "../kit/header";
 import Footer from "../kit/footer";
-import BottomTabBar from "../components/shared/BottomTabBar";
+import { BottomTabBar } from "../components/shared/BottomTabBar";
 
 export interface UserContext {
   appwriteUser: Models.User;

@@ -1,13 +1,17 @@
 import {
   Button,
   Input,
+  Label,
   Modal,
+  ModalBackdrop,
   ModalBody,
+  ModalContainer,
   ModalDialog,
   ModalFooter,
   ModalHeader,
   Switch,
   TextArea,
+  TextField,
 } from "@heroui/react";
 import type { ProductEntity } from "@repo/interfaces";
 import { useState, useEffect } from "react";
@@ -79,50 +83,55 @@ export function ProductFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" scrollBehavior="inside">
+    <Modal isOpen={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <ModalBackdrop>
+      <ModalContainer size="lg" scroll="inside">
       <ModalDialog>
         <ModalHeader>
           {isEditing ? "Produkt bearbeiten" : "Neues Produkt"}
         </ModalHeader>
         <ModalBody className="flex flex-col gap-4">
-          <Input
-            label="Name"
+          <TextField
             value={form.name}
-            onValueChange={(v) => updateField("name", v)}
+            onChange={(v) => updateField("name", v)}
             isRequired
-          />
-          <TextArea
-            label="Beschreibung"
+          >
+            <Label>Name</Label>
+            <Input />
+          </TextField>
+          <TextField
             value={form.description}
-            onValueChange={(v) => updateField("description", v)}
-            minRows={2}
-          />
+            onChange={(v) => updateField("description", v)}
+          >
+            <Label>Beschreibung</Label>
+            <TextArea rows={2} />
+          </TextField>
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Preis (EUR)"
-              type="number"
+            <TextField
               value={String(form.basePrice)}
-              onValueChange={(v) => updateField("basePrice", parseFloat(v) || 0)}
+              onChange={(v) => updateField("basePrice", Number.parseFloat(v) || 0)}
               isRequired
-              min={0}
-              step={0.01}
-            />
-            <Input
-              label="Zubereitungszeit (Min.)"
-              type="number"
+            >
+              <Label>Preis (EUR)</Label>
+              <Input type="number" min={0} step={0.01} />
+            </TextField>
+            <TextField
               value={String(form.prepTimeMinutes)}
-              onValueChange={(v) =>
-                updateField("prepTimeMinutes", parseInt(v) || 0)
+              onChange={(v) =>
+                updateField("prepTimeMinutes", Number.parseInt(v) || 0)
               }
-              min={0}
-            />
+            >
+              <Label>Zubereitungszeit (Min.)</Label>
+              <Input type="number" min={0} />
+            </TextField>
           </div>
-          <Input
-            label="Bild-URL"
+          <TextField
             value={form.imageUrl}
-            onValueChange={(v) => updateField("imageUrl", v)}
-            placeholder="https://..."
-          />
+            onChange={(v) => updateField("imageUrl", v)}
+          >
+            <Label>Bild-URL</Label>
+            <Input placeholder="https://..." />
+          </TextField>
           <div className="flex flex-col gap-3">
             <Switch
               isSelected={form.isAvailable}
@@ -152,6 +161,8 @@ export function ProductFormModal({
           </Button>
         </ModalFooter>
       </ModalDialog>
+      </ModalContainer>
+      </ModalBackdrop>
     </Modal>
   );
 }

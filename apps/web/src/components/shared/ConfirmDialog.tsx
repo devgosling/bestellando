@@ -1,7 +1,9 @@
 import {
   Button,
   Modal,
+  ModalBackdrop,
   ModalBody,
+  ModalContainer,
   ModalDialog,
   ModalFooter,
   ModalHeader,
@@ -34,27 +36,31 @@ export function ConfirmDialog({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
-      <ModalDialog>
-        <ModalHeader>{title}</ModalHeader>
-        {description && (
-          <ModalBody>
-            <p className="text-muted">{description}</p>
-          </ModalBody>
-        )}
-        <ModalFooter>
-          <Button variant="flat" onPress={onClose}>
-            {cancelLabel}
-          </Button>
-          <Button
-            color={variant === "danger" ? "danger" : undefined}
-            className={variant !== "danger" ? "bg-accent text-accent-foreground font-semibold" : undefined}
-            onPress={handleConfirm}
-          >
-            {confirmLabel}
-          </Button>
-        </ModalFooter>
-      </ModalDialog>
+    <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <ModalBackdrop>
+      <ModalContainer size="sm">
+        <ModalDialog>
+          <ModalHeader>{title}</ModalHeader>
+          {description && (
+            <ModalBody>
+              <p className="text-muted">{description}</p>
+            </ModalBody>
+          )}
+          <ModalFooter>
+            <Button variant="flat" onPress={onClose}>
+              {cancelLabel}
+            </Button>
+            <Button
+              color={variant === "danger" ? "danger" : undefined}
+              className={variant !== "danger" ? "bg-accent text-accent-foreground font-semibold" : undefined}
+              onPress={handleConfirm}
+            >
+              {confirmLabel}
+            </Button>
+          </ModalFooter>
+        </ModalDialog>
+      </ModalContainer>
+      </ModalBackdrop>
     </Modal>
   );
 }

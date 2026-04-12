@@ -3,11 +3,14 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   Chip,
   Input,
+  Label,
+  TextField,
   Modal,
+  ModalBackdrop,
   ModalBody,
+  ModalContainer,
   ModalDialog,
   ModalFooter,
   ModalHeader,
@@ -16,8 +19,8 @@ import {
   Pencil,
   TrashBin,
   CirclePlus,
-  Person,
   GeoPin,
+  Envelope,
 } from "@gravity-ui/icons";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -140,83 +143,110 @@ function ProfilePage() {
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
+  const userName = userContext?.appwriteUser.name || "-";
+  const userEmail = userContext?.appwriteUser.email || "-";
+  const initials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
     <AnimatedPage className="mx-auto max-w-2xl px-4 py-8">
-      {/* User Info */}
-      <Card className="mb-6">
-        <CardHeader className="flex gap-3">
-          <Person className="size-6 text-accent" />
-          <h1 className="text-xl font-bold">Profil</h1>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          <div className="flex justify-between">
-            <span className="text-muted text-sm">Name</span>
-            <span className="text-sm font-medium">
-              {userContext?.appwriteUser.name || "-"}
-            </span>
+      {/* Profile Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 text-accent text-xl font-bold shrink-0">
+          {initials}
+        </div>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold text-foreground truncate">
+            {userName}
+          </h1>
+          <div className="flex items-center gap-1.5 text-muted">
+            <Envelope className="size-3.5 shrink-0" />
+            <span className="text-sm truncate">{userEmail}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted text-sm">E-Mail</span>
-            <span className="text-sm font-medium">
-              {userContext?.appwriteUser.email || "-"}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Addresses */}
-      <Card>
-        <CardHeader className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <GeoPin className="size-6 text-accent" />
-            <h2 className="text-xl font-bold">Meine Adressen</h2>
-          </div>
-          <Button
-            size="sm"
-            className="bg-accent text-accent-foreground font-semibold"
-            startContent={<CirclePlus className="size-4" />}
-            onPress={openCreateForm}
-          >
-            Neue Adresse
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p className="text-sm text-muted">Laden...</p>
-          ) : addresses.length === 0 ? (
+      {/* Addresses Section */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <GeoPin className="size-5 text-muted" />
+          <h2 className="text-lg font-semibold text-foreground">
+            Meine Adressen
+          </h2>
+        </div>
+        <Button
+          size="sm"
+          className="bg-accent text-accent-foreground font-medium"
+          startContent={<CirclePlus className="size-4" />}
+          onPress={openCreateForm}
+        >
+          Neue Adresse
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <p className="text-sm text-muted py-8 text-center">Laden...</p>
+      ) : addresses.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <GeoPin className="size-10 text-muted mx-auto mb-3" />
             <p className="text-sm text-muted">
               Du hast noch keine Adressen gespeichert.
             </p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {addresses.map((address) => (
-                <div
-                  key={address.$id}
-                  className="flex items-start justify-between rounded-lg border border-border p-3"
-                >
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
-                        {address.street} {address.streetNumber}
-                      </span>
-                      {address.isDefault && (
-                        <Chip size="sm" className="bg-accent/10 text-accent">
-                          Standardadresse
-                        </Chip>
-                      )}
+            <Button
+              size="sm"
+              variant="flat"
+              className="mt-3"
+              onPress={openCreateForm}
+            >
+              Adresse hinzufügen
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {addresses.map((address) => (
+            <Card key={address.$id}>
+              <CardContent className="py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-surface-secondary shrink-0 mt-0.5">
+                      <GeoPin className="size-4 text-muted" />
                     </div>
-                    <span className="text-xs text-muted">
-                      {address.zipCode} {address.city}
-                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium text-foreground">
+                          {address.street} {address.streetNumber}
+                        </span>
+                        {address.isDefault && (
+                          <Chip
+                            size="sm"
+                            variant="flat"
+                            color="primary"
+                            className="text-xs"
+                          >
+                            Standard
+                          </Chip>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted">
+                        {address.zipCode} {address.city}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0">
                     {!address.isDefault && (
                       <Button
                         size="sm"
-                        variant="light"
+                        variant="flat"
+                        className="text-xs"
                         onPress={() => handleSetDefault(address.$id)}
                       >
-                        Standard
+                        Als Standard
                       </Button>
                     )}
                     <Button
@@ -233,61 +263,71 @@ function ProfilePage() {
                       variant="light"
                       isIconOnly
                       color="danger"
-                      aria-label="Loeschen"
+                      aria-label="Löschen"
                       onPress={() => setDeleteId(address.$id)}
                     >
                       <TrashBin className="size-4" />
                     </Button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Address Form Modal */}
-      <Modal isOpen={formOpen} onClose={closeForm} size="lg">
+      <Modal isOpen={formOpen} onOpenChange={(open) => { if (!open) closeForm(); }}>
+        <ModalBackdrop>
+        <ModalContainer size="lg">
         <ModalDialog>
           <ModalHeader>
             {editingId ? "Adresse bearbeiten" : "Neue Adresse"}
           </ModalHeader>
           <ModalBody className="flex flex-col gap-3">
             <div className="flex gap-3">
-              <Input
-                label="Strasse"
+              <TextField
                 value={formData.street}
-                onValueChange={(v) =>
+                onChange={(v) =>
                   setFormData((prev) => ({ ...prev, street: v }))
                 }
                 className="flex-1"
-              />
-              <Input
-                label="Hausnummer"
+              >
+                <Label>Straße</Label>
+                <Input />
+              </TextField>
+              <TextField
                 value={formData.streetNumber}
-                onValueChange={(v) =>
+                onChange={(v) =>
                   setFormData((prev) => ({ ...prev, streetNumber: v }))
                 }
                 className="w-28"
-              />
+              >
+                <Label>Hausnummer</Label>
+                <Input />
+              </TextField>
             </div>
             <div className="flex gap-3">
-              <Input
-                label="PLZ"
+              <TextField
                 value={formData.zipCode}
-                onValueChange={(v) =>
+                onChange={(v) =>
                   setFormData((prev) => ({ ...prev, zipCode: v }))
                 }
                 className="w-28"
-              />
-              <Input
-                label="Stadt"
+              >
+                <Label>PLZ</Label>
+                <Input />
+              </TextField>
+              <TextField
                 value={formData.city}
-                onValueChange={(v) =>
+                onChange={(v) =>
                   setFormData((prev) => ({ ...prev, city: v }))
                 }
                 className="flex-1"
-              />
+              >
+                <Label>Stadt</Label>
+                <Input />
+              </TextField>
             </div>
           </ModalBody>
           <ModalFooter>
@@ -295,14 +335,16 @@ function ProfilePage() {
               Abbrechen
             </Button>
             <Button
-              className="bg-accent text-accent-foreground font-semibold"
+              className="bg-accent text-accent-foreground font-medium"
               onPress={handleSubmit}
               isLoading={isSaving}
             >
-              {editingId ? "Speichern" : "Hinzufuegen"}
+              {editingId ? "Speichern" : "Hinzufügen"}
             </Button>
           </ModalFooter>
         </ModalDialog>
+        </ModalContainer>
+        </ModalBackdrop>
       </Modal>
 
       {/* Delete Confirmation */}
@@ -310,9 +352,9 @@ function ProfilePage() {
         isOpen={deleteId !== null}
         onClose={() => setDeleteId(null)}
         onConfirm={() => deleteId && deleteMutation.mutate(deleteId)}
-        title="Adresse loeschen"
-        description="Moechtest du diese Adresse wirklich loeschen?"
-        confirmLabel="Loeschen"
+        title="Adresse löschen"
+        description="Möchtest du diese Adresse wirklich löschen?"
+        confirmLabel="Löschen"
         variant="danger"
       />
     </AnimatedPage>
