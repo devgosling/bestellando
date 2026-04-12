@@ -1,10 +1,11 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { DatabaseModule } from "../database/database.module";
 import { AuthModule } from "../auth/auth.module";
 import { OrderItemModule } from "../orderItem/order-item.module";
 import { OrderStatusHistoryModule } from "../orderStatusHistory/order-status-history.module";
 import { UserModule } from "../user/user.module";
+import { GatewayModule } from "../gateway/gateway.module";
 import { OrderService } from "./service/order.service";
 import { OrderController } from "./controller/order.controller";
 
@@ -16,6 +17,7 @@ import { OrderController } from "./controller/order.controller";
     OrderItemModule,
     OrderStatusHistoryModule,
     UserModule,
+    forwardRef(() => GatewayModule),
   ],
   providers: [OrderService],
   controllers: [OrderController],

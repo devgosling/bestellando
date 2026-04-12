@@ -1,5 +1,7 @@
 import {
   Injectable,
+  Inject,
+  forwardRef,
   BadRequestException,
   NotFoundException,
 } from "@nestjs/common";
@@ -9,6 +11,7 @@ import { ActorContextService } from "../../auth/service/actor-context.service";
 import { UserService } from "../../user/service/user.service";
 import { OrderItemService } from "../../orderItem/service/order-item.service";
 import { OrderStatusHistoryService } from "../../orderStatusHistory/service/order-status-history.service";
+import { OrderGateway } from "../../gateway/orders/order.gateway";
 import { CreateOrderDto } from "../dto/create-order.dto";
 import { UpdateOrderStatusDto } from "../dto/update-order-status.dto";
 import { validateTransition } from "./order-state-machine";
@@ -26,6 +29,8 @@ export class OrderService {
     private readonly userService: UserService,
     private readonly orderItemService: OrderItemService,
     private readonly orderStatusHistoryService: OrderStatusHistoryService,
+    @Inject(forwardRef(() => OrderGateway))
+    private readonly orderGateway: OrderGateway,
   ) {
     this.dataBase = this.databaseService.getDatabase();
   }
@@ -122,6 +127,15 @@ export class OrderService {
       changedAt: new Date().toISOString(),
     });
 
+    // 9. Notify restaurant of new order via WebSocket
+    this.orderGateway.notifyRestaurant(dto.restaurantId, "order:new", {
+      order,
+      items: products.map(({ product, quantity }) => ({
+        productId: product.$id,
+        quantity,
+      })),
+    });
+
     return order;
   }
 
@@ -160,6 +174,14 @@ export class OrderService {
       status: dto.status,
       changedBy: userId,
       changedAt: new Date().toISOString(),
+    });
+
+    // Notify subscribers of status change via WebSocket
+    this.orderGateway.notifyOrderUpdate(orderId, "order:status-changed", {
+      orderId,
+      previousStatus: order.currentStatus,
+      newStatus: dto.status,
+      timestamp: new Date().toISOString(),
     });
 
     return { success: true, status: dto.status };

@@ -3,6 +3,8 @@ import {
   Post,
   Headers,
   HttpCode,
+  Inject,
+  forwardRef,
   Req,
 } from "@nestjs/common";
 import type { RawBodyRequest } from "@nestjs/common";
@@ -10,6 +12,7 @@ import { StripeService } from "../service/stripe.service";
 import { Public } from "../../auth/decorator/public.decorator";
 import { DatabaseService } from "../../database/service/database.service";
 import { ConfigService } from "@nestjs/config";
+import { OrderGateway } from "../../gateway/orders/order.gateway";
 import type { Request } from "express";
 
 @Controller({ path: "webhook", version: "1" })
@@ -18,6 +21,8 @@ export class WebhookController {
     private readonly stripeService: StripeService,
     private readonly databaseService: DatabaseService,
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => OrderGateway))
+    private readonly orderGateway: OrderGateway,
   ) {}
 
   @Public()
@@ -55,6 +60,27 @@ export class WebhookController {
             currentStatus: "CONFIRMED",
           },
         });
+
+        // Notify via WebSocket
+        this.orderGateway.notifyOrderUpdate(
+          orderId,
+          "order:status-changed",
+          {
+            orderId,
+            previousStatus: "PENDING",
+            newStatus: "CONFIRMED",
+            timestamp: new Date().toISOString(),
+          },
+        );
+
+        const restaurantId = session.metadata?.restaurantId;
+        if (restaurantId) {
+          this.orderGateway.notifyRestaurant(
+            restaurantId,
+            "order:new",
+            { orderId },
+          );
+        }
       }
     }
 
