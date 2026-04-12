@@ -1,4 +1,4 @@
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardContent } from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
 import type { OrderEntity } from "@repo/interfaces";
 import { PriceDisplay } from "../shared/PriceDisplay";
@@ -22,15 +22,15 @@ export function OrderCard({ order }: OrderCardProps) {
       onPress={() =>
         navigate({ to: "/orders/$orderId", params: { orderId: order.$id } })
       }
-      className="w-full"
+      className="w-full border border-border bg-surface transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
     >
-      <CardBody className="flex flex-row items-center justify-between gap-4">
+      <CardContent className="flex flex-row items-center justify-between gap-4">
         <div className="flex flex-col gap-1 min-w-0">
           <span className="text-sm font-semibold truncate">
             {order.restaurant?.name ?? "Restaurant"}
           </span>
           {order.createdAt && (
-            <span className="text-xs text-default-500">
+            <span className="text-xs text-muted">
               {dateFormatter.format(new Date(order.createdAt))}
             </span>
           )}
@@ -42,7 +42,7 @@ export function OrderCard({ order }: OrderCardProps) {
           />
           <OrderStatusBadge status={order.currentStatus} />
         </div>
-      </CardBody>
+      </CardContent>
     </Card>
   );
 }

@@ -30,7 +30,7 @@ function OrdersPage() {
 
   return (
     <AnimatedPage className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Meine Bestellungen</h1>
+      <h1 className="text-2xl font-bold mb-6 text-foreground">Meine Bestellungen</h1>
 
       {isLoading ? (
         <LoadingSkeleton count={4} type="row" />
@@ -41,7 +41,7 @@ function OrdersPage() {
           icon={<ShoppingCart className="size-12" />}
           action={
             <Button
-              color="primary"
+              className="bg-accent text-accent-foreground"
               onPress={() => navigate({ to: "/restaurants" })}
             >
               Jetzt bestellen
@@ -64,7 +64,7 @@ function OrdersPage() {
               >
                 Zurueck
               </Button>
-              <span className="flex items-center text-sm text-default-500">
+              <span className="flex items-center text-sm text-muted">
                 Seite {page} von {totalPages}
               </span>
               <Button
