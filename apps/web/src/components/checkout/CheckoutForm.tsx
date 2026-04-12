@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Card, CardBody, CardHeader, Divider } from "@heroui/react";
+import { Button, Card, CardContent, CardHeader, Separator } from "@heroui/react";
 import { authenticatedFetch } from "@repo/lib";
 import { useCartStore } from "../../stores/cart-store";
 import { PriceDisplay } from "../shared/PriceDisplay";
@@ -68,12 +68,12 @@ export function CheckoutForm() {
         <CardHeader>
           <h2 className="text-lg font-semibold">Lieferadresse</h2>
         </CardHeader>
-        <CardBody>
+        <CardContent>
           <AddressSelector
             selectedId={selectedAddressId}
             onChange={setSelectedAddressId}
           />
-        </CardBody>
+        </CardContent>
       </Card>
 
       <Card>
@@ -81,20 +81,20 @@ export function CheckoutForm() {
           <h2 className="text-lg font-semibold">
             Bestelluebersicht
             {restaurantName && (
-              <span className="ml-2 text-sm font-normal text-default-500">
+              <span className="ml-2 text-sm font-normal text-muted">
                 {restaurantName}
               </span>
             )}
           </h2>
         </CardHeader>
-        <CardBody className="flex flex-col gap-3">
+        <CardContent className="flex flex-col gap-3">
           {items.map((item) => (
             <div
               key={item.product.$id}
               className="flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm text-default-500">
+                <span className="text-sm text-muted">
                   {item.quantity}x
                 </span>
                 <span className="text-sm">{item.product.name}</span>
@@ -106,24 +106,24 @@ export function CheckoutForm() {
             </div>
           ))}
 
-          <Divider />
+          <Separator />
 
           <div className="flex justify-between text-sm">
-            <span className="text-default-500">Zwischensumme</span>
+            <span className="text-muted">Zwischensumme</span>
             <PriceDisplay amount={subtotal} className="font-medium" />
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-default-500">Liefergebuehr</span>
-            <span className="text-xs text-default-400">wird berechnet</span>
+            <span className="text-muted">Liefergebuehr</span>
+            <span className="text-xs text-muted">wird berechnet</span>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div className="flex justify-between text-base font-semibold">
             <span>Gesamt</span>
             <PriceDisplay amount={subtotal} />
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
 
       {error && (
@@ -131,9 +131,8 @@ export function CheckoutForm() {
       )}
 
       <Button
-        color="primary"
         size="lg"
-        className="w-full"
+        className="w-full bg-accent text-accent-foreground font-semibold"
         isLoading={isSubmitting}
         isDisabled={!selectedAddressId}
         onPress={handleCheckout}

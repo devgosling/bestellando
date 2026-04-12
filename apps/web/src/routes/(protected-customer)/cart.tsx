@@ -23,7 +23,7 @@ function CartPage() {
         <div>
           <h1 className="text-2xl font-bold">Warenkorb</h1>
           {restaurantName && (
-            <p className="text-sm text-default-500 mt-1">{restaurantName}</p>
+            <p className="text-sm text-muted mt-1">{restaurantName}</p>
           )}
         </div>
         {hasItems && (
@@ -41,7 +41,7 @@ function CartPage() {
 
       {hasItems ? (
         <div className="flex flex-col gap-6">
-          <div className="rounded-lg border border-divider bg-content1 px-4">
+          <div className="rounded-lg border border-border bg-surface px-4">
             {items.map((item) => (
               <CartItem key={item.product.$id} item={item} />
             ))}

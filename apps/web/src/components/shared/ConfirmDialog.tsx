@@ -2,7 +2,7 @@ import {
   Button,
   Modal,
   ModalBody,
-  ModalContent,
+  ModalDialog,
   ModalFooter,
   ModalHeader,
 } from "@heroui/react";
@@ -35,11 +35,11 @@ export function ConfirmDialog({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
-      <ModalContent>
+      <ModalDialog>
         <ModalHeader>{title}</ModalHeader>
         {description && (
           <ModalBody>
-            <p className="text-default-500">{description}</p>
+            <p className="text-muted">{description}</p>
           </ModalBody>
         )}
         <ModalFooter>
@@ -47,13 +47,14 @@ export function ConfirmDialog({
             {cancelLabel}
           </Button>
           <Button
-            color={variant === "danger" ? "danger" : "primary"}
+            color={variant === "danger" ? "danger" : undefined}
+            className={variant !== "danger" ? "bg-accent text-accent-foreground font-semibold" : undefined}
             onPress={handleConfirm}
           >
             {confirmLabel}
           </Button>
         </ModalFooter>
-      </ModalContent>
+      </ModalDialog>
     </Modal>
   );
 }

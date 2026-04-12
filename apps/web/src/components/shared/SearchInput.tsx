@@ -47,7 +47,7 @@ export function SearchInput({
       value={localValue}
       onValueChange={handleChange}
       placeholder={placeholder}
-      startContent={<Magnifier className="text-default-400" />}
+      startContent={<Magnifier className="text-muted" />}
       isClearable
       onClear={() => {
         setLocalValue("");

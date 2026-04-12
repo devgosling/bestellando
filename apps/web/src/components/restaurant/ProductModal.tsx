@@ -63,7 +63,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
               />
             )}
             {product.description && (
-              <p className="text-sm text-default-500">{product.description}</p>
+              <p className="text-sm text-muted">{product.description}</p>
             )}
             <div className="text-lg font-semibold">
               <PriceDisplay amount={product.basePrice} />
