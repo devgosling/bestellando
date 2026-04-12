@@ -25,7 +25,7 @@ function matchesOriginPattern(origin: string, pattern: string): boolean {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.getHttpAdapter().getInstance().disable("x-powered-by");
   app.getHttpAdapter().getInstance().disable("etag");

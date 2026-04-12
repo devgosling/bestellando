@@ -8,6 +8,7 @@ import { OrderModule } from "./order/order.module";
 import { OrderItemModule } from "./orderItem/order-item.module";
 import { OrderStatusHistoryModule } from "./orderStatusHistory/order-status-history.module";
 import { OpeningHoursModule } from "./openingHours/opening-hours.module";
+import { PaymentModule } from "./payment/payment.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_INTERCEPTOR } from "@nestjs/core";
@@ -26,6 +27,7 @@ import { ClsModule } from "nestjs-cls/dist/src/lib/cls-module/cls.module";
     OrderItemModule,
     OrderStatusHistoryModule,
     OpeningHoursModule,
+    PaymentModule,
     ConfigModule.forRoot(),
     ClsModule.forRoot({
       global: true,
