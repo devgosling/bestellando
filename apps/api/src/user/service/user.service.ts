@@ -59,9 +59,9 @@ export class UserService {
           }
           if (
             userMembership.roles.includes("delivery_person") ||
-            userMembership.roles.includes("DELIVER_PERSON")
+            userMembership.roles.includes("DELIVERY_PERSON")
           ) {
-            return "DELIVER_PERSON";
+            return "DELIVERY_PERSON";
           }
         }
       } catch (error) {

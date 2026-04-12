@@ -1,5 +1,5 @@
 export interface User {
-  type: "CUSTOMER" | "DELIVER_PERSON" | "RESTAURANT" | "ADMIN";
+  type: "CUSTOMER" | "DELIVERY_PERSON" | "RESTAURANT" | "ADMIN";
 }
 
 export type UserType = User["type"];
