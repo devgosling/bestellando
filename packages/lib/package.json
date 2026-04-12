@@ -21,6 +21,7 @@
     "@repo/contexts": "workspace:^",
     "@tanstack/react-query": "^5.90.21",
     "appwrite": "^22.4.1",
-    "react": "^19.2.0"
+    "react": "^19.2.0",
+    "socket.io-client": "^4.8.3"
   }
 }
