@@ -15,7 +15,9 @@ import { Route as protectedCustomerRouteRouteImport } from './routes/(protected-
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as protectedRestaurantManageRestaurantRouteImport } from './routes/(protected-restaurant)/manage-restaurant'
+import { Route as protectedCustomerCartRouteImport } from './routes/(protected-customer)/cart'
 import { Route as protectedCustomerRestaurantsIndexRouteImport } from './routes/(protected-customer)/restaurants/index'
+import { Route as protectedCustomerProfileIndexRouteImport } from './routes/(protected-customer)/profile/index'
 import { Route as AuthRegisterUserRouteImport } from './routes/auth/register/user'
 import { Route as AuthRegisterRestaurantRouteImport } from './routes/auth/register/restaurant'
 import { Route as protectedCustomerRestaurantsRestaurantIdRouteImport } from './routes/(protected-customer)/restaurants/$restaurantId'
@@ -50,10 +52,21 @@ const protectedRestaurantManageRestaurantRoute =
     path: '/manage-restaurant',
     getParentRoute: () => protectedRestaurantRouteRoute,
   } as any)
+const protectedCustomerCartRoute = protectedCustomerCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => protectedCustomerRouteRoute,
+} as any)
 const protectedCustomerRestaurantsIndexRoute =
   protectedCustomerRestaurantsIndexRouteImport.update({
     id: '/restaurants/',
     path: '/restaurants/',
+    getParentRoute: () => protectedCustomerRouteRoute,
+  } as any)
+const protectedCustomerProfileIndexRoute =
+  protectedCustomerProfileIndexRouteImport.update({
+    id: '/profile/',
+    path: '/profile/',
     getParentRoute: () => protectedCustomerRouteRoute,
   } as any)
 const AuthRegisterUserRoute = AuthRegisterUserRouteImport.update({
@@ -76,21 +89,25 @@ const protectedCustomerRestaurantsRestaurantIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/cart': typeof protectedCustomerCartRoute
   '/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
   '/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
+  '/profile/': typeof protectedCustomerProfileIndexRoute
   '/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/cart': typeof protectedCustomerCartRoute
   '/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
   '/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
+  '/profile': typeof protectedCustomerProfileIndexRoute
   '/restaurants': typeof protectedCustomerRestaurantsIndexRoute
 }
 export interface FileRoutesById {
@@ -99,11 +116,13 @@ export interface FileRoutesById {
   '/(protected-customer)': typeof protectedCustomerRouteRouteWithChildren
   '/(protected-restaurant)': typeof protectedRestaurantRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/(protected-customer)/cart': typeof protectedCustomerCartRoute
   '/(protected-restaurant)/manage-restaurant': typeof protectedRestaurantManageRestaurantRoute
   '/auth/login': typeof AuthLoginRoute
   '/(protected-customer)/restaurants/$restaurantId': typeof protectedCustomerRestaurantsRestaurantIdRoute
   '/auth/register/restaurant': typeof AuthRegisterRestaurantRoute
   '/auth/register/user': typeof AuthRegisterUserRoute
+  '/(protected-customer)/profile/': typeof protectedCustomerProfileIndexRoute
   '/(protected-customer)/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
 }
 export interface FileRouteTypes {
@@ -111,21 +130,25 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/cart'
     | '/manage-restaurant'
     | '/auth/login'
     | '/restaurants/$restaurantId'
     | '/auth/register/restaurant'
     | '/auth/register/user'
+    | '/profile/'
     | '/restaurants/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/cart'
     | '/manage-restaurant'
     | '/auth/login'
     | '/restaurants/$restaurantId'
     | '/auth/register/restaurant'
     | '/auth/register/user'
+    | '/profile'
     | '/restaurants'
   id:
     | '__root__'
@@ -133,11 +156,13 @@ export interface FileRouteTypes {
     | '/(protected-customer)'
     | '/(protected-restaurant)'
     | '/auth'
+    | '/(protected-customer)/cart'
     | '/(protected-restaurant)/manage-restaurant'
     | '/auth/login'
     | '/(protected-customer)/restaurants/$restaurantId'
     | '/auth/register/restaurant'
     | '/auth/register/user'
+    | '/(protected-customer)/profile/'
     | '/(protected-customer)/restaurants/'
   fileRoutesById: FileRoutesById
 }
@@ -192,11 +217,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof protectedRestaurantManageRestaurantRouteImport
       parentRoute: typeof protectedRestaurantRouteRoute
     }
+    '/(protected-customer)/cart': {
+      id: '/(protected-customer)/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof protectedCustomerCartRouteImport
+      parentRoute: typeof protectedCustomerRouteRoute
+    }
     '/(protected-customer)/restaurants/': {
       id: '/(protected-customer)/restaurants/'
       path: '/restaurants'
       fullPath: '/restaurants/'
       preLoaderRoute: typeof protectedCustomerRestaurantsIndexRouteImport
+      parentRoute: typeof protectedCustomerRouteRoute
+    }
+    '/(protected-customer)/profile/': {
+      id: '/(protected-customer)/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof protectedCustomerProfileIndexRouteImport
       parentRoute: typeof protectedCustomerRouteRoute
     }
     '/auth/register/user': {
@@ -224,14 +263,18 @@ declare module '@tanstack/react-router' {
 }
 
 interface protectedCustomerRouteRouteChildren {
+  protectedCustomerCartRoute: typeof protectedCustomerCartRoute
   protectedCustomerRestaurantsRestaurantIdRoute: typeof protectedCustomerRestaurantsRestaurantIdRoute
+  protectedCustomerProfileIndexRoute: typeof protectedCustomerProfileIndexRoute
   protectedCustomerRestaurantsIndexRoute: typeof protectedCustomerRestaurantsIndexRoute
 }
 
 const protectedCustomerRouteRouteChildren: protectedCustomerRouteRouteChildren =
   {
+    protectedCustomerCartRoute: protectedCustomerCartRoute,
     protectedCustomerRestaurantsRestaurantIdRoute:
       protectedCustomerRestaurantsRestaurantIdRoute,
+    protectedCustomerProfileIndexRoute: protectedCustomerProfileIndexRoute,
     protectedCustomerRestaurantsIndexRoute:
       protectedCustomerRestaurantsIndexRoute,
   }
