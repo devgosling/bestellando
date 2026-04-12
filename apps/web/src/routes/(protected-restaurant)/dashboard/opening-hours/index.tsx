@@ -84,7 +84,7 @@ function OpeningHoursPage() {
     <AnimatedPage className="flex flex-col gap-6 p-6">
       <div>
         <h1 className="text-2xl font-bold">Oeffnungszeiten</h1>
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           Lege fest, wann dein Restaurant geoeffnet ist
         </p>
       </div>

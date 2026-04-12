@@ -126,12 +126,12 @@ function MenuPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Speisekarte</h1>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             Produkte verwalten und bearbeiten
           </p>
         </div>
         <Button
-          color="primary"
+          className="bg-accent text-accent-foreground font-semibold"
           startContent={<Plus className="size-4" />}
           onPress={handleOpenCreate}
         >
@@ -158,7 +158,7 @@ function MenuPage() {
           icon={<Book className="size-12" />}
           action={
             !search ? (
-              <Button color="primary" onPress={handleOpenCreate}>
+              <Button className="bg-accent text-accent-foreground font-semibold" onPress={handleOpenCreate}>
                 Neues Produkt
               </Button>
             ) : undefined

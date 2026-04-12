@@ -3,11 +3,11 @@ import {
   Input,
   Modal,
   ModalBody,
-  ModalContent,
+  ModalDialog,
   ModalFooter,
   ModalHeader,
   Switch,
-  Textarea,
+  TextArea,
 } from "@heroui/react";
 import type { ProductEntity } from "@repo/interfaces";
 import { useState, useEffect } from "react";
@@ -80,7 +80,7 @@ export function ProductFormModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg" scrollBehavior="inside">
-      <ModalContent>
+      <ModalDialog>
         <ModalHeader>
           {isEditing ? "Produkt bearbeiten" : "Neues Produkt"}
         </ModalHeader>
@@ -91,7 +91,7 @@ export function ProductFormModal({
             onValueChange={(v) => updateField("name", v)}
             isRequired
           />
-          <Textarea
+          <TextArea
             label="Beschreibung"
             value={form.description}
             onValueChange={(v) => updateField("description", v)}
@@ -143,7 +143,7 @@ export function ProductFormModal({
             Abbrechen
           </Button>
           <Button
-            color="primary"
+            className="bg-accent text-accent-foreground font-semibold"
             onPress={handleSubmit}
             isLoading={isLoading}
             isDisabled={!form.name.trim()}
@@ -151,7 +151,7 @@ export function ProductFormModal({
             Speichern
           </Button>
         </ModalFooter>
-      </ModalContent>
+      </ModalDialog>
     </Modal>
   );
 }

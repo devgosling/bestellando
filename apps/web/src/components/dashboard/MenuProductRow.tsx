@@ -17,7 +17,7 @@ export function MenuProductRow({
   onToggleAvailability,
 }: MenuProductRowProps) {
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-divider p-4">
+    <div className="flex items-center gap-4 rounded-lg border border-border p-4">
       {product.imageUrl ? (
         <img
           src={product.imageUrl}
@@ -25,7 +25,7 @@ export function MenuProductRow({
           className="size-14 shrink-0 rounded-lg object-cover"
         />
       ) : (
-        <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-default-100 text-default-400 text-xl font-bold">
+        <div className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-surface text-muted text-xl font-bold">
           {product.name.charAt(0)}
         </div>
       )}
@@ -39,7 +39,7 @@ export function MenuProductRow({
             </span>
           )}
         </div>
-        <span className="truncate text-sm text-default-500">
+        <span className="truncate text-sm text-muted">
           {product.description}
         </span>
         <PriceDisplay

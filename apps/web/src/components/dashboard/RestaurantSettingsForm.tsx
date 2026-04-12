@@ -2,9 +2,9 @@ import {
   Button,
   Input,
   Select,
-  SelectItem,
+  ListBoxItem,
   Switch,
-  Textarea,
+  TextArea,
 } from "@heroui/react";
 import type { RestaurantEntity, RestaurantType } from "@repo/interfaces";
 import { RestaurantTypeNames } from "@repo/interfaces";
@@ -80,7 +80,7 @@ export function RestaurantSettingsForm({
           onValueChange={(v) => updateField("name", v)}
           isRequired
         />
-        <Textarea
+        <TextArea
           label="Beschreibung"
           value={form.description}
           onValueChange={(v) => updateField("description", v)}
@@ -101,7 +101,7 @@ export function RestaurantSettingsForm({
           }}
         >
           {restaurantTypes.map((t) => (
-            <SelectItem key={t.key}>{t.label}</SelectItem>
+            <ListBoxItem key={t.key}>{t.label}</ListBoxItem>
           ))}
         </Select>
       </div>
@@ -153,7 +153,7 @@ export function RestaurantSettingsForm({
 
       <div className="flex justify-end">
         <Button
-          color="primary"
+          className="bg-accent text-accent-foreground font-semibold"
           onPress={() => onSubmit(form)}
           isLoading={isLoading}
           isDisabled={!form.name.trim()}

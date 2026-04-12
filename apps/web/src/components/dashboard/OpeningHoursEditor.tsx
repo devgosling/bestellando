@@ -69,7 +69,7 @@ export function OpeningHoursEditor({
       {rows.map((row) => (
         <div
           key={row.dayOfWeek}
-          className="flex flex-col gap-2 rounded-lg border border-divider p-4 sm:flex-row sm:items-center sm:gap-4"
+          className="flex flex-col gap-2 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:gap-4"
         >
           <span className="w-28 shrink-0 font-medium">
             {DAY_NAMES[row.dayOfWeek]}
@@ -100,7 +100,7 @@ export function OpeningHoursEditor({
                 aria-label="Oeffnungszeit"
                 className="w-32"
               />
-              <span className="text-default-400">-</span>
+              <span className="text-muted">-</span>
               <Input
                 type="time"
                 size="sm"
@@ -118,7 +118,7 @@ export function OpeningHoursEditor({
 
       <div className="flex justify-end">
         <Button
-          color="primary"
+          className="bg-accent text-accent-foreground font-semibold"
           onPress={() => onSave(rows)}
           isLoading={isLoading}
         >
