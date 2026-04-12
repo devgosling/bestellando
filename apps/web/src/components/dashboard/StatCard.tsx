@@ -1,4 +1,4 @@
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardContent } from "@heroui/react";
 import type { ReactNode } from "react";
 
 interface StatCardProps {
@@ -11,20 +11,20 @@ interface StatCardProps {
 export function StatCard({ title, value, subtitle, icon }: StatCardProps) {
   return (
     <Card>
-      <CardBody className="flex flex-row items-start gap-4 p-5">
+      <CardContent className="flex flex-row items-start gap-4 p-5">
         {icon && (
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
             {icon}
           </div>
         )}
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm text-default-500">{title}</span>
+          <span className="text-sm text-muted">{title}</span>
           <span className="text-2xl font-bold">{value}</span>
           {subtitle && (
-            <span className="text-xs text-default-400">{subtitle}</span>
+            <span className="text-xs text-muted">{subtitle}</span>
           )}
         </div>
-      </CardBody>
+      </CardContent>
     </Card>
   );
 }

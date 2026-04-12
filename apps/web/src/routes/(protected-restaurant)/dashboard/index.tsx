@@ -28,7 +28,7 @@ function OverviewPage() {
         <h1 className="text-2xl font-bold">
           {restaurant?.name ?? "Dashboard"}
         </h1>
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           Willkommen in deinem Restaurant-Dashboard
         </p>
       </div>
@@ -60,7 +60,7 @@ function OverviewPage() {
 
       <div className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">Letzte Bestellungen</h2>
-        <div className="rounded-lg border border-divider p-8 text-center text-default-400">
+        <div className="rounded-lg border border-border p-8 text-center text-muted">
           Bestellungen werden ueber WebSocket empfangen.
           <br />
           Echtzeitdaten werden in Phase 5 verfuegbar sein.

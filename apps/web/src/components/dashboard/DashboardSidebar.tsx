@@ -38,8 +38,8 @@ export function DashboardSidebar() {
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
               active
-                ? "bg-default-200 text-foreground"
-                : "text-default-600 hover:bg-default-100 hover:text-foreground"
+                ? "bg-accent/10 text-accent font-semibold"
+                : "text-muted hover:bg-surface hover:text-foreground"
             }`}
           >
             <Icon className="size-5 flex-shrink-0" />
@@ -53,7 +53,7 @@ export function DashboardSidebar() {
   return (
     <>
       {/* Mobile toggle */}
-      <div className="sticky top-0 z-30 flex items-center border-b border-divider bg-background p-2 md:hidden">
+      <div className="sticky top-0 z-30 flex items-center border-b border-border bg-background p-2 md:hidden">
         <Button
           isIconOnly
           variant="light"
@@ -76,11 +76,11 @@ export function DashboardSidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-dvh w-60 shrink-0 border-r border-divider bg-background transition-transform md:sticky md:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-dvh w-60 shrink-0 border-r border-border bg-background transition-transform md:sticky md:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-14 items-center border-b border-divider px-4">
+        <div className="flex h-14 items-center border-b border-border px-4">
           <span className="text-lg font-bold">Dashboard</span>
         </div>
         {navContent}

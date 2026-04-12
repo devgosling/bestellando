@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardFooter, Divider } from "@heroui/react";
+import { Button, Card, CardContent, CardFooter, Separator } from "@heroui/react";
 import type { OrderEntity, OrderStatus } from "@repo/interfaces";
 import { OrderStatusBadge } from "../order/OrderStatusBadge";
 import { PriceDisplay } from "../shared/PriceDisplay";
@@ -24,16 +24,23 @@ export function IncomingOrderCard({
   const isPending = order.currentStatus === "PENDING";
   const nextAction = nextStatusMap[order.currentStatus];
 
+  const statusBorderColor =
+    order.currentStatus === "PENDING"
+      ? "border-l-warning"
+      : order.currentStatus === "READY"
+        ? "border-l-success"
+        : "border-l-accent";
+
   return (
-    <Card className="w-full">
-      <CardBody className="flex flex-col gap-3 p-4">
+    <Card className={`w-full border-l-4 ${statusBorderColor}`}>
+      <CardContent className="flex flex-col gap-3 p-4">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-0.5">
-            <span className="text-xs text-default-400">
+            <span className="text-xs text-muted">
               Bestellung #{order.$id.slice(-6).toUpperCase()}
             </span>
             {order.createdAt && (
-              <span className="text-xs text-default-400">
+              <span className="text-xs text-muted">
                 {new Date(order.createdAt).toLocaleString("de-DE")}
               </span>
             )}
@@ -41,27 +48,27 @@ export function IncomingOrderCard({
           <OrderStatusBadge status={order.currentStatus} />
         </div>
 
-        <Divider />
+        <Separator />
 
         <div className="flex flex-col gap-1">
-          <span className="text-sm text-default-500">
+          <span className="text-sm text-muted">
             Kunde: {order.customerId.slice(-6).toUpperCase()}
           </span>
           {order.specialInstructions && (
-            <p className="text-sm italic text-default-400">
+            <p className="text-sm italic text-muted">
               &quot;{order.specialInstructions}&quot;
             </p>
           )}
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-default-500">Gesamt</span>
+          <span className="text-sm text-muted">Gesamt</span>
           <PriceDisplay
             amount={order.totalAmount}
             className="text-lg font-bold"
           />
         </div>
-      </CardBody>
+      </CardContent>
 
       <CardFooter className="flex gap-2 px-4 pb-4 pt-0">
         {isPending && (
@@ -87,9 +94,8 @@ export function IncomingOrderCard({
         )}
         {!isPending && nextAction && (
           <Button
-            color="primary"
             size="sm"
-            className="flex-1"
+            className="flex-1 bg-accent text-accent-foreground font-semibold"
             onPress={() => onUpdateStatus?.(order.$id, nextAction.status)}
           >
             {nextAction.label}
