@@ -1,13 +1,15 @@
 import { Button, Card, CardBody, CardHeader, Divider } from "@heroui/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useApiQuery } from "@repo/hooks";
-import { authenticatedFetch } from "@repo/lib";
-import { useState } from "react";
+import { authenticatedFetch, getOrderSocket } from "@repo/lib";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type {
   OrderEntity,
   OrderItemEntity,
   OrderStatusHistoryEntity,
 } from "@repo/interfaces";
+import { useSocketEvent } from "../../../hooks/useSocketEvent";
 import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 import { LoadingSkeleton } from "../../../components/shared/LoadingSkeleton";
 import { PriceDisplay } from "../../../components/shared/PriceDisplay";
@@ -26,6 +28,29 @@ const dateFormatter = new Intl.DateTimeFormat("de-DE", {
 function OrderDetailPage() {
   const { orderId } = Route.useParams();
   const [isPayLoading, setIsPayLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const orderSocket = getOrderSocket();
+
+  // Subscribe to order room on mount
+  useEffect(() => {
+    if (orderSocket) {
+      orderSocket.emit("subscribe:order", { orderId });
+    }
+  }, [orderSocket, orderId]);
+
+  // Listen for status changes and invalidate queries
+  useSocketEvent<{ orderId: string }>(
+    orderSocket,
+    "order:status-changed",
+    (data) => {
+      if (data.orderId === orderId) {
+        queryClient.invalidateQueries({ queryKey: ["order", orderId] });
+        queryClient.invalidateQueries({
+          queryKey: ["order-history", orderId],
+        });
+      }
+    },
+  );
 
   const { data: order, isLoading: isLoadingOrder } =
     useApiQuery<OrderEntity>({

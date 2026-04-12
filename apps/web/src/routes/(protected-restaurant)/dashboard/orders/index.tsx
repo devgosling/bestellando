@@ -1,10 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, Tab } from "@heroui/react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { OrderStatus } from "@repo/interfaces";
 import { ListCheck } from "@gravity-ui/icons";
+import { getOrderSocket } from "@repo/lib";
+import { useApiQuery } from "@repo/hooks";
 import { AnimatedPage } from "../../../../components/shared/AnimatedPage";
 import { EmptyState } from "../../../../components/shared/EmptyState";
+import { useSocketEvent } from "../../../../hooks/useSocketEvent";
+
+import type { RestaurantEntity } from "@repo/interfaces";
 
 type FilterTab = "ALL" | OrderStatus;
 
@@ -18,6 +24,32 @@ const tabs: { key: FilterTab; label: string }[] = [
 
 function OrdersPage() {
   const [_filter, setFilter] = useState<FilterTab>("ALL");
+  const queryClient = useQueryClient();
+  const orderSocket = getOrderSocket();
+
+  const { data: restaurants } = useApiQuery<RestaurantEntity[]>({
+    request: { url: "/v1/restaurant/mine" },
+    queryKey: ["restaurant", "mine"],
+  });
+
+  const restaurantId = restaurants?.[0]?.$id;
+
+  // Subscribe to restaurant room for new orders
+  useEffect(() => {
+    if (orderSocket && restaurantId) {
+      orderSocket.emit("subscribe:restaurant", { restaurantId });
+    }
+  }, [orderSocket, restaurantId]);
+
+  // Listen for new incoming orders
+  useSocketEvent(orderSocket, "order:new", () => {
+    queryClient.invalidateQueries({ queryKey: ["restaurant-orders"] });
+  });
+
+  // Listen for status changes on existing orders
+  useSocketEvent(orderSocket, "order:status-changed", () => {
+    queryClient.invalidateQueries({ queryKey: ["restaurant-orders"] });
+  });
 
   return (
     <AnimatedPage className="flex flex-col gap-6 p-6">

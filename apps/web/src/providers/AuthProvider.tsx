@@ -8,7 +8,7 @@ import {
 } from "react";
 import type { UserContext } from "../routes/__root";
 import { registerAuthSetters, unregisterAuthSetters } from "./auth-store";
-import { appwriteAccount } from "@repo/lib";
+import { appwriteAccount, connectSockets, disconnectSockets } from "@repo/lib";
 
 interface AuthContextValue {
   userContext: UserContext | undefined;
@@ -47,10 +47,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .get()
       .then((appwriteUser) => {
         setUserContext({ appwriteUser });
+        connectSockets().catch(() => {});
       })
       .catch(() => {
         // No active session — keep undefined
+        disconnectSockets();
       });
+
+    return () => {
+      disconnectSockets();
+    };
   }, []);
 
   const value = useMemo(
