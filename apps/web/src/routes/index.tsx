@@ -1,6 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button, Chip, Input } from "@heroui/react";
-import { Magnifier, StarFill, Clock, GeoPin, Rocket } from "@gravity-ui/icons";
+import {
+  Magnifier,
+  StarFill,
+  Clock,
+  GeoPin,
+  Rocket,
+} from "@gravity-ui/icons";
 import {
   Pizza,
   Sandwich,
@@ -14,6 +20,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { AnimatedPage } from "../components/shared/AnimatedPage";
+import { Button } from "@heroui/react";
 import type { ComponentType, SVGProps } from "react";
 import type { LucideProps } from "lucide-react";
 
@@ -170,6 +177,31 @@ const Page = () => {
                   <p className="text-sm text-muted m-0">{s.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Restaurant partner CTA */}
+        <section className="px-4 lg:px-8 py-16 border-t border-border">
+          <div className="max-w-7xl mx-auto">
+            <div className="rounded-2xl border border-border bg-surface p-8 lg:p-12 flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
+              <div className="flex-1 text-center lg:text-left">
+                <h2 className="text-xl lg:text-2xl font-bold mt-0 mb-2">
+                  Du hast ein Restaurant?
+                </h2>
+                <p className="text-muted text-sm lg:text-base m-0">
+                  Erreiche mehr Kunden und steigere deinen Umsatz. Registriere
+                  dein Restaurant kostenlos auf bestellando und starte noch
+                  heute.
+                </p>
+              </div>
+              <Button
+                size="lg"
+                className="bg-accent text-accent-foreground font-semibold shrink-0"
+                onPress={() => navigate({ to: "/auth/register/restaurant" })}
+              >
+                Jetzt Partner werden
+              </Button>
             </div>
           </div>
         </section>

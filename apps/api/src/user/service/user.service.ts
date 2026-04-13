@@ -53,7 +53,8 @@ export class UserService {
           // Check roles to determine user type
           if (
             userMembership.roles.includes("restaurant") ||
-            userMembership.roles.includes("RESTAURANT")
+            userMembership.roles.includes("RESTAURANT") ||
+            userMembership.roles.includes("owner")
           ) {
             return "RESTAURANT";
           }
