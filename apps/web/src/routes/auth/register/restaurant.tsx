@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Input, Button } from "@heroui/react";
 import { CreateRestaurantDto } from "@repo/interfaces";
+import { appwriteAccount } from "@repo/lib";
 import { getMutationOptions } from "@repo/lib";
 import { useApiMutation, useNotification } from "@repo/hooks";
+import { useRef } from "react";
 import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 
 export const Route = createFileRoute("/auth/register/restaurant")({
@@ -15,17 +17,32 @@ export const Route = createFileRoute("/auth/register/restaurant")({
 
 function Page() {
   const { addNotification } = useNotification();
+  const navigate = useNavigate();
+  const credentialsRef = useRef<{ email: string; password: string } | null>(
+    null,
+  );
 
   const registerRestaurantAction = useApiMutation({
     ...getMutationOptions("/v1/restaurant/register", "POST", undefined, {
       requiresAuth: false,
     }),
-    success: () => {
+    success: async () => {
       addNotification({
         type: "SUCCESS",
         title: "Restaurant registriert",
         description: "Dein Restaurant wurde erfolgreich registriert.",
       });
+      if (credentialsRef.current) {
+        try {
+          await appwriteAccount.createEmailPasswordSession({
+            email: credentialsRef.current.email,
+            password: credentialsRef.current.password,
+          });
+          navigate({ to: "/dashboard" });
+        } catch {
+          navigate({ to: "/auth/login", search: { redirectUrl: "/dashboard" } });
+        }
+      }
     },
   });
 
@@ -37,6 +54,8 @@ function Page() {
     formData.forEach((value, key) => {
       data[key] = value.toString();
     });
+
+    credentialsRef.current = { email: data.email, password: data.password };
 
     registerRestaurantAction.mutate({
       name: data.restaurantName,
@@ -149,6 +168,26 @@ function Page() {
           >
             Restaurant registrieren
           </Button>
+
+          <p className="text-center text-sm text-muted">
+            Bereits registriert?{" "}
+            <Link
+              to="/auth/login"
+              search={{ redirectUrl: "/dashboard" }}
+              className="text-accent font-medium hover:underline"
+            >
+              Anmelden
+            </Link>
+          </p>
+          <p className="text-center text-sm text-muted">
+            Kein Restaurant?{" "}
+            <Link
+              to="/auth/register/user"
+              className="text-accent font-medium hover:underline"
+            >
+              Als Kunde registrieren
+            </Link>
+          </p>
         </form>
       </div>
     </AnimatedPage>

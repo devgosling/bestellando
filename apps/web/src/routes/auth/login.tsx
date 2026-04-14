@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button, Input } from "@heroui/react";
 import z from "zod";
 import { useForm } from "@tanstack/react-form";
-import { appwriteAccount } from "@repo/lib";
+import { appwriteAccount, authenticatedFetch } from "@repo/lib";
 import { AppwriteException } from "appwrite";
 import { AnimatedPage } from "../../components/shared/AnimatedPage";
 
@@ -29,9 +29,18 @@ const Page = () => {
           password: props.value.password,
         })
         .then(async () => {
-          navigate({
-            to: redirectUrl,
-          });
+          if (!redirectUrl || redirectUrl === "/") {
+            try {
+              const data = await authenticatedFetch("/v1/user/data");
+              if (data?.role === "RESTAURANT") {
+                navigate({ to: "/dashboard" });
+                return;
+              }
+            } catch {
+              // fall through to default redirect
+            }
+          }
+          navigate({ to: redirectUrl });
         })
         .catch((error) => {
           if (!(error instanceof AppwriteException)) {
@@ -105,6 +114,15 @@ const Page = () => {
               className="text-accent font-medium hover:underline"
             >
               Registrieren
+            </Link>
+          </p>
+          <p className="text-center text-sm text-muted">
+            Du hast ein Restaurant?{" "}
+            <Link
+              to="/auth/register/restaurant"
+              className="text-accent font-medium hover:underline"
+            >
+              Restaurant registrieren
             </Link>
           </p>
         </div>

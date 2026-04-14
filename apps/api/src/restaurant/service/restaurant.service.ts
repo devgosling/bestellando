@@ -50,7 +50,7 @@ export class RestaurantService {
     await this.teams.createMembership({
       teamId: team.$id,
       userId: user.$id,
-      roles: ["owner"],
+      roles: ["owner", "restaurant"],
     });
 
     const restaurantData: Record<string, unknown> = {

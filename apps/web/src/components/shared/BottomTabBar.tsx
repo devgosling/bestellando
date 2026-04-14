@@ -6,17 +6,35 @@ import {
   ListUl,
   ShoppingCart,
   Person,
+  ListCheck,
+  Book,
+  Gear,
 } from "@gravity-ui/icons";
 import { useCartStore } from "../../stores/cart-store";
 import { useUserContext } from "../../providers/useUserContext";
+import type { ComponentType, SVGProps } from "react";
 
-const TABS = [
+interface Tab {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label: string;
+  path: string;
+  showBadge?: boolean;
+}
+
+const CUSTOMER_TABS: Tab[] = [
   { icon: House, label: "Home", path: "/" },
   { icon: Magnifier, label: "Suche", path: "/restaurants" },
   { icon: ListUl, label: "Bestellungen", path: "/orders" },
   { icon: ShoppingCart, label: "Warenkorb", path: "/cart", showBadge: true },
   { icon: Person, label: "Profil", path: "/profile" },
-] as const;
+];
+
+const RESTAURANT_TABS: Tab[] = [
+  { icon: House, label: "Übersicht", path: "/dashboard" },
+  { icon: ListCheck, label: "Bestellungen", path: "/dashboard/orders" },
+  { icon: Book, label: "Speisekarte", path: "/dashboard/menu" },
+  { icon: Gear, label: "Einstellungen", path: "/dashboard/settings" },
+];
 
 export function BottomTabBar() {
   const navigate = useNavigate();
@@ -27,13 +45,18 @@ export function BottomTabBar() {
 
   if (!userContext) return null;
 
+  const isRestaurant = userContext.userRole === "RESTAURANT";
+  const tabs = isRestaurant ? RESTAURANT_TABS : CUSTOMER_TABS;
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center h-14 bg-surface border-t border-border lg:hidden">
-      {TABS.map((tab) => {
+      {tabs.map((tab) => {
         const isActive =
           tab.path === "/"
             ? currentPath === "/"
-            : currentPath.startsWith(tab.path);
+            : tab.path === "/dashboard"
+              ? currentPath === "/dashboard" || currentPath === "/dashboard/"
+              : currentPath.startsWith(tab.path);
         const Icon = tab.icon;
 
         const button = (

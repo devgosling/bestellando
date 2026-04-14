@@ -95,6 +95,15 @@ const Page = () => {
               Anmelden
             </Link>
           </p>
+          <p className="text-center text-sm text-muted">
+            Du hast ein Restaurant?{" "}
+            <Link
+              to="/auth/register/restaurant"
+              className="text-accent font-medium hover:underline"
+            >
+              Restaurant registrieren
+            </Link>
+          </p>
         </form>
       </div>
     </AnimatedPage>

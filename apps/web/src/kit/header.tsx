@@ -11,6 +11,7 @@ const Header = () => {
   const { userContext } = useUserContext();
   const loggedIn = userContext !== undefined;
   const isCustomer = userContext?.userRole === "CUSTOMER";
+  const isRestaurant = userContext?.userRole === "RESTAURANT";
   const totalItems = useCartStore((s) => s.getTotalItems());
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,18 +30,29 @@ const Header = () => {
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-1">
-          <a
-            href="/restaurants"
-            className="text-sm font-medium text-muted hover:text-foreground transition-colors no-underline px-3 py-2 rounded-lg hover:bg-surface-secondary"
-          >
-            Restaurants
-          </a>
-          <a
-            href="#how"
-            className="text-sm font-medium text-muted hover:text-foreground transition-colors no-underline px-3 py-2 rounded-lg hover:bg-surface-secondary"
-          >
-            So funktioniert's
-          </a>
+          {isRestaurant ? (
+            <a
+              href="/dashboard"
+              className="text-sm font-medium text-muted hover:text-foreground transition-colors no-underline px-3 py-2 rounded-lg hover:bg-surface-secondary"
+            >
+              Dashboard
+            </a>
+          ) : (
+            <>
+              <a
+                href="/restaurants"
+                className="text-sm font-medium text-muted hover:text-foreground transition-colors no-underline px-3 py-2 rounded-lg hover:bg-surface-secondary"
+              >
+                Restaurants
+              </a>
+              <a
+                href="#how"
+                className="text-sm font-medium text-muted hover:text-foreground transition-colors no-underline px-3 py-2 rounded-lg hover:bg-surface-secondary"
+              >
+                So funktioniert's
+              </a>
+            </>
+          )}
 
           <div className="w-px h-5 bg-border mx-2" />
 
@@ -70,12 +82,22 @@ const Header = () => {
               variant="solid"
               size="sm"
               className="bg-accent text-accent-foreground font-medium ml-2"
-              onPress={() => navigate({ to: "/profile" })}
+              onPress={() =>
+                navigate({ to: isRestaurant ? "/dashboard/settings" : "/profile" })
+              }
             >
-              Mein Konto
+              {isRestaurant ? "Einstellungen" : "Mein Konto"}
             </Button>
           ) : (
             <div className="flex gap-2 ml-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-foreground font-medium"
+                onPress={() => navigate({ to: "/auth/register/restaurant" })}
+              >
+                Für Restaurants
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -136,52 +158,77 @@ const Header = () => {
       {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-background border-b border-border px-4 py-3 flex flex-col gap-1 animate-in slide-in-from-top-2">
-          <a
-            href="/restaurants"
-            className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Restaurants
-          </a>
-          <a
-            href="#how"
-            className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            So funktioniert's
-          </a>
-          {loggedIn ? (
+          {isRestaurant ? (
             <a
-              href="/profile"
+              href="/dashboard"
               className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Mein Konto
+              Dashboard
             </a>
           ) : (
-            <div className="flex gap-2 pt-2 border-t border-border mt-1">
+            <>
+              <a
+                href="/restaurants"
+                className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Restaurants
+              </a>
+              <a
+                href="#how"
+                className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                So funktioniert's
+              </a>
+            </>
+          )}
+          {loggedIn ? (
+            <a
+              href={isRestaurant ? "/dashboard/settings" : "/profile"}
+              className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {isRestaurant ? "Einstellungen" : "Mein Konto"}
+            </a>
+          ) : (
+            <div className="flex flex-col gap-1 pt-2 border-t border-border mt-1">
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex-1 font-medium"
+                className="font-medium justify-start"
                 onPress={() => {
                   setMobileMenuOpen(false);
-                  navigate({ to: "/auth/login" });
+                  navigate({ to: "/auth/register/restaurant" });
                 }}
               >
-                Anmelden
+                Für Restaurants
               </Button>
-              <Button
-                variant="solid"
-                size="sm"
-                className="flex-1 bg-accent text-accent-foreground font-medium"
-                onPress={() => {
-                  setMobileMenuOpen(false);
-                  navigate({ to: "/auth/register/user" });
-                }}
-              >
-                Registrieren
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex-1 font-medium"
+                  onPress={() => {
+                    setMobileMenuOpen(false);
+                    navigate({ to: "/auth/login" });
+                  }}
+                >
+                  Anmelden
+                </Button>
+                <Button
+                  variant="solid"
+                  size="sm"
+                  className="flex-1 bg-accent text-accent-foreground font-medium"
+                  onPress={() => {
+                    setMobileMenuOpen(false);
+                    navigate({ to: "/auth/register/user" });
+                  }}
+                >
+                  Registrieren
+                </Button>
+              </div>
             </div>
           )}
         </div>
