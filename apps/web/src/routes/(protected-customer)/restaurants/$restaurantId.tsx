@@ -25,17 +25,16 @@ const RestaurantDetailPage = () => {
       queryKey: ["restaurant", restaurantId],
     });
 
-  const { data: productsData, isLoading: isLoadingProducts } = useApiQuery<{
-    data: ProductEntity[];
-  }>({
-    request: {
-      url: `/v1/product?restaurantId=${restaurantId}`,
-      requiresAuth: false,
-    },
-    queryKey: ["products", restaurantId],
-  });
+  const { data: productsData, isLoading: isLoadingProducts } =
+    useApiQuery<ProductEntity[]>({
+      request: {
+        url: `/v1/product?restaurantId=${restaurantId}`,
+        requiresAuth: false,
+      },
+      queryKey: ["products", restaurantId],
+    });
 
-  const products = productsData?.data ?? [];
+  const products = productsData ?? [];
   const featuredProducts = products.filter((p) => p.isFeatured);
   const regularProducts = products.filter((p) => !p.isFeatured);
   const isLoading = isLoadingRestaurant || isLoadingProducts;

@@ -19,8 +19,15 @@ function getDestination(
   delivery: DeliveryEntity,
   order: OrderEntity,
 ): { position: LatLng; label: string } | null {
-  if (delivery.status === "ASSIGNED" && order.restaurant?.address) {
-    const coords = order.restaurant.address.coordinates;
+  const restaurantAddr = order.restaurant?.address;
+  if (
+    delivery.status === "ASSIGNED" &&
+    restaurantAddr &&
+    typeof restaurantAddr !== "string"
+  ) {
+    const coords = restaurantAddr.coordinates as unknown as
+      | { coordinates: [number, number] }
+      | undefined;
     if (coords) {
       return {
         position: [coords.coordinates[1], coords.coordinates[0]],
@@ -32,7 +39,9 @@ function getDestination(
     (delivery.status === "PICKED_UP" || delivery.status === "IN_TRANSIT") &&
     order.deliveryAddress?.coordinates
   ) {
-    const coords = order.deliveryAddress.coordinates;
+    const coords = order.deliveryAddress.coordinates as unknown as {
+      coordinates: [number, number];
+    };
     return {
       position: [coords.coordinates[1], coords.coordinates[0]],
       label: "Lieferadresse",

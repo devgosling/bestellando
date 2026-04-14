@@ -28,10 +28,11 @@ export class AddressController {
     @Body() body: Partial<AddressEntity>,
   ) {
     const userId = this.actorContextService.get().user.id;
-    return this.addressService.createAddress("CUSTOMER", {
+    const ownerType = body.ownerType === "RESTAURANT" ? "RESTAURANT" : "CUSTOMER";
+    return this.addressService.createAddress(ownerType, {
       ...body,
       ownerId: userId,
-      ownerType: "CUSTOMER",
+      ownerType,
     });
   }
 

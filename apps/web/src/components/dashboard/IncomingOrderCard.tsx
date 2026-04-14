@@ -52,7 +52,7 @@ export function IncomingOrderCard({
 
         <div className="flex flex-col gap-1">
           <span className="text-sm text-muted">
-            Kunde: {order.customerId.slice(-6).toUpperCase()}
+            Kunde: {(typeof order.customer === "string" ? order.customer : order.customer.$id).slice(-6).toUpperCase()}
           </span>
           {order.specialInstructions && (
             <p className="text-sm italic text-muted">

@@ -111,12 +111,54 @@ export class RestaurantService {
   public async getRestaurantFromUser() {
     const actorContext = this.actorContextService.get();
     const userId = actorContext.user.id;
+    const databaseId = this.configService.get<string>("DATABASE_ID")!;
 
     const restaurants = await this.dataBase.listRows({
-      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      databaseId,
       tableId: "restaurant",
       queries: [Query.equal("ownerId", userId)],
     });
+
+    for (const restaurant of restaurants.rows) {
+      const r = restaurant as unknown as { $id: string; address?: { $id: string } | string | null };
+      const hasAddress = typeof r.address === "object" ? !!r.address?.$id : !!r.address;
+      if (hasAddress) continue;
+
+      const addresses = await this.dataBase.listRows({
+        databaseId,
+        tableId: "address",
+        queries: [Query.equal("ownerId", userId), Query.limit(1)],
+      });
+      const orphan = addresses.rows[0] as unknown as { $id: string; ownerType?: string } | undefined;
+      if (!orphan) continue;
+
+      if (orphan.ownerType !== "RESTAURANT") {
+        await this.dataBase.updateRow({
+          databaseId,
+          tableId: "address",
+          rowId: orphan.$id,
+          data: { ownerType: "RESTAURANT" },
+        });
+      }
+      await this.dataBase.updateRow({
+        databaseId,
+        tableId: "restaurant",
+        rowId: r.$id,
+        data: { address: orphan.$id },
+      });
+    }
+
+    if (restaurants.rows.some((row) => {
+      const r = row as unknown as { address?: { $id: string } | string | null };
+      const hasAddress = typeof r.address === "object" ? !!r.address?.$id : !!r.address;
+      return !hasAddress;
+    })) {
+      return await this.dataBase.listRows({
+        databaseId,
+        tableId: "restaurant",
+        queries: [Query.equal("ownerId", userId)],
+      });
+    }
 
     return restaurants;
   }

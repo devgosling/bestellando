@@ -12,7 +12,11 @@ import {
   TextField,
 } from "@heroui/react";
 import { ToggleSwitch } from "../shared/ToggleSwitch";
-import type { RestaurantEntity, RestaurantType } from "@repo/interfaces";
+import type {
+  AddressEntity,
+  RestaurantEntity,
+  RestaurantType,
+} from "@repo/interfaces";
 import { RestaurantTypeNames } from "@repo/interfaces";
 import { useState, useEffect } from "react";
 
@@ -41,6 +45,7 @@ export interface SettingsFormData {
 
 interface RestaurantSettingsFormProps {
   restaurant: RestaurantEntity;
+  address?: AddressEntity;
   onSubmit: (data: SettingsFormData) => void;
   isLoading?: boolean;
 }
@@ -52,7 +57,15 @@ const restaurantTypes = Object.entries(RestaurantTypeNames).map(
   }),
 );
 
-function buildInitial(restaurant: RestaurantEntity): SettingsFormData {
+function buildInitial(
+  restaurant: RestaurantEntity,
+  address?: AddressEntity,
+): SettingsFormData {
+  const addr =
+    address ??
+    (restaurant.address && typeof restaurant.address === "object"
+      ? (restaurant.address as AddressEntity)
+      : undefined);
   return {
     restaurant: {
       name: restaurant.name,
@@ -65,26 +78,27 @@ function buildInitial(restaurant: RestaurantEntity): SettingsFormData {
       isActive: restaurant.isActive,
     },
     address: {
-      street: restaurant.address?.street ?? "",
-      streetNumber: restaurant.address?.streetNumber ?? "",
-      zipCode: restaurant.address?.zipCode ?? "",
-      city: restaurant.address?.city ?? "",
+      street: addr?.street ?? "",
+      streetNumber: addr?.streetNumber ?? "",
+      zipCode: addr?.zipCode ?? "",
+      city: addr?.city ?? "",
     },
   };
 }
 
 export function RestaurantSettingsForm({
   restaurant,
+  address,
   onSubmit,
   isLoading,
 }: RestaurantSettingsFormProps) {
   const [form, setForm] = useState<SettingsFormData>(() =>
-    buildInitial(restaurant),
+    buildInitial(restaurant, address),
   );
 
   useEffect(() => {
-    setForm(buildInitial(restaurant));
-  }, [restaurant]);
+    setForm(buildInitial(restaurant, address));
+  }, [restaurant, address]);
 
   const updateField = <K extends keyof SettingsFormData["restaurant"]>(
     key: K,

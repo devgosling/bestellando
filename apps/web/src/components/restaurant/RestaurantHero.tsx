@@ -1,7 +1,8 @@
 import { Chip } from "@heroui/react";
 import { Clock } from "@gravity-ui/icons";
-import type { RestaurantEntity } from "@repo/interfaces";
+import type { OpeningHoursEntity, RestaurantEntity } from "@repo/interfaces";
 import { RestaurantTypeNames } from "@repo/interfaces";
+import { useApiQuery } from "@repo/hooks";
 import { PriceDisplay } from "../shared/PriceDisplay";
 import { OpeningHoursBadge } from "./OpeningHoursBadge";
 
@@ -10,13 +11,20 @@ interface RestaurantHeroProps {
 }
 
 export function RestaurantHero({ restaurant }: RestaurantHeroProps) {
+  const { data: hours } = useApiQuery<OpeningHoursEntity[]>({
+    request: {
+      url: `/v1/opening-hours?restaurantId=${restaurant.$id}`,
+      requiresAuth: false,
+    },
+    queryKey: ["opening-hours", restaurant.$id],
+  });
   return (
     <div
       className="relative overflow-hidden rounded-xl bg-linear-to-br from-accent/80 to-accent"
     >
       <div className="px-6 py-8 sm:py-12">
         <div className="absolute top-4 right-4">
-          <OpeningHoursBadge isActive={restaurant.isActive} />
+          <OpeningHoursBadge hours={hours ?? []} />
         </div>
         <h2 className="text-2xl font-bold text-white sm:text-3xl">
           {restaurant.name}

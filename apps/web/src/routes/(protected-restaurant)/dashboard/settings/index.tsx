@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useApiQuery } from "@repo/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { authenticatedFetch } from "@repo/lib";
-import type { RestaurantEntity } from "@repo/interfaces";
+import type { AddressEntity, RestaurantEntity } from "@repo/interfaces";
 import { AnimatedPage } from "../../../../components/shared/AnimatedPage";
 import { LoadingSkeleton } from "../../../../components/shared/LoadingSkeleton";
 import {
@@ -22,6 +22,28 @@ function SettingsPage() {
 
   const restaurant = restaurants?.[0];
 
+  const addressIdFromRestaurant = useMemo(() => {
+    const a = restaurant?.address as AddressEntity | string | undefined;
+    if (!a) return undefined;
+    return typeof a === "string" ? a : a.$id;
+  }, [restaurant]);
+
+  const { data: addresses } = useApiQuery<AddressEntity[]>({
+    request: { url: "/v1/address" },
+    queryKey: ["addresses", "mine"],
+    enabled: !!restaurant,
+  });
+
+  const restaurantAddress = useMemo<AddressEntity | undefined>(() => {
+    if (restaurant?.address && typeof restaurant.address === "object") {
+      return restaurant.address as AddressEntity;
+    }
+    if (addressIdFromRestaurant && addresses) {
+      return addresses.find((a) => a.$id === addressIdFromRestaurant);
+    }
+    return addresses?.find((a) => a.ownerType === "RESTAURANT");
+  }, [restaurant, addresses, addressIdFromRestaurant]);
+
   const handleSubmit = async (data: SettingsFormData) => {
     if (!restaurant) return;
     setIsSaving(true);
@@ -31,7 +53,7 @@ function SettingsPage() {
         body: JSON.stringify(data.restaurant),
       });
 
-      const addressId = restaurant.address?.$id;
+      const addressId = restaurantAddress?.$id ?? addressIdFromRestaurant;
       if (addressId) {
         await authenticatedFetch(`/v1/address/${addressId}`, {
           method: "PATCH",
@@ -52,6 +74,7 @@ function SettingsPage() {
       }
 
       queryClient.invalidateQueries({ queryKey: ["restaurant", "mine"] });
+      queryClient.invalidateQueries({ queryKey: ["addresses", "mine"] });
     } finally {
       setIsSaving(false);
     }
@@ -84,6 +107,7 @@ function SettingsPage() {
 
       <RestaurantSettingsForm
         restaurant={restaurant}
+        address={restaurantAddress}
         onSubmit={handleSubmit}
         isLoading={isSaving}
       />

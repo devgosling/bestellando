@@ -32,8 +32,8 @@ function MenuPage() {
   const restaurant = restaurants?.[0];
 
   const { data: products, isLoading } = useApiQuery<ProductEntity[]>({
-    request: { url: "/v1/product" },
-    queryKey: ["products"],
+    request: { url: `/v1/product?restaurantId=${restaurant?.$id ?? ""}` },
+    queryKey: ["products", restaurant?.$id],
     enabled: !!restaurant,
   });
 
@@ -69,11 +69,7 @@ function MenuPage() {
     },
   });
 
-  const restaurantProducts = (products ?? []).filter((p) =>
-    restaurant ? p.restaurant.$id === restaurant.$id : true,
-  );
-
-  const filteredProducts = restaurantProducts.filter(
+  const filteredProducts = (products ?? []).filter(
     (p) =>
       !search ||
       p.name.toLowerCase().includes(search.toLowerCase()) ||

@@ -7,6 +7,7 @@ import {
   Clock,
   Gear,
   Bars,
+  GeoPin,
 } from "@gravity-ui/icons";
 import { useState } from "react";
 
@@ -15,6 +16,7 @@ const navItems = [
   { to: "/dashboard/orders", label: "Bestellungen", icon: ListCheck },
   { to: "/dashboard/menu", label: "Speisekarte", icon: Book },
   { to: "/dashboard/opening-hours", label: "Öffnungszeiten", icon: Clock },
+  { to: "/dashboard/delivery-zones", label: "Lieferzonen", icon: GeoPin },
   { to: "/dashboard/settings", label: "Einstellungen", icon: Gear },
 ] as const;
 

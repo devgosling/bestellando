@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { DatabaseService } from "../../database/service/database.service";
-import { OpeningHoursEntity } from "@repo/interfaces";
+import { DeliveryZoneEntity } from "@repo/interfaces";
 import { ID, Permission, Query, Role, TablesDB } from "node-appwrite";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
-export class OpeningHoursService {
+export class DeliveryZoneService {
   private readonly dataBase: TablesDB;
 
   constructor(
@@ -15,59 +15,66 @@ export class OpeningHoursService {
     this.dataBase = this.databaseService.getDatabase();
   }
 
-  async createOpeningHours(entity: Partial<OpeningHoursEntity>) {
-    const { restaurantId, restaurant, ...rest } = entity as Record<string, unknown>;
-    const relation = restaurant ?? restaurantId;
-    const data: Record<string, unknown> = {
-      ...rest,
-      isClosed: (rest.isClosed as boolean | undefined) ?? false,
-    };
+  private normalizeData(
+    input: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const { restaurantId, restaurant, ...rest } = input;
+    const relation =
+      restaurant ??
+      (typeof restaurantId === "string" ? restaurantId : undefined);
+    const data: Record<string, unknown> = { ...rest };
     if (relation !== undefined) data.restaurant = relation;
+    return data;
+  }
+
+  async createDeliveryZone(
+    entity: Partial<DeliveryZoneEntity> & { restaurantId?: string },
+  ) {
     return this.dataBase.createRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "opening_hours",
+      tableId: "delivery_zone",
       rowId: ID.unique(),
-      data,
+      data: this.normalizeData(entity as unknown as Record<string, unknown>),
       permissions: [Permission.read(Role.any())],
     });
   }
 
-  async getOpeningHoursById(id: string) {
+  async getDeliveryZoneById(id: string) {
     return this.dataBase.getRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "opening_hours",
+      tableId: "delivery_zone",
       rowId: id,
     });
   }
 
-  async getAllOpeningHours() {
+  async getAllDeliveryZones(restaurantId?: string) {
+    const queries: string[] = [];
+    if (restaurantId) {
+      queries.push(Query.equal("restaurant", restaurantId));
+    }
     return this.dataBase.listRows({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "opening_hours",
+      tableId: "delivery_zone",
+      queries,
     });
   }
 
-  async getByRestaurant(restaurantId: string) {
-    return this.dataBase.listRows({
-      databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "opening_hours",
-      queries: [Query.equal("restaurant", restaurantId)],
-    });
-  }
-
-  async updateOpeningHours(id: string, patch: Partial<OpeningHoursEntity>) {
+  async updateDeliveryZone(
+    id: string,
+    patch: Partial<DeliveryZoneEntity> & { restaurantId?: string },
+  ) {
     return this.dataBase.updateRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "opening_hours",
+      tableId: "delivery_zone",
       rowId: id,
-      data: patch as object as Record<string, unknown>,
+      data: this.normalizeData(patch as unknown as Record<string, unknown>),
     });
   }
 
-  async deleteOpeningHours(id: string) {
+  async deleteDeliveryZone(id: string) {
     return this.dataBase.deleteRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "opening_hours",
+      tableId: "delivery_zone",
       rowId: id,
     });
   }

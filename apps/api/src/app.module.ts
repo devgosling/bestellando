@@ -12,6 +12,7 @@ import { ModifierOptionModule } from "./modifierOption/modifier-option.module";
 import { PaymentModule } from "./payment/payment.module";
 import { GatewayModule } from "./gateway/gateway.module";
 import { DeliveryModule } from "./delivery/delivery.module";
+import { DeliveryZoneModule } from "./delivery-zone/delivery-zone.module";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -35,6 +36,7 @@ import { ClsModule } from "nestjs-cls/dist/src/lib/cls-module/cls.module";
     PaymentModule,
     GatewayModule,
     DeliveryModule,
+    DeliveryZoneModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     ClsModule.forRoot({

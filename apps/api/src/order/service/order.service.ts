@@ -143,7 +143,7 @@ export class OrderService {
         deliveryFee,
         totalAmount,
         specialInstructions: dto.specialInstructions || "",
-        customerId: userId,
+        customer: userId,
         paymentStatus: "UNPAID",
         createdAt: new Date().toISOString(),
       },
@@ -257,7 +257,7 @@ export class OrderService {
       databaseId,
       tableId: "order",
       queries: [
-        Query.equal("customerId", userId),
+        Query.equal("customer", userId),
         Query.orderDesc("$createdAt"),
         Query.limit(limit),
         Query.offset(offset),
@@ -289,7 +289,9 @@ export class OrderService {
       const userId = this.actorContextService.get().user.id;
       const userType = await this.userService.getUserType();
 
-      if (userType === "CUSTOMER" && order.customerId !== userId) {
+      const customerRel = order.customer as { $id?: string } | string | undefined;
+      const customerId = typeof customerRel === "object" ? customerRel?.$id : customerRel;
+      if (userType === "CUSTOMER" && customerId !== userId) {
         throw new NotFoundException("Order not found");
       }
 

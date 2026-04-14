@@ -28,7 +28,7 @@ export class ModifierOptionService {
       tableId: "modifier_option",
       rowId: ID.unique(),
       data: {
-        product: dto.product,
+        Product: dto.product,
         name: dto.name,
         priceDelta: dto.priceDelta,
         isDefault: dto.isDefault ?? false,
@@ -70,7 +70,7 @@ export class ModifierOptionService {
     const result = await this.dataBase.listRows({
       databaseId: this.databaseId,
       tableId: "modifier_option",
-      queries: [Query.equal("product", productId)],
+      queries: [Query.equal("Product", productId)],
     });
     return { data: result.rows, total: result.total };
   }

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as protectedRestaurantRouteRouteImport } from './routes/(protected-restaurant)/route'
 import { Route as protectedDeliveryRouteRouteImport } from './routes/(protected-delivery)/route'
@@ -33,7 +34,13 @@ import { Route as protectedRestaurantDashboardSettingsIndexRouteImport } from '.
 import { Route as protectedRestaurantDashboardOrdersIndexRouteImport } from './routes/(protected-restaurant)/dashboard/orders/index'
 import { Route as protectedRestaurantDashboardOpeningHoursIndexRouteImport } from './routes/(protected-restaurant)/dashboard/opening-hours/index'
 import { Route as protectedRestaurantDashboardMenuIndexRouteImport } from './routes/(protected-restaurant)/dashboard/menu/index'
+import { Route as protectedRestaurantDashboardDeliveryZonesIndexRouteImport } from './routes/(protected-restaurant)/dashboard/delivery-zones/index'
 
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -166,10 +173,17 @@ const protectedRestaurantDashboardMenuIndexRoute =
     path: '/menu/',
     getParentRoute: () => protectedRestaurantDashboardRouteRoute,
   } as any)
+const protectedRestaurantDashboardDeliveryZonesIndexRoute =
+  protectedRestaurantDashboardDeliveryZonesIndexRouteImport.update({
+    id: '/delivery-zones/',
+    path: '/delivery-zones/',
+    getParentRoute: () => protectedRestaurantDashboardRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/map': typeof MapRoute
   '/dashboard': typeof protectedRestaurantDashboardRouteRouteWithChildren
   '/cart': typeof protectedCustomerCartRoute
   '/checkout': typeof protectedCustomerCheckoutRoute
@@ -185,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
   '/deliveries/': typeof protectedDeliveryDeliveriesIndexRoute
   '/dashboard/': typeof protectedRestaurantDashboardIndexRoute
+  '/dashboard/delivery-zones/': typeof protectedRestaurantDashboardDeliveryZonesIndexRoute
   '/dashboard/menu/': typeof protectedRestaurantDashboardMenuIndexRoute
   '/dashboard/opening-hours/': typeof protectedRestaurantDashboardOpeningHoursIndexRoute
   '/dashboard/orders/': typeof protectedRestaurantDashboardOrdersIndexRoute
@@ -193,6 +208,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
+  '/map': typeof MapRoute
   '/cart': typeof protectedCustomerCartRoute
   '/checkout': typeof protectedCustomerCheckoutRoute
   '/auth/login': typeof AuthLoginRoute
@@ -207,6 +223,7 @@ export interface FileRoutesByTo {
   '/restaurants': typeof protectedCustomerRestaurantsIndexRoute
   '/deliveries': typeof protectedDeliveryDeliveriesIndexRoute
   '/dashboard': typeof protectedRestaurantDashboardIndexRoute
+  '/dashboard/delivery-zones': typeof protectedRestaurantDashboardDeliveryZonesIndexRoute
   '/dashboard/menu': typeof protectedRestaurantDashboardMenuIndexRoute
   '/dashboard/opening-hours': typeof protectedRestaurantDashboardOpeningHoursIndexRoute
   '/dashboard/orders': typeof protectedRestaurantDashboardOrdersIndexRoute
@@ -219,6 +236,7 @@ export interface FileRoutesById {
   '/(protected-delivery)': typeof protectedDeliveryRouteRouteWithChildren
   '/(protected-restaurant)': typeof protectedRestaurantRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
+  '/map': typeof MapRoute
   '/(protected-restaurant)/dashboard': typeof protectedRestaurantDashboardRouteRouteWithChildren
   '/(protected-customer)/cart': typeof protectedCustomerCartRoute
   '/(protected-customer)/checkout': typeof protectedCustomerCheckoutRoute
@@ -234,6 +252,7 @@ export interface FileRoutesById {
   '/(protected-customer)/restaurants/': typeof protectedCustomerRestaurantsIndexRoute
   '/(protected-delivery)/deliveries/': typeof protectedDeliveryDeliveriesIndexRoute
   '/(protected-restaurant)/dashboard/': typeof protectedRestaurantDashboardIndexRoute
+  '/(protected-restaurant)/dashboard/delivery-zones/': typeof protectedRestaurantDashboardDeliveryZonesIndexRoute
   '/(protected-restaurant)/dashboard/menu/': typeof protectedRestaurantDashboardMenuIndexRoute
   '/(protected-restaurant)/dashboard/opening-hours/': typeof protectedRestaurantDashboardOpeningHoursIndexRoute
   '/(protected-restaurant)/dashboard/orders/': typeof protectedRestaurantDashboardOrdersIndexRoute
@@ -244,6 +263,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/map'
     | '/dashboard'
     | '/cart'
     | '/checkout'
@@ -259,6 +279,7 @@ export interface FileRouteTypes {
     | '/restaurants/'
     | '/deliveries/'
     | '/dashboard/'
+    | '/dashboard/delivery-zones/'
     | '/dashboard/menu/'
     | '/dashboard/opening-hours/'
     | '/dashboard/orders/'
@@ -267,6 +288,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/map'
     | '/cart'
     | '/checkout'
     | '/auth/login'
@@ -281,6 +303,7 @@ export interface FileRouteTypes {
     | '/restaurants'
     | '/deliveries'
     | '/dashboard'
+    | '/dashboard/delivery-zones'
     | '/dashboard/menu'
     | '/dashboard/opening-hours'
     | '/dashboard/orders'
@@ -292,6 +315,7 @@ export interface FileRouteTypes {
     | '/(protected-delivery)'
     | '/(protected-restaurant)'
     | '/auth'
+    | '/map'
     | '/(protected-restaurant)/dashboard'
     | '/(protected-customer)/cart'
     | '/(protected-customer)/checkout'
@@ -307,6 +331,7 @@ export interface FileRouteTypes {
     | '/(protected-customer)/restaurants/'
     | '/(protected-delivery)/deliveries/'
     | '/(protected-restaurant)/dashboard/'
+    | '/(protected-restaurant)/dashboard/delivery-zones/'
     | '/(protected-restaurant)/dashboard/menu/'
     | '/(protected-restaurant)/dashboard/opening-hours/'
     | '/(protected-restaurant)/dashboard/orders/'
@@ -319,10 +344,18 @@ export interface RootRouteChildren {
   protectedDeliveryRouteRoute: typeof protectedDeliveryRouteRouteWithChildren
   protectedRestaurantRouteRoute: typeof protectedRestaurantRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  MapRoute: typeof MapRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -491,6 +524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof protectedRestaurantDashboardMenuIndexRouteImport
       parentRoute: typeof protectedRestaurantDashboardRouteRoute
     }
+    '/(protected-restaurant)/dashboard/delivery-zones/': {
+      id: '/(protected-restaurant)/dashboard/delivery-zones/'
+      path: '/delivery-zones'
+      fullPath: '/dashboard/delivery-zones/'
+      preLoaderRoute: typeof protectedRestaurantDashboardDeliveryZonesIndexRouteImport
+      parentRoute: typeof protectedRestaurantDashboardRouteRoute
+    }
   }
 }
 
@@ -542,6 +582,7 @@ const protectedDeliveryRouteRouteWithChildren =
 
 interface protectedRestaurantDashboardRouteRouteChildren {
   protectedRestaurantDashboardIndexRoute: typeof protectedRestaurantDashboardIndexRoute
+  protectedRestaurantDashboardDeliveryZonesIndexRoute: typeof protectedRestaurantDashboardDeliveryZonesIndexRoute
   protectedRestaurantDashboardMenuIndexRoute: typeof protectedRestaurantDashboardMenuIndexRoute
   protectedRestaurantDashboardOpeningHoursIndexRoute: typeof protectedRestaurantDashboardOpeningHoursIndexRoute
   protectedRestaurantDashboardOrdersIndexRoute: typeof protectedRestaurantDashboardOrdersIndexRoute
@@ -552,6 +593,8 @@ const protectedRestaurantDashboardRouteRouteChildren: protectedRestaurantDashboa
   {
     protectedRestaurantDashboardIndexRoute:
       protectedRestaurantDashboardIndexRoute,
+    protectedRestaurantDashboardDeliveryZonesIndexRoute:
+      protectedRestaurantDashboardDeliveryZonesIndexRoute,
     protectedRestaurantDashboardMenuIndexRoute:
       protectedRestaurantDashboardMenuIndexRoute,
     protectedRestaurantDashboardOpeningHoursIndexRoute:
@@ -606,6 +649,7 @@ const rootRouteChildren: RootRouteChildren = {
   protectedDeliveryRouteRoute: protectedDeliveryRouteRouteWithChildren,
   protectedRestaurantRouteRoute: protectedRestaurantRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  MapRoute: MapRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

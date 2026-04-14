@@ -1,6 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useApiQuery } from "@repo/hooks";
 import { useState } from "react";
+import { Button } from "@heroui/react";
+import { Map as MapIcon } from "lucide-react";
 import type { RestaurantEntity } from "@repo/interfaces";
 import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 import { LoadingSkeleton } from "../../../components/shared/LoadingSkeleton";
@@ -9,6 +11,7 @@ import { RestaurantCard } from "../../../components/restaurant/RestaurantCard";
 import { RestaurantFilters } from "../../../components/restaurant/RestaurantFilters";
 
 const RestaurantsPage = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<string[]>([]);
 
@@ -38,7 +41,19 @@ const RestaurantsPage = () => {
   return (
     <AnimatedPage>
       <div className="max-w-[1280px] mx-auto px-4 lg:px-8 py-6">
-        <h1 className="text-2xl font-bold text-foreground mt-0 mb-4">Restaurants</h1>
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h1 className="text-2xl font-bold text-foreground mt-0 m-0">
+            Restaurants
+          </h1>
+          <Button
+            variant="ghost"
+            size="sm"
+            startContent={<MapIcon className="size-4" />}
+            onPress={() => navigate({ to: "/map" })}
+          >
+            Karte
+          </Button>
+        </div>
         <RestaurantFilters onSearchChange={setSearch} onFilterChange={setFilters} />
 
         {isLoading ? (

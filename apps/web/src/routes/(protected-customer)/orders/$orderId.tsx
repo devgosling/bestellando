@@ -181,11 +181,27 @@ function OrderDetailPage() {
       </Card>
 
       {/* Live delivery tracking map */}
-      {order.deliveryPersonId &&
-        (order.currentStatus === "PICKED_UP" ||
-          order.currentStatus === "DELIVERED") &&
-        order.restaurant?.address?.coordinates &&
-        order.deliveryAddress?.coordinates && (
+      {(() => {
+        const restAddr = order.restaurant?.address;
+        const restCoords =
+          restAddr && typeof restAddr !== "string"
+            ? (restAddr.coordinates as unknown as
+                | { coordinates: [number, number] }
+                | undefined)
+            : undefined;
+        const delivCoords = order.deliveryAddress?.coordinates as unknown as
+          | { coordinates: [number, number] }
+          | undefined;
+        if (
+          !order.deliveryPersonId ||
+          (order.currentStatus !== "PICKED_UP" &&
+            order.currentStatus !== "DELIVERED") ||
+          !restCoords ||
+          !delivCoords
+        ) {
+          return null;
+        }
+        return (
           <Card className="mb-4">
             <CardHeader>
               <h2 className="text-lg font-semibold">Live-Tracking</h2>
@@ -194,18 +210,19 @@ function OrderDetailPage() {
               <DeliveryMap
                 orderId={orderId}
                 restaurantPosition={[
-                  order.restaurant.address.coordinates.coordinates[1],
-                  order.restaurant.address.coordinates.coordinates[0],
+                  restCoords.coordinates[1],
+                  restCoords.coordinates[0],
                 ]}
                 customerPosition={[
-                  order.deliveryAddress.coordinates.coordinates[1],
-                  order.deliveryAddress.coordinates.coordinates[0],
+                  delivCoords.coordinates[1],
+                  delivCoords.coordinates[0],
                 ]}
                 restaurantName={order.restaurant.name}
               />
             </CardContent>
           </Card>
-        )}
+        );
+      })()}
 
       {/* Retry payment for PENDING orders */}
       {order.currentStatus === "PENDING" &&

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Delete,
+  Query,
 } from "@nestjs/common";
 import { ProductService } from "../service/product.service";
 import { type ProductEntity } from "@repo/interfaces";
@@ -30,8 +31,8 @@ export class ProductController {
 
   @Get()
   @Public()
-  async findAll() {
-    const result = await this.productService.getAllProducts();
+  async findAll(@Query("restaurantId") restaurantId?: string) {
+    const result = await this.productService.getAllProducts(restaurantId);
     return result.rows;
   }
 

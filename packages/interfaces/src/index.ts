@@ -10,4 +10,5 @@ export * from "./order-item.interface.js";
 export * from "./order-status-history.interface.js";
 export * from "./delivery-person.interface.js";
 export * from "./delivery.interface.js";
+export * from "./delivery-zone.interface.js";
 export * from "./ws-events.js";

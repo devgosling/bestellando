@@ -28,6 +28,10 @@ function OpeningHoursPage() {
 
   const saveMutation = useApiMutation<void, Error, DayRow[]>({
     mutationFn: async (rows) => {
+      const restaurantId = restaurant?.$id;
+      if (!restaurantId) {
+        throw new Error("Restaurant noch nicht geladen");
+      }
       const existingHours = hours ?? [];
       const promises: Promise<unknown>[] = [];
 
@@ -53,7 +57,7 @@ function OpeningHoursPage() {
             dayOfWeek: row.dayOfWeek,
             openTime: slot.openTime,
             closeTime: slot.closeTime,
-            restaurant: restaurant?.$id,
+            restaurant: restaurantId,
           });
 
           if (slot.entityId) {
@@ -94,7 +98,7 @@ function OpeningHoursPage() {
     },
   });
 
-  if (isLoading) {
+  if (isLoading || !restaurant) {
     return (
       <div className="p-6">
         <LoadingSkeleton count={7} type="row" />

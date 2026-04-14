@@ -30,7 +30,7 @@ export interface RestaurantEntity {
   name: string;
   description: string;
   phone: string;
-  address: AddressEntity;
+  address: AddressEntity | string | null;
   type: RestaurantType;
 
   imageUrl?: string;

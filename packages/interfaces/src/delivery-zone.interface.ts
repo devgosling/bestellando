@@ -1,10 +1,8 @@
 import type { RestaurantEntity } from "./restaurant.interface.js";
 
-export interface OpeningHoursEntity {
+export interface DeliveryZoneEntity {
   $id: string;
-  dayOfWeek: number;
-  isClosed: boolean;
-  openTime: string;
-  closeTime: string;
+  maxRadiusKm: number;
+  deliveryFeeOverride: number;
   restaurant: RestaurantEntity | string;
 }

@@ -1,12 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Button, Chip, Input } from "@heroui/react";
-import {
-  Magnifier,
-  StarFill,
-  Clock,
-  GeoPin,
-  Rocket,
-} from "@gravity-ui/icons";
+import { Magnifier, StarFill, Clock, GeoPin, Rocket } from "@gravity-ui/icons";
 import {
   Pizza,
   Sandwich,
@@ -16,10 +10,16 @@ import {
   Salad,
   Flame,
   CookingPot,
-  Wheat,
   UtensilsCrossed,
+  Map as MapIcon,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useApiQuery, useUserLocation } from "@repo/hooks";
+import type { RestaurantEntity, RestaurantType } from "@repo/interfaces";
+import { RestaurantTypeNames } from "@repo/interfaces";
 import { AnimatedPage } from "../components/shared/AnimatedPage";
+import { LoadingSkeleton } from "../components/shared/LoadingSkeleton";
+import { EmptyState } from "../components/shared/EmptyState";
 import type { ComponentType, SVGProps } from "react";
 import type { LucideProps } from "lucide-react";
 
@@ -38,21 +38,18 @@ const CATEGORIES: { icon: IconComponent; name: string }[] = [
   { icon: CookingPot, name: "Indisch" },
 ];
 
-const RESTAURANTS: {
-  name: string;
-  icon: IconComponent;
-  rating: number;
-  time: string;
-  min: string;
-  tag: string;
-}[] = [
-  { name: "Pizza Napoli", icon: Pizza, rating: 4.7, time: "25-35", min: "12,00", tag: "Italienisch" },
-  { name: "Burger Meister", icon: Sandwich, rating: 4.5, time: "20-30", min: "10,00", tag: "Amerikanisch" },
-  { name: "Sushi Garden", icon: Fish, rating: 4.9, time: "30-45", min: "15,00", tag: "Japanisch" },
-  { name: "Döner König", icon: Beef, rating: 4.4, time: "15-25", min: "8,00", tag: "Türkisch" },
-  { name: "Wok Express", icon: Soup, rating: 4.6, time: "25-35", min: "12,00", tag: "Asiatisch" },
-  { name: "Pasta Palace", icon: Wheat, rating: 4.7, time: "25-35", min: "11,00", tag: "Italienisch" },
-];
+const TYPE_ICONS: Partial<Record<RestaurantType, IconComponent>> = {
+  italian: Pizza,
+  fast_food: Sandwich,
+  asian: Soup,
+  chinese: Soup,
+  mexican: Flame,
+  indian: CookingPot,
+  vegetarian: Salad,
+  vegan: Salad,
+  dessert: Pizza,
+  other: UtensilsCrossed,
+};
 
 const STEPS = [
   { icon: GeoPin, title: "Adresse eingeben", desc: "Finde Restaurants in deiner Nähe" },
@@ -60,8 +57,70 @@ const STEPS = [
   { icon: Rocket, title: "Liefern lassen", desc: "Frisch und schnell an deine Tür" },
 ];
 
+interface RestaurantListResponse {
+  data: RestaurantEntity[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+function getLatLng(r: RestaurantEntity): [number, number] | null {
+  const addr = r.address;
+  if (!addr || typeof addr === "string") return null;
+  const coords = addr.coordinates as unknown as
+    | { coordinates?: number[] }
+    | undefined;
+  const arr = coords?.coordinates;
+  if (Array.isArray(arr) && arr.length === 2) {
+    return [arr[1], arr[0]];
+  }
+  return null;
+}
+
+function haversineKm(a: [number, number], b: [number, number]) {
+  const R = 6371;
+  const dLat = ((b[0] - a[0]) * Math.PI) / 180;
+  const dLng = ((b[1] - a[1]) * Math.PI) / 180;
+  const lat1 = (a[0] * Math.PI) / 180;
+  const lat2 = (b[0] * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
 const Page = () => {
   const navigate = useNavigate();
+  const { location, isLoading: locationLoading } = useUserLocation();
+  const [address, setAddress] = useState("");
+
+  useEffect(() => {
+    if (location?.city && !address) {
+      setAddress(location.city);
+    }
+  }, [location, address]);
+
+  const { data, isLoading } = useApiQuery<RestaurantListResponse>({
+    request: {
+      url: "/v1/restaurant/list?isActive=true&limit=12",
+      requiresAuth: false,
+    },
+    queryKey: ["restaurants", "landing"],
+  });
+
+  const restaurants = useMemo(() => {
+    const list = data?.data ?? [];
+    if (!location) return list;
+    const userLatLng: [number, number] = [location.lat, location.lng];
+    return [...list].sort((a, b) => {
+      const la = getLatLng(a);
+      const lb = getLatLng(b);
+      const da = la ? haversineKm(userLatLng, la) : Number.POSITIVE_INFINITY;
+      const db = lb ? haversineKm(userLatLng, lb) : Number.POSITIVE_INFINITY;
+      return da - db;
+    });
+  }, [data?.data, location]);
 
   return (
     <AnimatedPage>
@@ -75,7 +134,9 @@ const Page = () => {
               <span className="text-accent">was Gutes.</span>
             </h1>
             <p className="text-muted text-base lg:text-lg mt-3 mb-6">
-              Entdecke die besten Restaurants in deiner Nähe
+              {location?.city
+                ? `Entdecke Restaurants in ${location.city}`
+                : "Entdecke die besten Restaurants in deiner Nähe"}
             </p>
             <div className="flex rounded-xl overflow-hidden border border-border bg-surface max-w-md">
               <div className="flex-1">
@@ -83,6 +144,8 @@ const Page = () => {
                   placeholder="Deine Adresse eingeben..."
                   variant="flat"
                   radius="none"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   classNames={{
                     inputWrapper: "bg-transparent shadow-none border-none h-12",
                     input: "text-sm",
@@ -93,9 +156,27 @@ const Page = () => {
                 radius="none"
                 className="h-12 px-5 bg-accent text-accent-foreground font-medium shrink-0"
                 startContent={<Magnifier className="size-4" />}
+                onPress={() => navigate({ to: "/restaurants" })}
               >
                 Suchen
               </Button>
+            </div>
+            <div className="mt-3 flex items-center gap-2 text-xs text-muted">
+              {locationLoading && <span>Standort wird ermittelt…</span>}
+              {!locationLoading && location && (
+                <span>
+                  Standort:{" "}
+                  {location.source === "gps" ? "GPS" : "IP-basiert"}
+                  {location.city ? ` · ${location.city}` : ""}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/map" })}
+                className="ml-auto inline-flex items-center gap-1 text-accent hover:underline"
+              >
+                <MapIcon className="size-3.5" /> Kartenansicht
+              </button>
             </div>
           </div>
         </section>
@@ -118,38 +199,97 @@ const Page = () => {
 
         {/* Restaurant Grid */}
         <section className="px-4 lg:px-8 pb-16 max-w-7xl mx-auto">
-          <h2 className="text-xl font-bold mt-0 mb-5">Beliebt in deiner Nähe</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {RESTAURANTS.map((r) => (
-              <button
-                key={r.name}
-                type="button"
-                className="rounded-xl overflow-hidden border border-border bg-surface text-left transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md group"
-                onClick={() => navigate({ to: "/restaurants" })}
-              >
-                <div className="h-28 flex items-center justify-center bg-surface-secondary">
-                  <r.icon className="size-10 text-muted group-hover:text-accent transition-colors" />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <h3 className="text-sm font-semibold text-foreground">{r.name}</h3>
-                    <span className="flex items-center gap-0.5 text-xs font-semibold text-accent">
-                      <StarFill className="size-3" /> {r.rating}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted">
-                    <span className="flex items-center gap-1">
-                      <Clock className="size-3" /> {r.time} min
-                    </span>
-                    <span>Min. {r.min} €</span>
-                    <Chip size="sm" variant="flat" className="text-[10px] ml-auto">
-                      {r.tag}
-                    </Chip>
-                  </div>
-                </div>
-              </button>
-            ))}
+          <div className="flex items-end justify-between mb-5">
+            <h2 className="text-xl font-bold mt-0">
+              {location ? "In deiner Nähe" : "Beliebte Restaurants"}
+            </h2>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/restaurants" })}
+              className="text-sm font-medium text-accent hover:underline"
+            >
+              Alle anzeigen
+            </button>
           </div>
+
+          {isLoading ? (
+            <LoadingSkeleton type="card" count={6} />
+          ) : restaurants.length === 0 ? (
+            <EmptyState
+              title="Noch keine Restaurants"
+              description="Bald gibt es hier Restaurants zu entdecken."
+              icon={<UtensilsCrossed className="size-12" />}
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {restaurants.slice(0, 6).map((r) => {
+                const Icon = TYPE_ICONS[r.type] ?? UtensilsCrossed;
+                const latLng = getLatLng(r);
+                const distance =
+                  location && latLng
+                    ? haversineKm([location.lat, location.lng], latLng)
+                    : null;
+                return (
+                  <button
+                    key={r.$id}
+                    type="button"
+                    className="rounded-xl overflow-hidden border border-border bg-surface text-left transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md group"
+                    onClick={() =>
+                      navigate({
+                        to: "/restaurants/$restaurantId",
+                        params: { restaurantId: r.$id },
+                      })
+                    }
+                  >
+                    <div className="h-28 flex items-center justify-center bg-surface-secondary">
+                      {r.imageUrl ? (
+                        <img
+                          src={r.imageUrl}
+                          alt={r.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <Icon className="size-10 text-muted group-hover:text-accent transition-colors" />
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <h3 className="text-sm font-semibold text-foreground truncate">
+                          {r.name}
+                        </h3>
+                        <span className="flex items-center gap-0.5 text-xs font-semibold text-accent shrink-0 ml-2">
+                          <StarFill className="size-3" /> 4.5
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted">
+                        <span className="flex items-center gap-1">
+                          <Clock className="size-3" />{" "}
+                          {r.estimatedDeliveryMinutes} min
+                        </span>
+                        <span>Min. {r.minOrderValue.toFixed(2)} €</span>
+                        {distance != null && (
+                          <span className="ml-auto">
+                            {distance < 1
+                              ? `${Math.round(distance * 1000)} m`
+                              : `${distance.toFixed(1)} km`}
+                          </span>
+                        )}
+                        {distance == null && (
+                          <Chip
+                            size="sm"
+                            variant="flat"
+                            className="text-[10px] ml-auto"
+                          >
+                            {RestaurantTypeNames[r.type]}
+                          </Chip>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* How it works */}
