@@ -1,5 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Input, Label, Select, ListBoxItem, Button } from "@heroui/react";
+import {
+  Button,
+  Input,
+  Label,
+  ListBox,
+  ListBoxItem,
+  Select,
+  SelectPopover,
+  SelectTrigger,
+  SelectValue,
+} from "@heroui/react";
 import { getMutationOptions } from "@repo/lib";
 import { useApiMutation, useNotification } from "@repo/hooks";
 import type { VehicleType } from "@repo/interfaces";
@@ -66,7 +76,7 @@ function DeliveryRegistrationPage() {
             <label className="text-sm font-medium text-foreground">Name</label>
             <Input
               name="name"
-              placeholder="Dein vollstaendiger Name"
+              placeholder="Dein vollständiger Name"
               type="text"
               isRequired
             />
@@ -84,13 +94,22 @@ function DeliveryRegistrationPage() {
           </div>
           <Select
             name="vehicleType"
-            placeholder="Waehle dein Fahrzeug"
+            placeholder="Wähle dein Fahrzeug"
             isRequired
           >
             <Label>Fahrzeugtyp</Label>
-            {vehicleTypes.map((v) => (
-              <ListBoxItem key={v.key}>{v.label}</ListBoxItem>
-            ))}
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectPopover>
+              <ListBox>
+                {vehicleTypes.map((v) => (
+                  <ListBoxItem key={v.key} id={v.key}>
+                    {v.label}
+                  </ListBoxItem>
+                ))}
+              </ListBox>
+            </SelectPopover>
           </Select>
 
           <Button

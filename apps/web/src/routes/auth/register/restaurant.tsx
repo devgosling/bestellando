@@ -117,11 +117,11 @@ function Page() {
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-foreground">
-                Strasse
+                Straße
               </label>
               <Input
                 name="street"
-                placeholder="Strassenname"
+                placeholder="Straßenname"
                 type="text"
                 isRequired
               />

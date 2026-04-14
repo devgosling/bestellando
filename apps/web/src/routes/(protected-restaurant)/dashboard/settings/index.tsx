@@ -1,13 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useApiQuery, useApiMutation } from "@repo/hooks";
+import { useState } from "react";
+import { useApiQuery } from "@repo/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import { authenticatedFetch } from "@repo/lib";
 import type { RestaurantEntity } from "@repo/interfaces";
 import { AnimatedPage } from "../../../../components/shared/AnimatedPage";
 import { LoadingSkeleton } from "../../../../components/shared/LoadingSkeleton";
-import { RestaurantSettingsForm } from "../../../../components/dashboard/RestaurantSettingsForm";
+import {
+  RestaurantSettingsForm,
+  type SettingsFormData,
+} from "../../../../components/dashboard/RestaurantSettingsForm";
 
 function SettingsPage() {
   const queryClient = useQueryClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const { data: restaurants, isLoading } = useApiQuery<RestaurantEntity[]>({
     request: { url: "/v1/restaurant/mine" },
@@ -16,19 +22,40 @@ function SettingsPage() {
 
   const restaurant = restaurants?.[0];
 
-  const updateMutation = useApiMutation<
-    RestaurantEntity,
-    Error,
-    Record<string, unknown>
-  >({
-    request: {
-      url: `/v1/restaurant/${restaurant?.$id}`,
-      method: "PATCH",
-    },
-    success: () => {
+  const handleSubmit = async (data: SettingsFormData) => {
+    if (!restaurant) return;
+    setIsSaving(true);
+    try {
+      await authenticatedFetch(`/v1/restaurant/${restaurant.$id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data.restaurant),
+      });
+
+      const addressId = restaurant.address?.$id;
+      if (addressId) {
+        await authenticatedFetch(`/v1/address/${addressId}`, {
+          method: "PATCH",
+          body: JSON.stringify(data.address),
+        });
+      } else {
+        const created = (await authenticatedFetch("/v1/address", {
+          method: "POST",
+          body: JSON.stringify({
+            ...data.address,
+            ownerType: "RESTAURANT",
+          }),
+        })) as { $id: string };
+        await authenticatedFetch(`/v1/restaurant/${restaurant.$id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ address: created.$id }),
+        });
+      }
+
       queryClient.invalidateQueries({ queryKey: ["restaurant", "mine"] });
-    },
-  });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -57,8 +84,8 @@ function SettingsPage() {
 
       <RestaurantSettingsForm
         restaurant={restaurant}
-        onSubmit={(data) => updateMutation.mutate(data)}
-        isLoading={updateMutation.isPending}
+        onSubmit={handleSubmit}
+        isLoading={isSaving}
       />
     </AnimatedPage>
   );

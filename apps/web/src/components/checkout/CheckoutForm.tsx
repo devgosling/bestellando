@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Card, CardContent, CardHeader, Separator } from "@heroui/react";
 import { authenticatedFetch } from "@repo/lib";
-import { useCartStore } from "../../stores/cart-store";
+import { lineUnitPrice, useCartStore } from "../../stores/cart-store";
 import { PriceDisplay } from "../shared/PriceDisplay";
 import { AddressSelector } from "./AddressSelector";
 
@@ -39,6 +39,8 @@ export function CheckoutForm() {
         items: items.map((item) => ({
           productId: item.product.$id,
           quantity: item.quantity,
+          modifierOptionIds: item.modifiers.map((m) => m.$id),
+          specialInstructions: item.specialInstructions,
         })),
       };
 
@@ -79,7 +81,7 @@ export function CheckoutForm() {
       <Card>
         <CardHeader>
           <h2 className="text-lg font-semibold">
-            Bestelluebersicht
+            Bestellübersicht
             {restaurantName && (
               <span className="ml-2 text-sm font-normal text-muted">
                 {restaurantName}
@@ -90,17 +92,22 @@ export function CheckoutForm() {
         <CardContent className="flex flex-col gap-3">
           {items.map((item) => (
             <div
-              key={item.product.$id}
+              key={item.id}
               className="flex items-center justify-between"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted">
-                  {item.quantity}x
-                </span>
-                <span className="text-sm">{item.product.name}</span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted">{item.quantity}x</span>
+                  <span className="text-sm">{item.product.name}</span>
+                </div>
+                {item.modifiers.length > 0 && (
+                  <span className="text-xs text-muted">
+                    {item.modifiers.map((m) => m.name).join(", ")}
+                  </span>
+                )}
               </div>
               <PriceDisplay
-                amount={item.product.basePrice * item.quantity}
+                amount={lineUnitPrice(item) * item.quantity}
                 className="text-sm font-medium"
               />
             </div>
@@ -113,7 +120,7 @@ export function CheckoutForm() {
             <PriceDisplay amount={subtotal} className="font-medium" />
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted">Liefergebuehr</span>
+            <span className="text-muted">Liefergebühr</span>
             <span className="text-xs text-muted">wird berechnet</span>
           </div>
 

@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@heroui/react";
 import { ArrowLeft, ArrowRight } from "@gravity-ui/icons";
-import { useCartStore } from "../../stores/cart-store";
+import { lineUnitPrice, useCartStore } from "../../stores/cart-store";
 import { PriceDisplay } from "../shared/PriceDisplay";
 
 interface ReviewStepProps {
@@ -40,17 +40,24 @@ export function ReviewStep({ onBack, onNext }: ReviewStepProps) {
         <CardContent className="flex flex-col gap-3">
           {items.map((item) => (
             <div
-              key={item.product.$id}
+              key={item.id}
               className="flex items-center justify-between"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted">{item.quantity}x</span>
-                <span className="text-sm text-foreground">
-                  {item.product.name}
-                </span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted">{item.quantity}x</span>
+                  <span className="text-sm text-foreground">
+                    {item.product.name}
+                  </span>
+                </div>
+                {item.modifiers.length > 0 && (
+                  <span className="text-xs text-muted">
+                    {item.modifiers.map((m) => m.name).join(", ")}
+                  </span>
+                )}
               </div>
               <PriceDisplay
-                amount={item.product.basePrice * item.quantity}
+                amount={lineUnitPrice(item) * item.quantity}
                 className="text-sm font-medium text-foreground"
               />
             </div>

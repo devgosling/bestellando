@@ -37,26 +37,6 @@ function MenuPage() {
     enabled: !!restaurant,
   });
 
-  const createMutation = useApiMutation<ProductEntity, Error, Record<string, unknown>>({
-    request: { url: "/v1/product", method: "POST" },
-    success: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      setModalOpen(false);
-    },
-  });
-
-  const updateMutation = useApiMutation<ProductEntity, Error, Record<string, unknown>>({
-    request: {
-      url: `/v1/product/${editingProduct?.$id}`,
-      method: "PATCH",
-    },
-    success: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-      setEditingProduct(undefined);
-      setModalOpen(false);
-    },
-  });
-
   const deleteMutation = useApiMutation<void, Error, void>({
     request: {
       url: `/v1/product/${deletingProduct?.$id}`,
@@ -110,15 +90,29 @@ function MenuPage() {
     setModalOpen(true);
   };
 
-  const handleSubmit = (data: Record<string, unknown>) => {
+  const handleSaveProduct = async (
+    data: Record<string, unknown>,
+  ): Promise<string> => {
+    const { authenticatedFetch } = await import("@repo/lib");
+    let productId: string;
     if (editingProduct) {
-      updateMutation.mutate(data);
+      const updated = (await authenticatedFetch(
+        `/v1/product/${editingProduct.$id}`,
+        { method: "PATCH", body: JSON.stringify(data) },
+      )) as { $id: string };
+      productId = updated.$id ?? editingProduct.$id;
     } else {
-      createMutation.mutate({
-        ...data,
-        restaurantId: restaurant?.$id,
-      });
+      const created = (await authenticatedFetch("/v1/product", {
+        method: "POST",
+        body: JSON.stringify({ ...data, restaurantId: restaurant?.$id }),
+      })) as { $id: string };
+      productId = created.$id;
     }
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    queryClient.invalidateQueries({ queryKey: ["modifier-option", productId] });
+    setEditingProduct(undefined);
+    setModalOpen(false);
+    return productId;
   };
 
   return (
@@ -152,7 +146,7 @@ function MenuPage() {
           title="Keine Produkte"
           description={
             search
-              ? "Keine Produkte fuer diese Suche gefunden."
+              ? "Keine Produkte für diese Suche gefunden."
               : "Fuege dein erstes Produkt hinzu."
           }
           icon={<Book className="size-12" />}
@@ -186,18 +180,17 @@ function MenuPage() {
           setModalOpen(false);
           setEditingProduct(undefined);
         }}
-        onSubmit={handleSubmit}
+        onSaveProduct={handleSaveProduct}
         product={editingProduct}
-        isLoading={createMutation.isPending || updateMutation.isPending}
       />
 
       <ConfirmDialog
         isOpen={!!deletingProduct}
         onClose={() => setDeletingProduct(undefined)}
         onConfirm={() => deleteMutation.mutate()}
-        title="Produkt loeschen"
-        description={`Moechtest du "${deletingProduct?.name}" wirklich loeschen? Diese Aktion kann nicht rueckgaengig gemacht werden.`}
-        confirmLabel="Loeschen"
+        title="Produkt löschen"
+        description={`Möchtest du "${deletingProduct?.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`}
+        confirmLabel="Löschen"
         variant="danger"
       />
     </AnimatedPage>

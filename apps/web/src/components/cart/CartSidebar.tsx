@@ -30,7 +30,7 @@ export function CartSidebar({ deliveryFee = 2.5 }: { deliveryFee?: number }) {
       </h3>
       <div className="flex-1 overflow-y-auto space-y-1">
         {items.map((item) => (
-          <CartItem key={item.product.$id} item={item} />
+          <CartItem key={item.id} item={item} />
         ))}
       </div>
       <Separator className="my-3" />

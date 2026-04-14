@@ -14,7 +14,7 @@ export function CartSummary() {
         <PriceDisplay amount={subtotal} className="font-medium" />
       </div>
       <div className="flex justify-between text-sm">
-        <span className="text-muted">Liefergebuehr</span>
+        <span className="text-muted">Liefergebühr</span>
         <span className="text-muted text-xs">wird berechnet</span>
       </div>
       <Separator />

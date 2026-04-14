@@ -4,6 +4,7 @@ export * from "./opening-hours.interface.js";
 export * from "./create-restaurant.dto.js";
 export * from "./register.interface.js";
 export * from "./product.interface.js";
+export * from "./modifier-option.interface.js";
 export * from "./order.interface.js";
 export * from "./order-item.interface.js";
 export * from "./order-status-history.interface.js";

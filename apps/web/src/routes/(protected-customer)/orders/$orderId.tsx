@@ -150,7 +150,7 @@ function OrderDetailPage() {
             <PriceDisplay amount={order.subtotal} className="font-medium" />
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted">Liefergebuehr</span>
+            <span className="text-muted">Liefergebühr</span>
             <PriceDisplay amount={order.deliveryFee} className="font-medium" />
           </div>
 

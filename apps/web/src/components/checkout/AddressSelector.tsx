@@ -1,4 +1,13 @@
-import { Select, Label, ListBoxItem, Skeleton } from "@heroui/react";
+import {
+  Label,
+  ListBox,
+  ListBoxItem,
+  Select,
+  SelectPopover,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+} from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useApiQuery } from "@repo/hooks";
 import type { AddressEntity } from "@repo/interfaces";
@@ -33,28 +42,33 @@ export function AddressSelector({
 
   return (
     <Select
-      placeholder="Adresse auswaehlen"
-      selectedKeys={selectedId ? [selectedId] : []}
-      onSelectionChange={(keys) => {
-        const selected = Array.from(keys)[0] as string;
-        if (selected) handleSelectionChange(selected);
+      placeholder="Adresse auswählen"
+      selectedKey={selectedId ?? undefined}
+      onSelectionChange={(key) => {
+        if (key) handleSelectionChange(String(key));
       }}
       isRequired
     >
       <Label>Lieferadresse</Label>
-      {[
-        ...addresses.map((address) => (
-          <ListBoxItem key={address.$id}>
-            {address.street} {address.streetNumber}, {address.city}
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectPopover>
+        <ListBox>
+          {addresses.map((address) => (
+            <ListBoxItem key={address.$id} id={address.$id}>
+              {address.street} {address.streetNumber}, {address.city}
+            </ListBoxItem>
+          ))}
+          <ListBoxItem
+            key="__add_new__"
+            id="__add_new__"
+            className="text-accent"
+          >
+            Neue Adresse hinzufügen
           </ListBoxItem>
-        )),
-        <ListBoxItem
-          key="__add_new__"
-          className="text-accent"
-        >
-          Neue Adresse hinzufuegen
-        </ListBoxItem>,
-      ]}
+        </ListBox>
+      </SelectPopover>
     </Select>
   );
 }

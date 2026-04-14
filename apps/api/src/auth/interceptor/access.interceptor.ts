@@ -75,16 +75,6 @@ export class AccessInterceptor implements NestInterceptor {
       );
     }
 
-    if (
-      user &&
-      requiredUserType &&
-      !requiredUserType.includes(
-        (await this.userService.getUserType()) || "CUSTOMER",
-      )
-    ) {
-      throw new UnauthorizedException("Insufficient user type");
-    }
-
     request.meta = {
       ipAddress:
         request.headers["x-real-ip"] ??
@@ -102,6 +92,16 @@ export class AccessInterceptor implements NestInterceptor {
           request.user.appwrite.email ||
           "Unknown",
       });
+    }
+
+    if (
+      user &&
+      requiredUserType &&
+      !requiredUserType.includes(
+        (await this.userService.getUserType()) || "CUSTOMER",
+      )
+    ) {
+      throw new UnauthorizedException("Insufficient user type");
     }
 
     this.clsService.enter();

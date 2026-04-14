@@ -2,6 +2,7 @@ import { Button } from "@heroui/react";
 import { TrashBin } from "@gravity-ui/icons";
 import { PriceDisplay } from "../shared/PriceDisplay";
 import {
+  lineUnitPrice,
   useCartStore,
   type CartItem as CartItemType,
 } from "../../stores/cart-store";
@@ -14,7 +15,7 @@ interface CartItemProps {
 export function CartItem({ item, compact = false }: CartItemProps) {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
-  const lineTotal = item.product.basePrice * item.quantity;
+  const lineTotal = lineUnitPrice(item) * item.quantity;
 
   return (
     <div className="flex items-center gap-3 py-3 border-b border-border last:border-b-0">
@@ -24,6 +25,11 @@ export function CartItem({ item, compact = false }: CartItemProps) {
 
       <div className="flex-1 min-w-0">
         <p className="text-sm text-foreground truncate">{item.product.name}</p>
+        {item.modifiers.length > 0 && (
+          <p className="text-xs text-muted mt-0.5 truncate">
+            {item.modifiers.map((m) => m.name).join(", ")}
+          </p>
+        )}
         {item.specialInstructions && (
           <p className="text-xs text-muted mt-0.5 italic truncate">
             {item.specialInstructions}
@@ -43,9 +49,7 @@ export function CartItem({ item, compact = false }: CartItemProps) {
             variant="ghost"
             isIconOnly
             aria-label="Menge verringern"
-            onPress={() =>
-              updateQuantity(item.product.$id, item.quantity - 1)
-            }
+            onPress={() => updateQuantity(item.id, item.quantity - 1)}
           >
             -
           </Button>
@@ -53,10 +57,8 @@ export function CartItem({ item, compact = false }: CartItemProps) {
             size="sm"
             variant="ghost"
             isIconOnly
-            aria-label="Menge erhoehen"
-            onPress={() =>
-              updateQuantity(item.product.$id, item.quantity + 1)
-            }
+            aria-label="Menge erhöhen"
+            onPress={() => updateQuantity(item.id, item.quantity + 1)}
           >
             +
           </Button>
@@ -66,7 +68,7 @@ export function CartItem({ item, compact = false }: CartItemProps) {
             isIconOnly
             color="danger"
             aria-label="Entfernen"
-            onPress={() => removeItem(item.product.$id)}
+            onPress={() => removeItem(item.id)}
           >
             <TrashBin className="size-4" />
           </Button>

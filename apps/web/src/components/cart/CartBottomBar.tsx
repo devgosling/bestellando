@@ -1,4 +1,4 @@
-import { Badge, Button } from "@heroui/react";
+import { Badge, BadgeAnchor, Button } from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
 import { ShoppingCart } from "@gravity-ui/icons";
 import { useCartStore } from "../../stores/cart-store";
@@ -22,9 +22,12 @@ export function CartBottomBar() {
         >
           <div className="flex items-center justify-between bg-accent text-accent-foreground rounded-xl px-4 py-3 shadow-lg">
             <div className="flex items-center gap-2">
-              <Badge content={totalItems} size="sm" color="default">
+              <BadgeAnchor>
                 <ShoppingCart className="size-5" />
-              </Badge>
+                <Badge size="sm" color="default" placement="top-right">
+                  {totalItems}
+                </Badge>
+              </BadgeAnchor>
               <span className="font-semibold text-sm">
                 <PriceDisplay amount={subtotal} />
               </span>

@@ -57,7 +57,7 @@ function CartPage() {
         onClose={() => setConfirmOpen(false)}
         onConfirm={clearCart}
         title="Warenkorb leeren"
-        description="Moechtest du wirklich alle Artikel aus deinem Warenkorb entfernen?"
+        description="Möchtest du wirklich alle Artikel aus deinem Warenkorb entfernen?"
         confirmLabel="Leeren"
         variant="danger"
       />

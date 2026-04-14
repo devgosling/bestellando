@@ -2,17 +2,21 @@ import {
   Button,
   Input,
   Label,
-  Select,
+  ListBox,
   ListBoxItem,
-  Switch,
+  Select,
+  SelectPopover,
+  SelectTrigger,
+  SelectValue,
   TextArea,
   TextField,
 } from "@heroui/react";
+import { ToggleSwitch } from "../shared/ToggleSwitch";
 import type { RestaurantEntity, RestaurantType } from "@repo/interfaces";
 import { RestaurantTypeNames } from "@repo/interfaces";
 import { useState, useEffect } from "react";
 
-interface SettingsFormData {
+interface RestaurantPatch {
   name: string;
   description: string;
   phone: string;
@@ -21,6 +25,18 @@ interface SettingsFormData {
   deliveryFee: number;
   estimatedDeliveryMinutes: number;
   isActive: boolean;
+}
+
+interface AddressPatch {
+  street: string;
+  streetNumber: string;
+  zipCode: string;
+  city: string;
+}
+
+export interface SettingsFormData {
+  restaurant: RestaurantPatch;
+  address: AddressPatch;
 }
 
 interface RestaurantSettingsFormProps {
@@ -36,24 +52,9 @@ const restaurantTypes = Object.entries(RestaurantTypeNames).map(
   }),
 );
 
-export function RestaurantSettingsForm({
-  restaurant,
-  onSubmit,
-  isLoading,
-}: RestaurantSettingsFormProps) {
-  const [form, setForm] = useState<SettingsFormData>({
-    name: restaurant.name,
-    description: restaurant.description,
-    phone: restaurant.phone,
-    type: restaurant.type,
-    minOrderValue: restaurant.minOrderValue,
-    deliveryFee: restaurant.deliveryFee,
-    estimatedDeliveryMinutes: restaurant.estimatedDeliveryMinutes,
-    isActive: restaurant.isActive,
-  });
-
-  useEffect(() => {
-    setForm({
+function buildInitial(restaurant: RestaurantEntity): SettingsFormData {
+  return {
+    restaurant: {
       name: restaurant.name,
       description: restaurant.description,
       phone: restaurant.phone,
@@ -62,14 +63,47 @@ export function RestaurantSettingsForm({
       deliveryFee: restaurant.deliveryFee,
       estimatedDeliveryMinutes: restaurant.estimatedDeliveryMinutes,
       isActive: restaurant.isActive,
-    });
+    },
+    address: {
+      street: restaurant.address?.street ?? "",
+      streetNumber: restaurant.address?.streetNumber ?? "",
+      zipCode: restaurant.address?.zipCode ?? "",
+      city: restaurant.address?.city ?? "",
+    },
+  };
+}
+
+export function RestaurantSettingsForm({
+  restaurant,
+  onSubmit,
+  isLoading,
+}: RestaurantSettingsFormProps) {
+  const [form, setForm] = useState<SettingsFormData>(() =>
+    buildInitial(restaurant),
+  );
+
+  useEffect(() => {
+    setForm(buildInitial(restaurant));
   }, [restaurant]);
 
-  const updateField = <K extends keyof SettingsFormData>(
+  const updateField = <K extends keyof SettingsFormData["restaurant"]>(
     key: K,
-    value: SettingsFormData[K],
+    value: SettingsFormData["restaurant"][K],
   ) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => ({
+      ...prev,
+      restaurant: { ...prev.restaurant, [key]: value },
+    }));
+  };
+
+  const updateAddress = <K extends keyof SettingsFormData["address"]>(
+    key: K,
+    value: SettingsFormData["address"][K],
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      address: { ...prev.address, [key]: value },
+    }));
   };
 
   return (
@@ -77,7 +111,7 @@ export function RestaurantSettingsForm({
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-semibold">Allgemein</h3>
         <TextField
-          value={form.name}
+          value={form.restaurant.name}
           onChange={(v) => updateField("name", v)}
           isRequired
         >
@@ -85,30 +119,38 @@ export function RestaurantSettingsForm({
           <Input />
         </TextField>
         <TextField
-          value={form.description}
+          value={form.restaurant.description}
           onChange={(v) => updateField("description", v)}
         >
           <Label>Beschreibung</Label>
           <TextArea rows={3} />
         </TextField>
         <TextField
-          value={form.phone}
+          value={form.restaurant.phone}
           onChange={(v) => updateField("phone", v)}
         >
           <Label>Telefon</Label>
           <Input type="tel" />
         </TextField>
         <Select
-          selectedKeys={[form.type]}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0] as RestaurantType | undefined;
-            if (selected) updateField("type", selected);
+          selectedKey={form.restaurant.type}
+          onSelectionChange={(key) => {
+            if (key) updateField("type", key as RestaurantType);
           }}
         >
           <Label>Restauranttyp</Label>
-          {restaurantTypes.map((t) => (
-            <ListBoxItem key={t.key}>{t.label}</ListBoxItem>
-          ))}
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopover>
+            <ListBox>
+              {restaurantTypes.map((t) => (
+                <ListBoxItem key={t.key} id={t.key}>
+                  {t.label}
+                </ListBoxItem>
+              ))}
+            </ListBox>
+          </SelectPopover>
         </Select>
       </div>
 
@@ -116,7 +158,7 @@ export function RestaurantSettingsForm({
         <h3 className="text-lg font-semibold">Lieferung & Bestellung</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <TextField
-            value={String(form.minOrderValue)}
+            value={String(form.restaurant.minOrderValue)}
             onChange={(v) =>
               updateField("minOrderValue", Number.parseFloat(v) || 0)
             }
@@ -125,16 +167,16 @@ export function RestaurantSettingsForm({
             <Input type="number" min={0} step={0.5} />
           </TextField>
           <TextField
-            value={String(form.deliveryFee)}
+            value={String(form.restaurant.deliveryFee)}
             onChange={(v) =>
               updateField("deliveryFee", Number.parseFloat(v) || 0)
             }
           >
-            <Label>Liefergebuehr (EUR)</Label>
+            <Label>Liefergebühr (EUR)</Label>
             <Input type="number" min={0} step={0.5} />
           </TextField>
           <TextField
-            value={String(form.estimatedDeliveryMinutes)}
+            value={String(form.restaurant.estimatedDeliveryMinutes)}
             onChange={(v) =>
               updateField("estimatedDeliveryMinutes", Number.parseInt(v) || 0)
             }
@@ -146,13 +188,49 @@ export function RestaurantSettingsForm({
       </div>
 
       <div className="flex flex-col gap-4">
+        <h3 className="text-lg font-semibold">Adresse</h3>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_8rem]">
+          <TextField
+            value={form.address.street}
+            onChange={(v) => updateAddress("street", v)}
+          >
+            <Label>Straße</Label>
+            <Input />
+          </TextField>
+          <TextField
+            value={form.address.streetNumber}
+            onChange={(v) => updateAddress("streetNumber", v)}
+          >
+            <Label>Hausnummer</Label>
+            <Input />
+          </TextField>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[8rem_1fr]">
+          <TextField
+            value={form.address.zipCode}
+            onChange={(v) => updateAddress("zipCode", v)}
+          >
+            <Label>PLZ</Label>
+            <Input />
+          </TextField>
+          <TextField
+            value={form.address.city}
+            onChange={(v) => updateAddress("city", v)}
+          >
+            <Label>Stadt</Label>
+            <Input />
+          </TextField>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
         <h3 className="text-lg font-semibold">Status</h3>
-        <Switch
-          isSelected={form.isActive}
-          onValueChange={(v) => updateField("isActive", v)}
+        <ToggleSwitch
+          isSelected={form.restaurant.isActive}
+          onChange={(v) => updateField("isActive", v)}
         >
-          Restaurant aktiv (sichtbar fuer Kunden)
-        </Switch>
+          Restaurant aktiv (sichtbar für Kunden)
+        </ToggleSwitch>
       </div>
 
       <div className="flex justify-end">
@@ -160,7 +238,7 @@ export function RestaurantSettingsForm({
           className="bg-accent text-accent-foreground font-semibold"
           onPress={() => onSubmit(form)}
           isLoading={isLoading}
-          isDisabled={!form.name.trim()}
+          isDisabled={!form.restaurant.name.trim()}
         >
           Speichern
         </Button>

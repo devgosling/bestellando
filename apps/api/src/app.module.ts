@@ -8,6 +8,7 @@ import { OrderModule } from "./order/order.module";
 import { OrderItemModule } from "./orderItem/order-item.module";
 import { OrderStatusHistoryModule } from "./orderStatusHistory/order-status-history.module";
 import { OpeningHoursModule } from "./openingHours/opening-hours.module";
+import { ModifierOptionModule } from "./modifierOption/modifier-option.module";
 import { PaymentModule } from "./payment/payment.module";
 import { GatewayModule } from "./gateway/gateway.module";
 import { DeliveryModule } from "./delivery/delivery.module";
@@ -30,6 +31,7 @@ import { ClsModule } from "nestjs-cls/dist/src/lib/cls-module/cls.module";
     OrderItemModule,
     OrderStatusHistoryModule,
     OpeningHoursModule,
+    ModifierOptionModule,
     PaymentModule,
     GatewayModule,
     DeliveryModule,

@@ -2,10 +2,18 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ProductEntity } from "@repo/interfaces";
 
+export interface CartModifier {
+  $id: string;
+  name: string;
+  priceDelta: number;
+}
+
 export interface CartItem {
+  id: string;
   product: ProductEntity;
   quantity: number;
   specialInstructions?: string;
+  modifiers: CartModifier[];
 }
 
 interface CartState {
@@ -16,26 +24,46 @@ interface CartState {
     product: ProductEntity;
     quantity: number;
     instructions?: string;
+    modifiers: CartModifier[];
   } | null;
 
   addItem: (
     product: ProductEntity,
     quantity: number,
     instructions?: string,
+    modifiers?: CartModifier[],
   ) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
   setPendingItem: (
     product: ProductEntity,
     quantity: number,
     instructions?: string,
+    modifiers?: CartModifier[],
   ) => void;
   confirmPendingItem: () => void;
   cancelPendingItem: () => void;
 
   getTotalItems: () => number;
   getSubtotal: () => number;
+}
+
+function lineUnitPrice(item: Pick<CartItem, "product" | "modifiers">) {
+  const mods = item.modifiers.reduce((sum, m) => sum + (m.priceDelta || 0), 0);
+  return item.product.basePrice + mods;
+}
+
+function modifiersKey(modifiers: CartModifier[]) {
+  return modifiers
+    .map((m) => m.$id)
+    .sort((a, b) => a.localeCompare(b))
+    .join("|");
+}
+
+function buildItemId(productId: string, modifiers: CartModifier[]) {
+  const key = modifiersKey(modifiers);
+  return key ? `${productId}::${key}` : productId;
 }
 
 export const useCartStore = create<CartState>()(
@@ -46,24 +74,22 @@ export const useCartStore = create<CartState>()(
       restaurantName: null,
       pendingItem: null,
 
-      addItem: (product, quantity, instructions) => {
+      addItem: (product, quantity, instructions, modifiers = []) => {
         const state = get();
         const incomingRestaurantId = product.restaurant.$id;
 
-        // Single-restaurant enforcement: set pending item if switching restaurants
         if (
           state.restaurantId !== null &&
           state.restaurantId !== incomingRestaurantId
         ) {
           set({
-            pendingItem: { product, quantity, instructions },
+            pendingItem: { product, quantity, instructions, modifiers },
           });
           return;
         }
 
-        const existingIndex = state.items.findIndex(
-          (item) => item.product.$id === product.$id,
-        );
+        const itemId = buildItemId(product.$id, modifiers);
+        const existingIndex = state.items.findIndex((i) => i.id === itemId);
 
         if (existingIndex >= 0) {
           const updatedItems = [...state.items];
@@ -78,7 +104,13 @@ export const useCartStore = create<CartState>()(
           set({
             items: [
               ...state.items,
-              { product, quantity, specialInstructions: instructions },
+              {
+                id: itemId,
+                product,
+                quantity,
+                specialInstructions: instructions,
+                modifiers,
+              },
             ],
             restaurantId: incomingRestaurantId,
             restaurantName: product.restaurant.name,
@@ -86,10 +118,8 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      removeItem: (productId) => {
-        const items = get().items.filter(
-          (item) => item.product.$id !== productId,
-        );
+      removeItem: (itemId) => {
+        const items = get().items.filter((item) => item.id !== itemId);
         if (items.length === 0) {
           set({ items: [], restaurantId: null, restaurantName: null });
         } else {
@@ -97,13 +127,13 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (itemId, quantity) => {
         if (quantity <= 0) {
-          get().removeItem(productId);
+          get().removeItem(itemId);
           return;
         }
         const updatedItems = get().items.map((item) =>
-          item.product.$id === productId ? { ...item, quantity } : item,
+          item.id === itemId ? { ...item, quantity } : item,
         );
         set({ items: updatedItems });
       },
@@ -112,8 +142,8 @@ export const useCartStore = create<CartState>()(
         set({ items: [], restaurantId: null, restaurantName: null });
       },
 
-      setPendingItem: (product, quantity, instructions) => {
-        set({ pendingItem: { product, quantity, instructions } });
+      setPendingItem: (product, quantity, instructions, modifiers = []) => {
+        set({ pendingItem: { product, quantity, instructions, modifiers } });
       },
 
       confirmPendingItem: () => {
@@ -122,9 +152,11 @@ export const useCartStore = create<CartState>()(
         set({
           items: [
             {
+              id: buildItemId(pending.product.$id, pending.modifiers),
               product: pending.product,
               quantity: pending.quantity,
               specialInstructions: pending.instructions,
+              modifiers: pending.modifiers,
             },
           ],
           restaurantId: pending.product.restaurant.$id,
@@ -143,7 +175,7 @@ export const useCartStore = create<CartState>()(
 
       getSubtotal: () => {
         return get().items.reduce(
-          (total, item) => total + item.product.basePrice * item.quantity,
+          (total, item) => total + lineUnitPrice(item) * item.quantity,
           0,
         );
       },
@@ -158,3 +190,5 @@ export const useCartStore = create<CartState>()(
     },
   ),
 );
+
+export { lineUnitPrice };

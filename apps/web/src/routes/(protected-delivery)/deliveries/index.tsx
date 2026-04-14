@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
-import { Switch, Card, CardContent } from "@heroui/react";
+import { Card, CardContent } from "@heroui/react";
+import { ToggleSwitch } from "../../../components/shared/ToggleSwitch";
 import { useApiQuery, useApiMutation } from "@repo/hooks";
 import { getDeliverySocket } from "@repo/lib";
 import type {
@@ -137,13 +138,13 @@ function DeliveriesPage() {
             </h1>
             <span className="text-sm text-muted">
               {isOnline
-                ? "Du erhaeltst neue Lieferauftraege"
-                : "Gehe online um Auftraege zu erhalten"}
+                ? "Du erhältst neue Lieferaufträge"
+                : "Gehe online um Aufträge zu erhalten"}
             </span>
           </div>
-          <Switch
+          <ToggleSwitch
             isSelected={isOnline}
-            onValueChange={handleToggle}
+            onChange={handleToggle}
             color="success"
             size="lg"
           />
@@ -153,12 +154,12 @@ function DeliveriesPage() {
       {/* Available deliveries */}
       {isOnline && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Verfuegbare Lieferungen</h2>
+          <h2 className="text-lg font-semibold">Verfügbare Lieferungen</h2>
           {availableDeliveries.length === 0 ? (
             <Card>
               <CardContent className="text-center py-8">
                 <p className="text-muted">
-                  Keine verfuegbaren Lieferungen. Warte auf neue Auftraege...
+                  Keine verfügbaren Lieferungen. Warte auf neue Aufträge...
                 </p>
               </CardContent>
             </Card>

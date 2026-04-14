@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Delete,
+  Query,
 } from "@nestjs/common";
 import { OpeningHoursService } from "../service/opening-hours.service";
 import { type OpeningHoursEntity } from "@repo/interfaces";
@@ -30,8 +31,10 @@ export class OpeningHoursController {
 
   @Get()
   @Public()
-  async findAll() {
-    const result = await this.openingHoursService.getAllOpeningHours();
+  async findAll(@Query("restaurantId") restaurantId?: string) {
+    const result = restaurantId
+      ? await this.openingHoursService.getByRestaurant(restaurantId)
+      : await this.openingHoursService.getAllOpeningHours();
     return result.rows;
   }
 

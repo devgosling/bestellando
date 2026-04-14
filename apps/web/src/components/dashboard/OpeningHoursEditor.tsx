@@ -1,4 +1,6 @@
-import { Button, Input, Switch } from "@heroui/react";
+import { Button, Input, TextField } from "@heroui/react";
+import { ToggleSwitch } from "../shared/ToggleSwitch";
+import { Plus, TrashBin } from "@gravity-ui/icons";
 import type { OpeningHoursEntity } from "@repo/interfaces";
 import { useState, useEffect, useCallback } from "react";
 
@@ -12,15 +14,18 @@ const DAY_NAMES = [
   "Samstag",
 ];
 
-// Display order: Mon-Sun (1,2,3,4,5,6,0)
 const DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
+
+interface SlotRow {
+  openTime: string;
+  closeTime: string;
+  entityId?: string;
+}
 
 interface DayRow {
   dayOfWeek: number;
-  openTime: string;
-  closeTime: string;
   isClosed: boolean;
-  entityId?: string;
+  slots: SlotRow[];
 }
 
 interface OpeningHoursEditorProps {
@@ -32,13 +37,19 @@ interface OpeningHoursEditorProps {
 
 function buildRows(hours: OpeningHoursEntity[]): DayRow[] {
   return DISPLAY_ORDER.map((day) => {
-    const existing = hours.find((h) => h.dayOfWeek === day);
+    const forDay = hours
+      .filter((h) => h.dayOfWeek === day)
+      .sort((a, b) => a.openTime.localeCompare(b.openTime));
     return {
       dayOfWeek: day,
-      openTime: existing?.openTime ?? "09:00",
-      closeTime: existing?.closeTime ?? "22:00",
-      isClosed: existing ? false : true,
-      entityId: existing?.$id,
+      isClosed: forDay.length === 0,
+      slots: forDay.length
+        ? forDay.map((h) => ({
+            openTime: h.openTime,
+            closeTime: h.closeTime,
+            entityId: h.$id,
+          }))
+        : [{ openTime: "09:00", closeTime: "22:00" }],
     };
   });
 }
@@ -64,53 +75,124 @@ export function OpeningHoursEditor({
     [],
   );
 
+  const updateSlot = useCallback(
+    (dayOfWeek: number, slotIndex: number, update: Partial<SlotRow>) => {
+      setRows((prev) =>
+        prev.map((r) =>
+          r.dayOfWeek !== dayOfWeek
+            ? r
+            : {
+                ...r,
+                slots: r.slots.map((s, i) =>
+                  i === slotIndex ? { ...s, ...update } : s,
+                ),
+              },
+        ),
+      );
+    },
+    [],
+  );
+
+  const addSlot = useCallback((dayOfWeek: number) => {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.dayOfWeek !== dayOfWeek
+          ? r
+          : {
+              ...r,
+              slots: [...r.slots, { openTime: "12:00", closeTime: "14:00" }],
+            },
+      ),
+    );
+  }, []);
+
+  const removeSlot = useCallback((dayOfWeek: number, slotIndex: number) => {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.dayOfWeek !== dayOfWeek
+          ? r
+          : {
+              ...r,
+              slots:
+                r.slots.length === 1
+                  ? r.slots
+                  : r.slots.filter((_, i) => i !== slotIndex),
+            },
+      ),
+    );
+  }, []);
+
   return (
     <div className="flex flex-col gap-4">
       {rows.map((row) => (
         <div
           key={row.dayOfWeek}
-          className="flex flex-col gap-2 rounded-lg border border-border p-4 sm:flex-row sm:items-center sm:gap-4"
+          className="flex flex-col gap-3 rounded-lg border border-border p-4"
         >
-          <span className="w-28 shrink-0 font-medium">
-            {DAY_NAMES[row.dayOfWeek]}
-          </span>
-
-          <Switch
-            size="sm"
-            isSelected={!row.isClosed}
-            onValueChange={(open) =>
-              updateRow(row.dayOfWeek, { isClosed: !open })
-            }
-            aria-label={`${DAY_NAMES[row.dayOfWeek]} geoeffnet`}
-          >
-            <span className="text-sm">
-              {row.isClosed ? "Geschlossen" : "Geoeffnet"}
+          <div className="flex items-center justify-between gap-4">
+            <span className="w-28 shrink-0 font-medium">
+              {DAY_NAMES[row.dayOfWeek]}
             </span>
-          </Switch>
+
+            <ToggleSwitch
+              size="sm"
+              isSelected={!row.isClosed}
+              onChange={(open) => updateRow(row.dayOfWeek, { isClosed: !open })}
+              aria-label={`${DAY_NAMES[row.dayOfWeek]} geöffnet`}
+            >
+              <span className="text-sm">
+                {row.isClosed ? "Geschlossen" : "Geöffnet"}
+              </span>
+            </ToggleSwitch>
+          </div>
 
           {!row.isClosed && (
-            <div className="flex items-center gap-2">
-              <Input
-                type="time"
+            <div className="flex flex-col gap-2 pl-0 sm:pl-32">
+              {row.slots.map((slot, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-wrap items-center gap-2"
+                >
+                  <TextField
+                    value={slot.openTime}
+                    onChange={(v) =>
+                      updateSlot(row.dayOfWeek, idx, { openTime: v })
+                    }
+                    aria-label="Öffnungszeit"
+                  >
+                    <Input type="time" size="sm" className="w-32" />
+                  </TextField>
+                  <span className="text-muted">-</span>
+                  <TextField
+                    value={slot.closeTime}
+                    onChange={(v) =>
+                      updateSlot(row.dayOfWeek, idx, { closeTime: v })
+                    }
+                    aria-label="Schließzeit"
+                  >
+                    <Input type="time" size="sm" className="w-32" />
+                  </TextField>
+                  <Button
+                    size="sm"
+                    variant="light"
+                    isIconOnly
+                    aria-label="Zeitfenster entfernen"
+                    isDisabled={row.slots.length === 1}
+                    onPress={() => removeSlot(row.dayOfWeek, idx)}
+                  >
+                    <TrashBin className="size-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
                 size="sm"
-                value={row.openTime}
-                onValueChange={(v) =>
-                  updateRow(row.dayOfWeek, { openTime: v })
-                }
-                aria-label="Oeffnungszeit"
-                className="w-32"
-              />
-              <span className="text-muted">-</span>
-              <Input
-                type="time"
-                size="sm"
-                value={row.closeTime}
-                onValueChange={(v) =>
-                  updateRow(row.dayOfWeek, { closeTime: v })
-                }
-                aria-label="Schliesszeit"
-                className="w-32"
-              />
+                variant="flat"
+                startContent={<Plus className="size-4" />}
+                onPress={() => addSlot(row.dayOfWeek)}
+                className="self-start"
+              >
+                Zeitfenster hinzufügen
+              </Button>
             </div>
           )}
         </div>
@@ -129,4 +211,4 @@ export function OpeningHoursEditor({
   );
 }
 
-export type { DayRow };
+export type { DayRow, SlotRow };

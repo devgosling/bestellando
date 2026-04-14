@@ -20,6 +20,7 @@ export class OrderItemService {
     quantity: number;
     unitPrice: number;
     totalPrice: number;
+    specialInstructions?: string;
   }) {
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
 

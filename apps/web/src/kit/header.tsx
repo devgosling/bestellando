@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Badge, Button } from "@heroui/react";
+import { Badge, BadgeAnchor, Button } from "@heroui/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useUserContext } from "../providers/useUserContext";
 import { ShoppingCart, Bars, Xmark } from "@gravity-ui/icons";
@@ -59,12 +59,7 @@ const Header = () => {
           <ThemeToggle />
 
           {loggedIn && isCustomer && (
-            <Badge
-              content={totalItems}
-              color="danger"
-              size="sm"
-              isInvisible={totalItems === 0}
-            >
+            <BadgeAnchor>
               <Button
                 isIconOnly
                 variant="ghost"
@@ -74,7 +69,12 @@ const Header = () => {
               >
                 <ShoppingCart className="size-4" />
               </Button>
-            </Badge>
+              {totalItems > 0 && (
+                <Badge color="danger" size="sm" placement="top-right">
+                  {totalItems}
+                </Badge>
+              )}
+            </BadgeAnchor>
           )}
 
           {loggedIn ? (
@@ -122,12 +122,7 @@ const Header = () => {
         <div className="flex lg:hidden items-center gap-1">
           <ThemeToggle />
           {loggedIn && isCustomer && (
-            <Badge
-              content={totalItems}
-              color="danger"
-              size="sm"
-              isInvisible={totalItems === 0}
-            >
+            <BadgeAnchor>
               <Button
                 isIconOnly
                 variant="ghost"
@@ -137,7 +132,12 @@ const Header = () => {
               >
                 <ShoppingCart className="size-4" />
               </Button>
-            </Badge>
+              {totalItems > 0 && (
+                <Badge color="danger" size="sm" placement="top-right">
+                  {totalItems}
+                </Badge>
+              )}
+            </BadgeAnchor>
           )}
           <Button
             isIconOnly

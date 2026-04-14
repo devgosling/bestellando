@@ -18,7 +18,7 @@ export class OpeningHoursService {
   async createOpeningHours(entity: OpeningHoursEntity) {
     return this.dataBase.createRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "openingHours",
+      tableId: "opening_hours",
       rowId: ID.unique(),
       data: entity as object as Record<string, unknown>,
       permissions: [Permission.read(Role.any())],
@@ -28,7 +28,7 @@ export class OpeningHoursService {
   async getOpeningHoursById(id: string) {
     return this.dataBase.getRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "openingHours",
+      tableId: "opening_hours",
       rowId: id,
     });
   }
@@ -36,14 +36,22 @@ export class OpeningHoursService {
   async getAllOpeningHours() {
     return this.dataBase.listRows({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "openingHours",
+      tableId: "opening_hours",
+    });
+  }
+
+  async getByRestaurant(restaurantId: string) {
+    return this.dataBase.listRows({
+      databaseId: this.configService.get<string>("DATABASE_ID")!,
+      tableId: "opening_hours",
+      queries: [Query.equal("restaurant", restaurantId)],
     });
   }
 
   async updateOpeningHours(id: string, patch: Partial<OpeningHoursEntity>) {
     return this.dataBase.updateRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "openingHours",
+      tableId: "opening_hours",
       rowId: id,
       data: patch as object as Record<string, unknown>,
     });
@@ -52,7 +60,7 @@ export class OpeningHoursService {
   async deleteOpeningHours(id: string) {
     return this.dataBase.deleteRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
-      tableId: "openingHours",
+      tableId: "opening_hours",
       rowId: id,
     });
   }

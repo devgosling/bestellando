@@ -10,5 +10,6 @@ import { AuthModule } from "src/auth/auth.module";
   imports: [DatabaseModule, ConfigModule.forRoot(), AuthModule],
   controllers: [AddressController],
   providers: [AddressService, GeocodingService],
+  exports: [AddressService, GeocodingService],
 })
 export class AddressModule {}

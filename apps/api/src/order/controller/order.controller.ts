@@ -31,6 +31,17 @@ export class OrderController {
     );
   }
 
+  @Get("restaurant/:restaurantId")
+  async getRestaurantOrders(
+    @Param("restaurantId") restaurantId: string,
+    @Query("limit") limit?: string,
+  ) {
+    return this.orderService.getRestaurantOrders(
+      restaurantId,
+      limit ? parseInt(limit) : 25,
+    );
+  }
+
   @Get(":id")
   async getById(@Param("id") id: string) {
     return this.orderService.getOrderById(id);

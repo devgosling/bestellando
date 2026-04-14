@@ -1,5 +1,5 @@
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { Badge } from "@heroui/react";
+import { Badge, BadgeAnchor } from "@heroui/react";
 import {
   House,
   Magnifier,
@@ -75,15 +75,12 @@ export function BottomTabBar() {
 
         if (tab.showBadge && totalItems > 0) {
           return (
-            <Badge
-              key={tab.path}
-              content={totalItems}
-              color="danger"
-              size="sm"
-              placement="top-right"
-            >
+            <BadgeAnchor key={tab.path}>
               {button}
-            </Badge>
+              <Badge color="danger" size="sm" placement="top-right">
+                {totalItems}
+              </Badge>
+            </BadgeAnchor>
           );
         }
 

@@ -10,6 +10,7 @@ import { ConfigService } from "@nestjs/config";
 import { ActorContextService } from "../../auth/service/actor-context.service";
 import { UserService } from "../../user/service/user.service";
 import { OrderItemService } from "../../orderItem/service/order-item.service";
+import { ModifierOptionService } from "../../modifierOption/service/modifier-option.service";
 import { OrderStatusHistoryService } from "../../orderStatusHistory/service/order-status-history.service";
 import { OrderGateway } from "../../gateway/orders/order.gateway";
 import { CreateOrderDto } from "../dto/create-order.dto";
@@ -28,6 +29,7 @@ export class OrderService {
     private readonly actorContextService: ActorContextService,
     private readonly userService: UserService,
     private readonly orderItemService: OrderItemService,
+    private readonly modifierOptionService: ModifierOptionService,
     private readonly orderStatusHistoryService: OrderStatusHistoryService,
     @Inject(forwardRef(() => OrderGateway))
     private readonly orderGateway: OrderGateway,
@@ -50,8 +52,13 @@ export class OrderService {
     }
 
     // 2. Validate all products belong to restaurant and are available
-    const products: { product: Record<string, unknown>; quantity: number }[] =
-      [];
+    const products: {
+      product: Record<string, unknown>;
+      quantity: number;
+      resolvedModifiers: { $id: string; priceDelta: number }[];
+      specialInstructions?: string;
+      unitPrice: number;
+    }[] = [];
     for (const item of dto.items) {
       const product = await this.dataBase.getRow({
         databaseId,
@@ -66,13 +73,48 @@ export class OrderService {
           `Product ${product.name} is not available`,
         );
       }
-      products.push({ product, quantity: item.quantity });
+
+      const resolvedModifiers: { $id: string; priceDelta: number }[] = [];
+      for (const modifierOptionId of item.modifierOptionIds ?? []) {
+        const option = await this.modifierOptionService.getById(modifierOptionId);
+        const optionProductId =
+          typeof option.product === "string"
+            ? option.product
+            : (option.product as { $id?: string } | undefined)?.$id;
+        if (optionProductId !== item.productId) {
+          throw new BadRequestException(
+            `Modifier option ${modifierOptionId} does not belong to product ${item.productId}`,
+          );
+        }
+        if (option.isAvailable === false) {
+          throw new BadRequestException(
+            `Modifier option "${option.name}" is not available`,
+          );
+        }
+        resolvedModifiers.push({
+          $id: option.$id,
+          priceDelta: option.priceDelta as number,
+        });
+      }
+
+      const modifierTotal = resolvedModifiers.reduce(
+        (sum, m) => sum + m.priceDelta,
+        0,
+      );
+      const unitPrice = (product.basePrice as number) + modifierTotal;
+
+      products.push({
+        product,
+        quantity: item.quantity,
+        resolvedModifiers,
+        specialInstructions: item.specialInstructions,
+        unitPrice,
+      });
     }
 
-    // 3. Calculate subtotal server-side
+    // 3. Calculate subtotal server-side (modifier prices included)
     const subtotal = products.reduce(
-      (sum, { product, quantity }) =>
-        sum + (product.basePrice as number) * quantity,
+      (sum, { unitPrice, quantity }) => sum + unitPrice * quantity,
       0,
     );
 
@@ -107,16 +149,35 @@ export class OrderService {
       },
     });
 
-    // 7. Create order items with price snapshots
-    for (const { product, quantity } of products) {
-      const unitPrice = product.basePrice as number;
-      await this.orderItemService.createOrderItem({
+    // 7. Create order items with price snapshots + linked modifier rows
+    for (const {
+      product,
+      quantity,
+      unitPrice,
+      resolvedModifiers,
+      specialInstructions,
+    } of products) {
+      const orderItem = await this.orderItemService.createOrderItem({
         order: order.$id,
         product: product.$id as string,
         quantity,
         unitPrice,
         totalPrice: unitPrice * quantity,
+        specialInstructions,
       });
+
+      for (const mod of resolvedModifiers) {
+        await this.dataBase.createRow({
+          databaseId,
+          tableId: "order_item_modifier",
+          rowId: ID.unique(),
+          data: {
+            orderItem: orderItem.$id,
+            modifierOption: mod.$id,
+            deltaPrice: mod.priceDelta,
+          },
+        });
+      }
     }
 
     // 8. Create initial status history
@@ -247,6 +308,22 @@ export class OrderService {
     }
 
     return order;
+  }
+
+  async getRestaurantOrders(restaurantId: string, limit = 25) {
+    const databaseId = this.configService.get<string>("DATABASE_ID")!;
+
+    const result = await this.dataBase.listRows({
+      databaseId,
+      tableId: "order",
+      queries: [
+        Query.equal("restaurant", restaurantId),
+        Query.orderDesc("$createdAt"),
+        Query.limit(limit),
+      ],
+    });
+
+    return { data: result.rows, total: result.total };
   }
 
   async getOrderItems(orderId: string) {

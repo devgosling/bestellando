@@ -8,7 +8,12 @@ import {
 } from "react";
 import type { UserContext } from "../routes/__root";
 import { registerAuthSetters, unregisterAuthSetters } from "./auth-store";
-import { appwriteAccount, connectSockets, disconnectSockets } from "@repo/lib";
+import {
+  appwriteAccount,
+  authenticatedFetch,
+  connectSockets,
+  disconnectSockets,
+} from "@repo/lib";
 
 interface AuthContextValue {
   userContext: UserContext | undefined;
@@ -41,13 +46,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [updateUserContext]);
 
-  // Check for existing Appwrite session on mount
+  // Check for existing Appwrite session on mount and fetch role
   useEffect(() => {
     appwriteAccount
       .get()
-      .then((appwriteUser) => {
+      .then(async (appwriteUser) => {
         setUserContext({ appwriteUser });
         connectSockets().catch(() => {});
+        try {
+          const data = (await authenticatedFetch(
+            "/v1/user/data",
+            undefined,
+            false,
+          )) as { role?: UserContext["userRole"] };
+          if (data?.role) {
+            setUserContext({ appwriteUser, userRole: data.role });
+          }
+        } catch {
+          // Role fetch failed — leave userRole undefined
+        }
       })
       .catch(() => {
         // No active session — keep undefined

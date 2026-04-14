@@ -21,54 +21,76 @@ function OpeningHoursPage() {
   const restaurant = restaurants?.[0];
 
   const { data: hours, isLoading } = useApiQuery<OpeningHoursEntity[]>({
-    request: { url: "/v1/opening-hours" },
-    queryKey: ["opening-hours"],
-    enabled: !!restaurant,
+    request: { url: `/v1/opening-hours?restaurantId=${restaurant?.$id}` },
+    queryKey: ["opening-hours", restaurant?.$id],
+    enabled: !!restaurant?.$id,
   });
 
   const saveMutation = useApiMutation<void, Error, DayRow[]>({
     mutationFn: async (rows) => {
       const existingHours = hours ?? [];
+      const promises: Promise<unknown>[] = [];
 
-      const promises = rows.map((row) => {
-        const existing = existingHours.find(
+      for (const row of rows) {
+        const existingForDay = existingHours.filter(
           (h) => h.dayOfWeek === row.dayOfWeek,
         );
 
-        if (row.isClosed && existing) {
-          return authenticatedFetch(`/v1/opening-hours/${existing.$id}`, {
-            method: "DELETE",
-          });
-        }
-
         if (row.isClosed) {
-          return Promise.resolve();
+          for (const h of existingForDay) {
+            promises.push(
+              authenticatedFetch(`/v1/opening-hours/${h.$id}`, {
+                method: "DELETE",
+              }),
+            );
+          }
+          continue;
         }
 
-        const body = JSON.stringify({
-          dayOfWeek: row.dayOfWeek,
-          openTime: row.openTime,
-          closeTime: row.closeTime,
-          restaurantId: restaurant?.$id,
-        });
-
-        if (existing) {
-          return authenticatedFetch(`/v1/opening-hours/${existing.$id}`, {
-            method: "PATCH",
-            body,
+        const keptIds = new Set<string>();
+        for (const slot of row.slots) {
+          const body = JSON.stringify({
+            dayOfWeek: row.dayOfWeek,
+            openTime: slot.openTime,
+            closeTime: slot.closeTime,
+            restaurant: restaurant?.$id,
           });
+
+          if (slot.entityId) {
+            keptIds.add(slot.entityId);
+            promises.push(
+              authenticatedFetch(`/v1/opening-hours/${slot.entityId}`, {
+                method: "PATCH",
+                body,
+              }),
+            );
+          } else {
+            promises.push(
+              authenticatedFetch("/v1/opening-hours", {
+                method: "POST",
+                body,
+              }),
+            );
+          }
         }
 
-        return authenticatedFetch("/v1/opening-hours", {
-          method: "POST",
-          body,
-        });
-      });
+        for (const h of existingForDay) {
+          if (!keptIds.has(h.$id)) {
+            promises.push(
+              authenticatedFetch(`/v1/opening-hours/${h.$id}`, {
+                method: "DELETE",
+              }),
+            );
+          }
+        }
+      }
 
       await Promise.all(promises);
     },
     success: () => {
-      queryClient.invalidateQueries({ queryKey: ["opening-hours"] });
+      queryClient.invalidateQueries({
+        queryKey: ["opening-hours", restaurant?.$id],
+      });
     },
   });
 
@@ -83,9 +105,9 @@ function OpeningHoursPage() {
   return (
     <AnimatedPage className="flex flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold">Oeffnungszeiten</h1>
+        <h1 className="text-2xl font-bold">Öffnungszeiten</h1>
         <p className="text-sm text-muted">
-          Lege fest, wann dein Restaurant geoeffnet ist
+          Lege fest, wann dein Restaurant geöffnet ist
         </p>
       </div>
 

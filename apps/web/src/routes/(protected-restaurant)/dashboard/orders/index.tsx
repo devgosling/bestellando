@@ -1,8 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Tabs, Tab, Card, CardContent, Chip, Button, Spinner } from "@heroui/react";
+import {
+  Tabs,
+  TabList,
+  Tab,
+  Card,
+  CardContent,
+  Chip,
+  Button,
+  Spinner,
+} from "@heroui/react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { OrderStatus } from "@repo/interfaces";
+import type { OrderStatus, RestaurantEntity } from "@repo/interfaces";
 import { ListCheck } from "@gravity-ui/icons";
 import { getOrderSocket } from "@repo/lib";
 import { useApiQuery, useApiMutation } from "@repo/hooks";
@@ -11,14 +20,12 @@ import { EmptyState } from "../../../../components/shared/EmptyState";
 import { PriceDisplay } from "../../../../components/shared/PriceDisplay";
 import { useSocketEvent } from "../../../../hooks/useSocketEvent";
 
-import type { RestaurantEntity } from "@repo/interfaces";
-
 type FilterTab = "ALL" | OrderStatus;
 
 const tabs: { key: FilterTab; label: string }[] = [
   { key: "ALL", label: "Alle" },
   { key: "PENDING", label: "Ausstehend" },
-  { key: "CONFIRMED", label: "Bestaetigt" },
+  { key: "CONFIRMED", label: "Bestätigt" },
   { key: "PREPARING", label: "In Zubereitung" },
   { key: "READY", label: "Bereit" },
 ];
@@ -107,9 +114,13 @@ function OrdersPage() {
         onSelectionChange={(key) => setFilter(key as FilterTab)}
         variant="underlined"
       >
-        {tabs.map((tab) => (
-          <Tab key={tab.key} title={tab.label} />
-        ))}
+        <TabList>
+          {tabs.map((tab) => (
+            <Tab key={tab.key} id={tab.key}>
+              {tab.label}
+            </Tab>
+          ))}
+        </TabList>
       </Tabs>
 
       {isLoading ? (

@@ -13,6 +13,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { AppwriteService } from "../../auth/service/appwrite.service";
 import { ActorContextService } from "../../auth/service/actor-context.service";
+import { GeocodingService } from "../../address/service/geocoding.service";
 import { RestaurantFilterDto } from "../dto/restaurant-filter.dto";
 
 @Injectable()
@@ -26,6 +27,7 @@ export class RestaurantService {
     private readonly configService: ConfigService,
     private readonly appwriteService: AppwriteService,
     private readonly actorContextService: ActorContextService,
+    private readonly geocodingService: GeocodingService,
   ) {
     this.dataBase = this.databaseService.getDatabase();
     this.teams = new Teams(this.appwriteService.getSDKClient());
@@ -62,10 +64,34 @@ export class RestaurantService {
       minOrderValue: 0,
       deliveryFee: 0,
       estimatedDeliveryMinutes: 30,
+      ownerId: user.$id,
     };
 
     if (params.partialAddress) {
-      restaurantData.address = params.partialAddress;
+      const coordinates = await this.geocodingService.forward({
+        street: params.partialAddress.street,
+        streetNumber: params.partialAddress.streetNumber,
+        zipCode: params.partialAddress.zipCode,
+        city: params.partialAddress.city,
+      });
+
+      const address = await this.dataBase.createRow({
+        databaseId: this.configService.get<string>("DATABASE_ID")!,
+        tableId: "address",
+        rowId: ID.unique(),
+        data: {
+          ownerId: user.$id,
+          ownerType: "RESTAURANT",
+          street: params.partialAddress.street ?? "",
+          streetNumber: params.partialAddress.streetNumber ?? "",
+          zipCode: params.partialAddress.zipCode ?? "",
+          city: params.partialAddress.city ?? "",
+          isDefault: true,
+          ...(coordinates ? { coordinates } : {}),
+        },
+      });
+
+      restaurantData.address = address.$id;
     }
 
     await this.dataBase.createRow({
@@ -86,20 +112,10 @@ export class RestaurantService {
     const actorContext = this.actorContextService.get();
     const userId = actorContext.user.id;
 
-    const { memberships } = await this.users.listMemberships({ userId });
-    const teamIds = memberships.map((m) => m.teamId);
-
-    if (!teamIds.length) return { total: 0, documents: [] };
-
     const restaurants = await this.dataBase.listRows({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
       tableId: "restaurant",
-      queries: [
-        Query.contains(
-          "$permissions",
-          teamIds.map((id) => `update("team:${id}/owner")`),
-        ),
-      ],
+      queries: [Query.equal("ownerId", userId)],
     });
 
     return restaurants;

@@ -20,7 +20,6 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { AnimatedPage } from "../components/shared/AnimatedPage";
-import { Button } from "@heroui/react";
 import type { ComponentType, SVGProps } from "react";
 import type { LucideProps } from "lucide-react";
 

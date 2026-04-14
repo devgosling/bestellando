@@ -1,4 +1,5 @@
-import { Button, Switch } from "@heroui/react";
+import { Button } from "@heroui/react";
+import { ToggleSwitch } from "../shared/ToggleSwitch";
 import { Pencil, TrashBin } from "@gravity-ui/icons";
 import type { ProductEntity } from "@repo/interfaces";
 import { PriceDisplay } from "../shared/PriceDisplay";
@@ -49,11 +50,11 @@ export function MenuProductRow({
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-        <Switch
+        <ToggleSwitch
           size="sm"
           isSelected={product.isAvailable}
-          onValueChange={(val) => onToggleAvailability(product, val)}
-          aria-label="Verfuegbar"
+          onChange={(val) => onToggleAvailability(product, val)}
+          aria-label="Verfügbar"
         />
         <Button
           isIconOnly
@@ -70,7 +71,7 @@ export function MenuProductRow({
           color="danger"
           size="sm"
           onPress={() => onDelete(product)}
-          aria-label="Loeschen"
+          aria-label="Löschen"
         >
           <TrashBin className="size-4" />
         </Button>

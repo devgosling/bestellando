@@ -46,7 +46,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <Button
                 isIconOnly
                 variant="ghost"
-                aria-label="Warenkorb schliessen"
+                aria-label="Warenkorb schließen"
                 onPress={onClose}
               >
                 <Xmark className="size-5" />
@@ -56,7 +56,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             <div className="flex-1 overflow-y-auto px-4">
               {hasItems ? (
                 items.map((item) => (
-                  <CartItem key={item.product.$id} item={item} />
+                  <CartItem key={item.id} item={item} />
                 ))
               ) : (
                 <div className="flex items-center justify-center h-full">

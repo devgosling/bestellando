@@ -13,7 +13,7 @@ const statusColorMap: Record<OrderStatus, "warning" | "default" | "secondary" | 
 
 const statusLabelMap: Record<OrderStatus, string> = {
   PENDING: "Ausstehend",
-  CONFIRMED: "Bestaetigt",
+  CONFIRMED: "Bestätigt",
   PREPARING: "In Zubereitung",
   READY: "Bereit",
   PICKED_UP: "Abgeholt",

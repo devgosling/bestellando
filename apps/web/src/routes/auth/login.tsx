@@ -59,7 +59,7 @@ const Page = () => {
           bestellando
         </h1>
         <p className="text-muted text-center text-sm mt-1 mb-6">
-          Willkommen zurueck
+          Willkommen zurück
         </p>
 
         <div className="flex flex-col gap-4">

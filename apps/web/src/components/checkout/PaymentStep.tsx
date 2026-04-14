@@ -47,6 +47,8 @@ export function PaymentStep({
         items: items.map((item) => ({
           productId: item.product.$id,
           quantity: item.quantity,
+          modifierOptionIds: item.modifiers.map((m) => m.$id),
+          specialInstructions: item.specialInstructions,
         })),
         ...(notes ? { notes } : {}),
       };

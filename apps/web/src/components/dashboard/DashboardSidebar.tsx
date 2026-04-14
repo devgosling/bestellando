@@ -11,10 +11,10 @@ import {
 import { useState } from "react";
 
 const navItems = [
-  { to: "/dashboard", label: "Uebersicht", icon: House, exact: true },
+  { to: "/dashboard", label: "Übersicht", icon: House, exact: true },
   { to: "/dashboard/orders", label: "Bestellungen", icon: ListCheck },
   { to: "/dashboard/menu", label: "Speisekarte", icon: Book },
-  { to: "/dashboard/opening-hours", label: "Oeffnungszeiten", icon: Clock },
+  { to: "/dashboard/opening-hours", label: "Öffnungszeiten", icon: Clock },
   { to: "/dashboard/settings", label: "Einstellungen", icon: Gear },
 ] as const;
 
@@ -59,7 +59,7 @@ export function DashboardSidebar() {
           variant="light"
           size="sm"
           onPress={() => setMobileOpen((o) => !o)}
-          aria-label="Menue oeffnen"
+          aria-label="Menü öffnen"
         >
           <Bars className="size-5" />
         </Button>
