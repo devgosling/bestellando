@@ -6,10 +6,10 @@ import {
 import { ConfigService } from "@nestjs/config/dist/config.service";
 import { AddressEntity, type AddressOwnerType } from "@repo/interfaces";
 import { ID, Query, TablesDB, Teams, Users } from "node-appwrite";
-import { NotFoundError } from "rxjs";
 import { ActorContextService } from "src/auth/service/actor-context.service";
 import { AppwriteService } from "src/auth/service/appwrite.service";
 import { DatabaseService } from "src/database/service/database.service";
+import { GeocodingService } from "./geocoding.service";
 
 @Injectable()
 export class AddressService {
@@ -22,6 +22,7 @@ export class AddressService {
     private readonly configService: ConfigService,
     private readonly appwriteService: AppwriteService,
     private readonly actorContextService: ActorContextService,
+    private readonly geocodingService: GeocodingService,
   ) {
     this.dataBase = this.databaseService.getDatabase();
     this.teams = new Teams(this.appwriteService.getSDKClient());
@@ -31,14 +32,31 @@ export class AddressService {
   public async createAddress(type: AddressOwnerType, addressData: Partial<AddressEntity>) {
     const actorContext = this.actorContextService.get();
 
+    const coordinates =
+      addressData.coordinates ??
+      (await this.geocodingService.forward({
+        street: addressData.street,
+        streetNumber: addressData.streetNumber,
+        zipCode: addressData.zipCode,
+        city: addressData.city,
+      }));
+
+    let isDefault = addressData.isDefault ?? false;
+    if (type === "CUSTOMER" && addressData.ownerId && !isDefault) {
+      const existing = await this.getMyAddresses(addressData.ownerId);
+      if (existing.length === 0) isDefault = true;
+    }
+
     const address = await this.dataBase.createRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
       tableId: "address",
       rowId: ID.unique(),
       data: {
         ...addressData,
-      }
-    })
+        isDefault,
+        ...(coordinates ? { coordinates } : {}),
+      },
+    });
 
     if (type === "RESTAURANT") {
       const restaurant = await this.dataBase.listRows({
@@ -96,13 +114,35 @@ export class AddressService {
   }
 
   public async updateAddress(id: string, patch: Partial<AddressEntity>): Promise<AddressEntity> {
+    const addressChanged =
+      patch.street !== undefined ||
+      patch.streetNumber !== undefined ||
+      patch.zipCode !== undefined ||
+      patch.city !== undefined;
+
+    let coordinates = patch.coordinates;
+    if (addressChanged && coordinates === undefined) {
+      const current = await this.getAddressById(id);
+      coordinates =
+        (await this.geocodingService.forward({
+          street: patch.street ?? current.street,
+          streetNumber: patch.streetNumber ?? current.streetNumber,
+          zipCode: patch.zipCode ?? current.zipCode,
+          city: patch.city ?? current.city,
+        })) ?? undefined;
+    }
+
     const updated = await this.dataBase.updateRow({
       databaseId: this.configService.get<string>("DATABASE_ID")!,
       tableId: "address",
       rowId: id,
-      data: { ...patch },
+      data: { ...patch, ...(coordinates ? { coordinates } : {}) },
     });
     return updated as unknown as AddressEntity;
+  }
+
+  public async reverseGeocode(lat: number, lng: number) {
+    return this.geocodingService.reverse(lat, lng);
   }
 
   public async deleteAddress(id: string) {

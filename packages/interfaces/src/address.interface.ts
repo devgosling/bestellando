@@ -1,6 +1,6 @@
-import { Point } from "geojson";
-
 export type AddressOwnerType = "RESTAURANT" | "CUSTOMER";
+
+export type Coordinates = [longitude: number, latitude: number];
 
 export interface AddressEntity {
   $id: string;
@@ -11,5 +11,5 @@ export interface AddressEntity {
   zipCode: string;
   city: string;
   isDefault: boolean;
-  coordinates: Point;
+  coordinates: Coordinates;
 }

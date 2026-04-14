@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from "@nestjs/common";
 import { AddressEntity } from "@repo/interfaces";
 import { AddressService } from "../service/address.service";
@@ -37,6 +39,19 @@ export class AddressController {
   public async getMyAddresses() {
     const userId = this.actorContextService.get().user.id;
     return this.addressService.getMyAddresses(userId);
+  }
+
+  @Get("reverse")
+  public async reverseGeocode(
+    @Query("lat") lat?: string,
+    @Query("lng") lng?: string,
+  ) {
+    const latNum = lat !== undefined ? Number(lat) : Number.NaN;
+    const lngNum = lng !== undefined ? Number(lng) : Number.NaN;
+    if (!Number.isFinite(latNum) || !Number.isFinite(lngNum)) {
+      throw new BadRequestException("lat and lng must be valid numbers");
+    }
+    return this.addressService.reverseGeocode(latNum, lngNum);
   }
 
   @Patch(":id")
