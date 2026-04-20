@@ -17,14 +17,12 @@ export class OrderStatusHistoryService {
   public async createOrderStatusHistory(data: {
     order: string;
     status: string;
-    changedBy: string;
-    changedAt: string;
   }) {
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
 
     return this.dataBase.createRow({
       databaseId,
-      tableId: "orderStatusHistory",
+      tableId: "order_status_history",
       rowId: ID.unique(),
       data: data as Record<string, unknown>,
     });

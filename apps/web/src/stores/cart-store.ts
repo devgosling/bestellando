@@ -76,7 +76,11 @@ export const useCartStore = create<CartState>()(
 
       addItem: (product, quantity, instructions, modifiers = []) => {
         const state = get();
-        const incomingRestaurantId = product.restaurant.$id;
+        const restaurantRel = product.restaurant;
+        const incomingRestaurantId =
+          typeof restaurantRel === "string"
+            ? restaurantRel
+            : restaurantRel?.$id ?? "";
 
         if (
           state.restaurantId !== null &&
@@ -113,7 +117,10 @@ export const useCartStore = create<CartState>()(
               },
             ],
             restaurantId: incomingRestaurantId,
-            restaurantName: product.restaurant.name,
+            restaurantName:
+              typeof restaurantRel === "object"
+                ? restaurantRel?.name ?? null
+                : null,
           });
         }
       },
@@ -159,8 +166,14 @@ export const useCartStore = create<CartState>()(
               modifiers: pending.modifiers,
             },
           ],
-          restaurantId: pending.product.restaurant.$id,
-          restaurantName: pending.product.restaurant.name,
+          restaurantId:
+            typeof pending.product.restaurant === "string"
+              ? pending.product.restaurant
+              : pending.product.restaurant?.$id ?? null,
+          restaurantName:
+            typeof pending.product.restaurant === "object"
+              ? pending.product.restaurant?.name ?? null
+              : null,
           pendingItem: null,
         });
       },

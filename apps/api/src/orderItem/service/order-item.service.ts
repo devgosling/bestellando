@@ -26,7 +26,7 @@ export class OrderItemService {
 
     return this.dataBase.createRow({
       databaseId,
-      tableId: "orderItem",
+      tableId: "order_item",
       rowId: ID.unique(),
       data: data as Record<string, unknown>,
     });

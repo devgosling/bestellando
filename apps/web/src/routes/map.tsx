@@ -9,6 +9,28 @@ import { MapBase } from "../components/shared/MapBase";
 import { useEffect } from "react";
 import L from "leaflet";
 
+const iconCache = new Map<string, L.DivIcon>();
+
+function restaurantIcon(r: RestaurantEntity) {
+  const key = `${r.$id}-${r.imageUrl ?? ""}`;
+  const cached = iconCache.get(key);
+  if (cached) return cached;
+
+  const img = r.imageUrl
+    ? `<img src="${r.imageUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+    : `<div style="width:100%;height:100%;border-radius:50%;background:#006FEE;color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;">${r.name.charAt(0).toUpperCase()}</div>`;
+
+  const icon = L.divIcon({
+    className: "restaurant-map-marker",
+    iconSize: [44, 44],
+    iconAnchor: [22, 44],
+    popupAnchor: [0, -44],
+    html: `<div style="width:44px;height:44px;border-radius:50%;border:3px solid #006FEE;background:#fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.35);">${img}</div>`,
+  });
+  iconCache.set(key, icon);
+  return icon;
+}
+
 interface RestaurantListResponse {
   data: RestaurantEntity[];
   total: number;
@@ -20,12 +42,14 @@ interface RestaurantListResponse {
 function getLatLng(r: RestaurantEntity): [number, number] | null {
   const addr = r.address;
   if (!addr || typeof addr === "string") return null;
-  const coords = addr.coordinates as unknown as
-    | { coordinates?: number[] }
-    | undefined;
-  const arr = coords?.coordinates;
-  if (Array.isArray(arr) && arr.length === 2) {
-    return [arr[1], arr[0]];
+  const coords = addr.coordinates as unknown;
+  if (!coords) return null;
+  if (Array.isArray(coords) && coords.length === 2 && typeof coords[0] === "number") {
+    return [coords[1], coords[0]];
+  }
+  const nested = (coords as { coordinates?: number[] }).coordinates;
+  if (Array.isArray(nested) && nested.length === 2) {
+    return [nested[1], nested[0]];
   }
   return null;
 }
@@ -128,7 +152,7 @@ function MapPage() {
             )}
 
             {markerPoints.map(({ r, pt }) => (
-              <Marker key={r.$id} position={pt}>
+              <Marker key={r.$id} position={pt} icon={restaurantIcon(r)}>
                 <Popup>
                   <div className="flex flex-col gap-1 min-w-[180px]">
                     <div className="font-semibold text-sm">{r.name}</div>

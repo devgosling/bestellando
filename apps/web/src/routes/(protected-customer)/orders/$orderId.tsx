@@ -106,11 +106,11 @@ function OrderDetailPage() {
       <div className="flex items-start justify-between mb-6">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold">
-            {order.restaurant?.name ?? "Bestellung"}
+            {typeof order.restaurant === "object" ? order.restaurant?.name : "Bestellung"}
           </h1>
-          {order.createdAt && (
+          {order.$createdAt && (
             <p className="text-sm text-muted">
-              {dateFormatter.format(new Date(order.createdAt))}
+              {dateFormatter.format(new Date(order.$createdAt))}
             </p>
           )}
         </div>
@@ -170,11 +170,7 @@ function OrderDetailPage() {
         </CardHeader>
         <CardContent>
           <OrderTimeline
-            history={history.map((h) => ({
-              status: h.status,
-              changedAt: h.changedAt,
-              changedBy: h.changedBy,
-            }))}
+            history={history}
             currentStatus={order.currentStatus}
           />
         </CardContent>
@@ -225,8 +221,7 @@ function OrderDetailPage() {
       })()}
 
       {/* Retry payment for PENDING orders */}
-      {order.currentStatus === "PENDING" &&
-        order.paymentStatus !== "PAID" && (
+      {order.currentStatus === "PENDING" && (
           <Button
             size="lg"
             className="w-full bg-accent text-accent-foreground font-semibold"

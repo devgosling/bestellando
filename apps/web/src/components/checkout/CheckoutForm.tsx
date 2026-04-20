@@ -27,14 +27,15 @@ export function CheckoutForm() {
   const [error, setError] = useState<string | null>(null);
 
   const handleCheckout = async () => {
-    if (!selectedAddressId || !restaurantId) return;
+    const storeRestaurantId = restaurantId ?? useCartStore.getState().restaurantId;
+    if (!selectedAddressId || !storeRestaurantId) return;
 
     setIsSubmitting(true);
     setError(null);
 
     try {
       const orderPayload = {
-        restaurantId,
+        restaurantId: storeRestaurantId,
         deliveryAddressId: selectedAddressId,
         items: items.map((item) => ({
           productId: item.product.$id,

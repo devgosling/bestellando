@@ -39,9 +39,9 @@ export function IncomingOrderCard({
             <span className="text-xs text-muted">
               Bestellung #{order.$id.slice(-6).toUpperCase()}
             </span>
-            {order.createdAt && (
+            {order.$createdAt && (
               <span className="text-xs text-muted">
-                {new Date(order.createdAt).toLocaleString("de-DE")}
+                {new Date(order.$createdAt).toLocaleString("de-DE")}
               </span>
             )}
           </div>

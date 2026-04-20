@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@heroui/react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import type { OrderEntity } from "@repo/interfaces";
 import { PriceDisplay } from "../shared/PriceDisplay";
 import { OrderStatusBadge } from "./OrderStatusBadge";
@@ -14,35 +14,33 @@ interface OrderCardProps {
 }
 
 export function OrderCard({ order }: OrderCardProps) {
-  const navigate = useNavigate();
-
   return (
-    <Card
-      isPressable
-      onPress={() =>
-        navigate({ to: "/orders/$orderId", params: { orderId: order.$id } })
-      }
-      className="w-full border border-border bg-surface transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
+    <Link
+      to="/orders/$orderId"
+      params={{ orderId: order.$id }}
+      className="block"
     >
-      <CardContent className="flex flex-row items-center justify-between gap-4">
-        <div className="flex flex-col gap-1 min-w-0">
-          <span className="text-sm font-semibold truncate">
-            {order.restaurant?.name ?? "Restaurant"}
-          </span>
-          {order.createdAt && (
-            <span className="text-xs text-muted">
-              {dateFormatter.format(new Date(order.createdAt))}
+      <Card className="w-full border border-border bg-surface transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md cursor-pointer">
+        <CardContent className="flex flex-row items-center justify-between gap-4">
+          <div className="flex flex-col gap-1 min-w-0">
+            <span className="text-sm font-semibold truncate">
+              {typeof order.restaurant === "object" ? order.restaurant?.name : "Restaurant"}
             </span>
-          )}
-        </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <PriceDisplay
-            amount={order.totalAmount}
-            className="text-sm font-semibold"
-          />
-          <OrderStatusBadge status={order.currentStatus} />
-        </div>
-      </CardContent>
-    </Card>
+            {order.$createdAt && (
+              <span className="text-xs text-muted">
+                {dateFormatter.format(new Date(order.$createdAt))}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <PriceDisplay
+              amount={order.totalAmount}
+              className="text-sm font-semibold"
+            />
+            <OrderStatusBadge status={order.currentStatus} />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

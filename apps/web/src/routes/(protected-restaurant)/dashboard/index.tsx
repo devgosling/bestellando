@@ -94,7 +94,7 @@ function OverviewPage() {
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const todays = orders.filter((o) => {
-      const created = o.createdAt ? new Date(o.createdAt) : null;
+      const created = o.$createdAt ? new Date(o.$createdAt) : null;
       return created && created >= startOfDay;
     });
     const revenue = todays
@@ -183,8 +183,8 @@ function OverviewPage() {
                     #{order.$id.slice(-6).toUpperCase()}
                   </span>
                   <span className="text-xs text-muted">
-                    {order.createdAt
-                      ? new Date(order.createdAt).toLocaleTimeString("de-DE", {
+                    {order.$createdAt
+                      ? new Date(order.$createdAt).toLocaleTimeString("de-DE", {
                           hour: "2-digit",
                           minute: "2-digit",
                         })

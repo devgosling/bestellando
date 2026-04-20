@@ -76,7 +76,9 @@ export class OrderGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       if (!order) return { event: "error", data: { message: "Order not found" } };
 
-      const isCustomer = order.customerId === userId;
+      const customerRel = order.customer as { $id?: string } | string | undefined;
+      const customerId = typeof customerRel === "object" ? customerRel?.$id : customerRel;
+      const isCustomer = customerId === userId;
       const isDeliveryPerson = order.deliveryPersonId === userId;
 
       // Check restaurant ownership via team memberships

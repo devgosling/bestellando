@@ -21,8 +21,7 @@ const statusFlow: OrderStatus[] = [
 
 interface HistoryEntry {
   status: OrderStatus;
-  changedAt: string;
-  changedBy: string;
+  $createdAt: string;
 }
 
 interface OrderTimelineProps {
@@ -85,7 +84,7 @@ export function OrderTimeline({ history, currentStatus }: OrderTimelineProps) {
               </p>
               {entry && (
                 <p className="text-xs text-muted mt-0.5">
-                  {dateFormatter.format(new Date(entry.changedAt))}
+                  {dateFormatter.format(new Date(entry.$createdAt))}
                 </p>
               )}
             </div>

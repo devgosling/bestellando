@@ -58,20 +58,23 @@ function OrdersPage() {
     data: any[];
     total: number;
   }>({
-    request: { url: "/v1/order/mine" },
-    queryKey: ["restaurant-orders"],
+    request: { url: `/v1/order/restaurant/${restaurantId}` },
+    queryKey: ["restaurant-orders", restaurantId],
     enabled: !!restaurantId,
   });
 
   const updateStatus = useApiMutation<
     { success: boolean },
+    Error,
     { orderId: string; status: OrderStatus }
   >({
-    request: (vars) => ({
-      url: `/v1/order/${vars.orderId}/status`,
-      method: "PATCH",
-      body: { status: vars.status },
-    }),
+    mutationFn: async (vars) => {
+      const { authenticatedFetch } = await import("@repo/lib");
+      return authenticatedFetch(`/v1/order/${vars.orderId}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: vars.status }),
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["restaurant-orders"] });
     },

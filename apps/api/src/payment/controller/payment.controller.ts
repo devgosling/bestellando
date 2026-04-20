@@ -17,12 +17,14 @@ export class PaymentController {
     const order = await this.orderService.getOrderById(orderId);
 
     if (!order) throw new BadRequestException("Order not found");
-    if (order.customerId !== userId)
+    const orderCustomer =
+      typeof order.customer === "object"
+        ? (order.customer as { $id: string }).$id
+        : (order.customer as string);
+    if (orderCustomer !== userId)
       throw new BadRequestException("Order does not belong to you");
     if (order.currentStatus !== "PENDING")
       throw new BadRequestException("Order is not in PENDING status");
-    if (order.paymentStatus === "PAID")
-      throw new BadRequestException("Order is already paid");
 
     // Get order items to build line items
     const itemsResult = await this.orderService.getOrderItems(orderId);
@@ -45,7 +47,10 @@ export class PaymentController {
 
     const session = await this.stripeService.createCheckoutSession({
       orderId,
-      restaurantId: order.restaurant,
+      restaurantId:
+        typeof order.restaurant === "object"
+          ? (order.restaurant as { $id: string }).$id
+          : (order.restaurant as string),
       amount: Math.round(order.totalAmount * 100),
       lineItems,
     });

@@ -55,8 +55,6 @@ export class WebhookController {
           tableId: "order",
           rowId: orderId,
           data: {
-            paymentStatus: "PAID",
-            stripeSessionId: session.id,
             currentStatus: "CONFIRMED",
           },
         });
@@ -95,7 +93,7 @@ export class WebhookController {
           databaseId,
           tableId: "order",
           rowId: orderId,
-          data: { paymentStatus: "FAILED" },
+          data: { currentStatus: "CANCELLED" },
         });
       }
     }

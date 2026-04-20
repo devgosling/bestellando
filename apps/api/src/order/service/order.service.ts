@@ -144,8 +144,6 @@ export class OrderService {
         totalAmount,
         specialInstructions: dto.specialInstructions || "",
         customer: userId,
-        paymentStatus: "UNPAID",
-        createdAt: new Date().toISOString(),
       },
     });
 
@@ -184,8 +182,6 @@ export class OrderService {
     await this.orderStatusHistoryService.createOrderStatusHistory({
       order: order.$id,
       status: "PENDING",
-      changedBy: userId,
-      changedAt: new Date().toISOString(),
     });
 
     // 9. Notify restaurant of new order via WebSocket
@@ -201,7 +197,6 @@ export class OrderService {
   }
 
   async transitionStatus(orderId: string, dto: UpdateOrderStatusDto) {
-    const userId = this.actorContextService.get().user.id;
     const userType = await this.userService.getUserType();
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
 
@@ -233,8 +228,6 @@ export class OrderService {
     await this.orderStatusHistoryService.createOrderStatusHistory({
       order: orderId,
       status: dto.status,
-      changedBy: userId,
-      changedAt: new Date().toISOString(),
     });
 
     // Notify subscribers of status change via WebSocket
@@ -289,9 +282,7 @@ export class OrderService {
       const userId = this.actorContextService.get().user.id;
       const userType = await this.userService.getUserType();
 
-      const customerRel = order.customer as { $id?: string } | string | undefined;
-      const customerId = typeof customerRel === "object" ? customerRel?.$id : customerRel;
-      if (userType === "CUSTOMER" && customerId !== userId) {
+      if (userType === "CUSTOMER" && order.customer !== userId) {
         throw new NotFoundException("Order not found");
       }
 
@@ -333,7 +324,7 @@ export class OrderService {
 
     return this.dataBase.listRows({
       databaseId,
-      tableId: "orderItem",
+      tableId: "order_item",
       queries: [Query.equal("order", orderId)],
     });
   }
@@ -343,10 +334,10 @@ export class OrderService {
 
     return this.dataBase.listRows({
       databaseId,
-      tableId: "orderStatusHistory",
+      tableId: "order_status_history",
       queries: [
         Query.equal("order", orderId),
-        Query.orderAsc("changedAt"),
+        Query.orderAsc("$createdAt"),
       ],
     });
   }

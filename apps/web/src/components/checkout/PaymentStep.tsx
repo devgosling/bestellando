@@ -27,15 +27,35 @@ export function PaymentStep({
   onSuccess,
   onError,
 }: PaymentStepProps) {
-  const items = useCartStore((s) => s.items);
-  const restaurantId = useCartStore((s) => s.restaurantId);
   const clearCart = useCartStore((s) => s.clearCart);
 
   const [isProcessing, setIsProcessing] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const processCheckout = async () => {
-    if (!restaurantId) return;
+    // Wait for zustand persist hydration
+    if (!useCartStore.persist.hasHydrated()) {
+      await new Promise<void>((resolve) => {
+        const unsub = useCartStore.persist.onFinishHydration(() => {
+          unsub();
+          resolve();
+        });
+      });
+    }
+    const { items, restaurantId: storeRestaurantId } = useCartStore.getState();
+    // Fallback: derive restaurantId from cart items if store value is missing
+    let restaurantId = storeRestaurantId;
+    if (!restaurantId && items.length > 0) {
+      const rel = items[0].product.restaurant;
+      restaurantId = typeof rel === "string" ? rel : (rel as any)?.$id ?? null;
+    }
+    if (!restaurantId || items.length === 0) {
+      const message = "Warenkorb ist leer oder Restaurant nicht erkannt.";
+      setError(message);
+      setIsProcessing(false);
+      onError(message);
+      return;
+    }
 
     setIsProcessing(true);
     setError(null);

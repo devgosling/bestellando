@@ -25,6 +25,20 @@ img {
   display: block;
 }
 
+/* Leaflet map z-index fix — prevent tiles overlapping page UI */
+.leaflet-container {
+  z-index: 0;
+}
+
+/* Custom Leaflet marker — reset default div-icon styles */
+.restaurant-map-marker {
+  background: none !important;
+  border: none !important;
+}
+.restaurant-map-marker img {
+  max-width: none;
+}
+
 /*
  * HeroUI Theme — Clean Neutral + Orange Accent
  * Zinc-based neutrals with orange primary for a modern food-delivery look

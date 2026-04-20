@@ -6,10 +6,12 @@ import { useApiQuery, useApiMutation, useNotification } from "@repo/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { authenticatedFetch } from "@repo/lib";
 import type {
+  AddressEntity,
   DeliveryZoneEntity,
   RestaurantEntity,
 } from "@repo/interfaces";
 import { Circle, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
 import { AnimatedPage } from "../../../../components/shared/AnimatedPage";
 import { LoadingSkeleton } from "../../../../components/shared/LoadingSkeleton";
 import { EmptyState } from "../../../../components/shared/EmptyState";
@@ -18,18 +20,29 @@ import { MapBase } from "../../../../components/shared/MapBase";
 
 type LatLng = [number, number];
 
-function extractLatLng(restaurant?: RestaurantEntity): LatLng | null {
-  const addr = restaurant?.address;
-  if (!addr || typeof addr === "string") return null;
-  const coords = addr.coordinates;
+function extractLatLng(address?: AddressEntity | null): LatLng | null {
+  if (!address) return null;
+  const coords = address.coordinates as unknown;
   if (!coords) return null;
+  // Plain [lng, lat] array
+  if (Array.isArray(coords) && coords.length === 2 && typeof coords[0] === "number") {
+    return [coords[1], coords[0]];
+  }
   // GeoJSON Point: { type: "Point", coordinates: [lng, lat] }
-  const arr = (coords as unknown as { coordinates?: number[] }).coordinates;
-  if (Array.isArray(arr) && arr.length === 2) {
-    return [arr[1], arr[0]];
+  const nested = (coords as { coordinates?: number[] }).coordinates;
+  if (Array.isArray(nested) && nested.length === 2) {
+    return [nested[1], nested[0]];
   }
   return null;
 }
+
+const restaurantPinIcon = L.divIcon({
+  className: "restaurant-map-marker",
+  iconSize: [44, 44],
+  iconAnchor: [22, 44],
+  popupAnchor: [0, -44],
+  html: `<div style="width:44px;height:44px;border-radius:50%;border:3px solid #006FEE;background:#006FEE;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.35);font-size:20px;">📍</div>`,
+});
 
 const ZONE_COLORS = [
   "#0ea5e9",
@@ -56,9 +69,32 @@ function DeliveryZonesPage() {
   });
 
   const restaurant = restaurants?.[0];
+
+  const addressId = useMemo(() => {
+    const a = restaurant?.address;
+    if (!a) return undefined;
+    return typeof a === "string" ? a : a.$id;
+  }, [restaurant]);
+
+  const { data: addresses } = useApiQuery<AddressEntity[]>({
+    request: { url: "/v1/address" },
+    queryKey: ["addresses", "mine"],
+    enabled: !!restaurant,
+  });
+
+  const resolvedAddress = useMemo<AddressEntity | undefined>(() => {
+    if (restaurant?.address && typeof restaurant.address === "object") {
+      return restaurant.address as AddressEntity;
+    }
+    if (addressId && addresses) {
+      return addresses.find((a) => a.$id === addressId);
+    }
+    return addresses?.find((a) => a.ownerType === "RESTAURANT");
+  }, [restaurant, addresses, addressId]);
+
   const restaurantLatLng = useMemo(
-    () => extractLatLng(restaurant),
-    [restaurant],
+    () => extractLatLng(resolvedAddress),
+    [resolvedAddress],
   );
 
   const { data: zones, isLoading } = useApiQuery<DeliveryZoneEntity[]>({
@@ -289,7 +325,7 @@ function DeliveryZonesPage() {
               zoom={12}
               style={{ height: "520px", width: "100%" }}
             >
-              <Marker position={restaurantLatLng}>
+              <Marker position={restaurantLatLng} icon={restaurantPinIcon}>
                 <Popup>{restaurant?.name ?? "Restaurant"}</Popup>
               </Marker>
               {sortedZones.map((zone, i) => {

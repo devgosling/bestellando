@@ -4,16 +4,14 @@ export type OrderStatus = "PENDING" | "CONFIRMED" | "PREPARING" | "READY" | "PIC
 
 export interface OrderEntity {
     $id: string;
-    restaurant: RestaurantEntity;
-    deliveryAddress: AddressEntity;
+    restaurant: RestaurantEntity | string;
+    deliveryAddress: AddressEntity | string;
     currentStatus: OrderStatus;
     subtotal: number;
     deliveryFee: number;
     totalAmount: number;
     specialInstructions?: string;
-    customer: string | { $id: string };
-    paymentStatus: "UNPAID" | "PAID" | "FAILED" | "REFUNDED";
-    stripeSessionId?: string;
-    deliveryPersonId?: string;
-    createdAt?: string;
+    customer: string;
+    $createdAt?: string;
+    $updatedAt?: string;
 }

@@ -68,12 +68,14 @@ interface RestaurantListResponse {
 function getLatLng(r: RestaurantEntity): [number, number] | null {
   const addr = r.address;
   if (!addr || typeof addr === "string") return null;
-  const coords = addr.coordinates as unknown as
-    | { coordinates?: number[] }
-    | undefined;
-  const arr = coords?.coordinates;
-  if (Array.isArray(arr) && arr.length === 2) {
-    return [arr[1], arr[0]];
+  const coords = addr.coordinates as unknown;
+  if (!coords) return null;
+  if (Array.isArray(coords) && coords.length === 2 && typeof coords[0] === "number") {
+    return [coords[1], coords[0]];
+  }
+  const nested = (coords as { coordinates?: number[] }).coordinates;
+  if (Array.isArray(nested) && nested.length === 2) {
+    return [nested[1], nested[0]];
   }
   return null;
 }
