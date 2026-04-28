@@ -8,22 +8,27 @@ export interface UserLocation {
 }
 
 interface IpApiResponse {
-  status: "success" | "fail";
-  lat?: number;
-  lon?: number;
+  success: boolean;
+  latitude?: number;
+  longitude?: number;
   city?: string;
   message?: string;
 }
 
 async function fetchIpLocation(): Promise<UserLocation | null> {
   try {
-    const res = await fetch("https://ip-api.com/json/?fields=status,lat,lon,city,message");
+    const res = await fetch("https://ipwho.is/?fields=success,latitude,longitude,city,message");
     if (!res.ok) return null;
     const data = (await res.json()) as IpApiResponse;
-    if (data.status !== "success" || data.lat == null || data.lon == null) {
+    if (!data.success || data.latitude == null || data.longitude == null) {
       return null;
     }
-    return { lat: data.lat, lng: data.lon, city: data.city, source: "ip" };
+    return {
+      lat: data.latitude,
+      lng: data.longitude,
+      city: data.city,
+      source: "ip",
+    };
   } catch {
     return null;
   }

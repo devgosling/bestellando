@@ -5,6 +5,7 @@ import {
   Patch,
   Body,
 } from "@nestjs/common";
+import { type DeliveryPersonRegisterDTO } from "@repo/interfaces";
 import { DeliveryPersonService } from "../service/delivery-person.service";
 import { RequireUserType } from "../../auth/decorator/user-type.decorator";
 import { Public } from "../../auth/decorator/public.decorator";
@@ -20,9 +21,7 @@ export class DeliveryPersonController {
 
   @Public()
   @Post("register")
-  async register(
-    @Body() body: { name: string; phone: string; vehicleType: string },
-  ) {
+  async register(@Body() body: DeliveryPersonRegisterDTO) {
     return this.deliveryPersonService.register(body);
   }
 

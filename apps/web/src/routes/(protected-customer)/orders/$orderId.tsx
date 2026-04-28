@@ -5,6 +5,7 @@ import { authenticatedFetch, getOrderSocket } from "@repo/lib";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type {
+  DeliveryEntity,
   OrderEntity,
   OrderItemEntity,
   OrderStatusHistoryEntity,
@@ -49,6 +50,21 @@ function OrderDetailPage() {
         queryClient.invalidateQueries({
           queryKey: ["order-history", orderId],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["delivery", "order", orderId],
+        });
+      }
+    },
+  );
+
+  useSocketEvent<{ orderId: string }>(
+    orderSocket,
+    "delivery:assigned",
+    (data) => {
+      if (data.orderId === orderId) {
+        queryClient.invalidateQueries({
+          queryKey: ["delivery", "order", orderId],
+        });
       }
     },
   );
@@ -71,6 +87,13 @@ function OrderDetailPage() {
   }>({
     request: { url: `/v1/order/${orderId}/history` },
     queryKey: ["order-history", orderId],
+  });
+
+  const { data: delivery } = useApiQuery<DeliveryEntity>({
+    request: { url: `/v1/delivery/order/${orderId}` },
+    queryKey: ["delivery", "order", orderId],
+    enabled: !!orderId,
+    retry: false,
   });
 
   const items = itemsData?.data ?? [];
@@ -178,20 +201,25 @@ function OrderDetailPage() {
 
       {/* Live delivery tracking map */}
       {(() => {
-        const restAddr = order.restaurant?.address;
-        const restCoords =
-          restAddr && typeof restAddr !== "string"
-            ? (restAddr.coordinates as unknown as
-                | { coordinates: [number, number] }
-                | undefined)
-            : undefined;
-        const delivCoords = order.deliveryAddress?.coordinates as unknown as
+        const restaurant =
+          typeof order.restaurant === "object" ? order.restaurant : null;
+        const restAddr =
+          restaurant && typeof restaurant.address === "object"
+            ? restaurant.address
+            : null;
+        const restCoords = restAddr?.coordinates as unknown as
+          | { coordinates: [number, number] }
+          | undefined;
+        const delivAddr =
+          typeof order.deliveryAddress === "object"
+            ? order.deliveryAddress
+            : null;
+        const delivCoords = delivAddr?.coordinates as unknown as
           | { coordinates: [number, number] }
           | undefined;
         if (
-          !order.deliveryPersonId ||
-          (order.currentStatus !== "PICKED_UP" &&
-            order.currentStatus !== "DELIVERED") ||
+          !delivery ||
+          delivery.status !== "PICKED_UP" ||
           !restCoords ||
           !delivCoords
         ) {
@@ -213,7 +241,7 @@ function OrderDetailPage() {
                   delivCoords.coordinates[1],
                   delivCoords.coordinates[0],
                 ]}
-                restaurantName={order.restaurant.name}
+                restaurantName={restaurant?.name ?? "Restaurant"}
               />
             </CardContent>
           </Card>

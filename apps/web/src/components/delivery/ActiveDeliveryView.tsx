@@ -35,10 +35,7 @@ function getDestination(
       };
     }
   }
-  if (
-    (delivery.status === "PICKED_UP" || delivery.status === "IN_TRANSIT") &&
-    order.deliveryAddress?.coordinates
-  ) {
+  if (delivery.status === "PICKED_UP" && order.deliveryAddress?.coordinates) {
     const coords = order.deliveryAddress.coordinates as unknown as {
       coordinates: [number, number];
     };
@@ -55,8 +52,6 @@ function getStatusLabel(status: DeliveryEntity["status"]): string {
     case "ASSIGNED":
       return "Fahrt zur Abholung";
     case "PICKED_UP":
-      return "Fahrt zum Kunden";
-    case "IN_TRANSIT":
       return "Fahrt zum Kunden";
     case "DELIVERED":
       return "Zugestellt";

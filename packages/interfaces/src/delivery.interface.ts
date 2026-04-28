@@ -1,6 +1,6 @@
 import { Point } from "geojson";
 
-export type DeliveryStatus = "ASSIGNED" | "PICKED_UP" | "IN_TRANSIT" | "DELIVERED";
+export type DeliveryStatus = "ASSIGNED" | "PICKED_UP" | "DELIVERED";
 
 export interface DeliveryEntity {
   $id: string;
@@ -12,4 +12,5 @@ export interface DeliveryEntity {
   deliveredAt?: string;
   currentLocation?: Point;
   estimatedArrivalMinutes?: number;
+  proofImageId?: string;
 }

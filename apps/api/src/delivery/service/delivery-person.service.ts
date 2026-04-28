@@ -6,41 +6,81 @@ import {
 import { DatabaseService } from "../../database/service/database.service";
 import { ConfigService } from "@nestjs/config";
 import { ActorContextService } from "../../auth/service/actor-context.service";
-import { ID, Query, TablesDB } from "node-appwrite";
+import { AppwriteService } from "../../auth/service/appwrite.service";
+import { ID, Query, TablesDB, Teams, Users } from "node-appwrite";
+
+const DELIVERY_PERSONS_TEAM_ID = "delivery_persons";
 
 @Injectable()
 export class DeliveryPersonService {
   private readonly dataBase: TablesDB;
+  private readonly teams: Teams;
+  private readonly users: Users;
 
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly configService: ConfigService,
     private readonly actorContextService: ActorContextService,
+    private readonly appwriteService: AppwriteService,
   ) {
     this.dataBase = this.databaseService.getDatabase();
+    const sdk = this.appwriteService.getSDKClient();
+    this.teams = new Teams(sdk);
+    this.users = new Users(sdk);
   }
 
-  async register(data: { name: string; phone: string; vehicleType: string }) {
-    const userId = this.actorContextService.get().user.id;
+  async register(data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    phone: string;
+    vehicleType: string;
+  }) {
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
+    const fullName = `${data.firstName} ${data.lastName}`.trim();
 
-    // Check if already registered
-    const existing = await this.dataBase.listRows({
-      databaseId,
-      tableId: "deliveryPerson",
-      queries: [Query.equal("userId", userId), Query.limit(1)],
-    });
-    if (existing.total > 0) {
-      throw new BadRequestException("Already registered as delivery person");
+    let user;
+    try {
+      user = await this.users.create({
+        userId: ID.unique(),
+        email: data.email,
+        password: data.password,
+        name: fullName,
+      });
+    } catch (error: any) {
+      if (error?.type === "user_already_exists") {
+        throw new BadRequestException(
+          "Ein Benutzer mit dieser E-Mail existiert bereits.",
+        );
+      }
+      throw error;
     }
+
+    try {
+      await this.teams.create({
+        teamId: DELIVERY_PERSONS_TEAM_ID,
+        name: "Delivery Persons",
+      });
+    } catch (error: any) {
+      if (error?.code !== 409) {
+        throw error;
+      }
+    }
+
+    await this.teams.createMembership({
+      teamId: DELIVERY_PERSONS_TEAM_ID,
+      userId: user.$id,
+      roles: ["DELIVERY_PERSON"],
+    });
 
     return this.dataBase.createRow({
       databaseId,
-      tableId: "deliveryPerson",
+      tableId: "delivery_person",
       rowId: ID.unique(),
       data: {
-        userId,
-        name: data.name,
+        userId: user.$id,
+        name: fullName,
         phone: data.phone,
         vehicleType: data.vehicleType,
         isAvailable: false,
@@ -54,7 +94,7 @@ export class DeliveryPersonService {
 
     const result = await this.dataBase.listRows({
       databaseId,
-      tableId: "deliveryPerson",
+      tableId: "delivery_person",
       queries: [Query.equal("userId", userId), Query.limit(1)],
     });
     if (result.total === 0) {
@@ -70,7 +110,7 @@ export class DeliveryPersonService {
 
     const result = await this.dataBase.listRows({
       databaseId,
-      tableId: "deliveryPerson",
+      tableId: "delivery_person",
       queries: [Query.equal("userId", userId), Query.limit(1)],
     });
     if (result.total === 0) {
@@ -81,7 +121,7 @@ export class DeliveryPersonService {
 
     await this.dataBase.updateRow({
       databaseId,
-      tableId: "deliveryPerson",
+      tableId: "delivery_person",
       rowId: deliveryPerson.$id,
       data: { isAvailable },
     });
@@ -94,7 +134,7 @@ export class DeliveryPersonService {
 
     const result = await this.dataBase.listRows({
       databaseId,
-      tableId: "deliveryPerson",
+      tableId: "delivery_person",
       queries: [Query.equal("userId", userId), Query.limit(1)],
     });
     if (result.total === 0) {

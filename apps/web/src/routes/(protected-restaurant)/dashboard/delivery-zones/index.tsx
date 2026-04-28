@@ -39,8 +39,8 @@ function extractLatLng(address?: AddressEntity | null): LatLng | null {
 const restaurantPinIcon = L.divIcon({
   className: "restaurant-map-marker",
   iconSize: [44, 44],
-  iconAnchor: [22, 44],
-  popupAnchor: [0, -44],
+  iconAnchor: [22, 22],
+  popupAnchor: [0, -22],
   html: `<div style="width:44px;height:44px;border-radius:50%;border:3px solid #006FEE;background:#006FEE;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.35);font-size:20px;">📍</div>`,
 });
 

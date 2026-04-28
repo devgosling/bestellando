@@ -36,6 +36,10 @@ const Page = () => {
                 navigate({ to: "/dashboard" });
                 return;
               }
+              if (data?.role === "DELIVERY_PERSON") {
+                navigate({ to: "/deliveries" });
+                return;
+              }
             } catch {
               // fall through to default redirect
             }
@@ -123,6 +127,15 @@ const Page = () => {
               className="text-accent font-medium hover:underline"
             >
               Restaurant registrieren
+            </Link>
+          </p>
+          <p className="text-center text-sm text-muted">
+            Du möchtest Lieferungen ausführen?{" "}
+            <Link
+              to="/auth/register/delivery"
+              className="text-accent font-medium hover:underline"
+            >
+              Als Fahrer registrieren
             </Link>
           </p>
         </div>

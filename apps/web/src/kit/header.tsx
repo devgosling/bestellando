@@ -12,6 +12,7 @@ const Header = () => {
   const loggedIn = userContext !== undefined;
   const isCustomer = userContext?.userRole === "CUSTOMER";
   const isRestaurant = userContext?.userRole === "RESTAURANT";
+  const isDelivery = userContext?.userRole === "DELIVERY_PERSON";
   const totalItems = useCartStore((s) => s.getTotalItems());
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,6 +37,13 @@ const Header = () => {
               className="text-sm font-medium text-muted hover:text-foreground transition-colors no-underline px-3 py-2 rounded-lg hover:bg-surface-secondary"
             >
               Dashboard
+            </a>
+          ) : isDelivery ? (
+            <a
+              href="/deliveries"
+              className="text-sm font-medium text-muted hover:text-foreground transition-colors no-underline px-3 py-2 rounded-lg hover:bg-surface-secondary"
+            >
+              Lieferungen
             </a>
           ) : (
             <>
@@ -83,10 +91,20 @@ const Header = () => {
               size="sm"
               className="bg-accent text-accent-foreground font-medium ml-2"
               onPress={() =>
-                navigate({ to: isRestaurant ? "/dashboard/settings" : "/profile" })
+                navigate({
+                  to: isRestaurant
+                    ? "/dashboard/settings"
+                    : isDelivery
+                      ? "/deliveries"
+                      : "/profile",
+                })
               }
             >
-              {isRestaurant ? "Einstellungen" : "Mein Konto"}
+              {isRestaurant
+                ? "Einstellungen"
+                : isDelivery
+                  ? "Meine Lieferungen"
+                  : "Mein Konto"}
             </Button>
           ) : (
             <div className="flex gap-2 ml-2">
@@ -97,6 +115,14 @@ const Header = () => {
                 onPress={() => navigate({ to: "/auth/register/restaurant" })}
               >
                 Für Restaurants
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-foreground font-medium"
+                onPress={() => navigate({ to: "/auth/register/delivery" })}
+              >
+                Als Fahrer
               </Button>
               <Button
                 variant="ghost"
@@ -166,6 +192,14 @@ const Header = () => {
             >
               Dashboard
             </a>
+          ) : isDelivery ? (
+            <a
+              href="/deliveries"
+              className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Lieferungen
+            </a>
           ) : (
             <>
               <a
@@ -186,11 +220,21 @@ const Header = () => {
           )}
           {loggedIn ? (
             <a
-              href={isRestaurant ? "/dashboard/settings" : "/profile"}
+              href={
+                isRestaurant
+                  ? "/dashboard/settings"
+                  : isDelivery
+                    ? "/deliveries"
+                    : "/profile"
+              }
               className="text-sm font-medium text-foreground no-underline py-2 px-3 rounded-lg hover:bg-surface-secondary"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {isRestaurant ? "Einstellungen" : "Mein Konto"}
+              {isRestaurant
+                ? "Einstellungen"
+                : isDelivery
+                  ? "Meine Lieferungen"
+                  : "Mein Konto"}
             </a>
           ) : (
             <div className="flex flex-col gap-1 pt-2 border-t border-border mt-1">
@@ -204,6 +248,17 @@ const Header = () => {
                 }}
               >
                 Für Restaurants
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="font-medium justify-start"
+                onPress={() => {
+                  setMobileMenuOpen(false);
+                  navigate({ to: "/auth/register/delivery" });
+                }}
+              >
+                Als Fahrer
               </Button>
               <div className="flex gap-2">
                 <Button

@@ -12,3 +12,12 @@ export interface DeliveryPersonEntity {
   currentLocation?: Point;
   rating?: number;
 }
+
+export interface DeliveryPersonRegisterDTO {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+  vehicleType: VehicleType;
+}

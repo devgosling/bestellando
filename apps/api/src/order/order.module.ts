@@ -7,6 +7,7 @@ import { ModifierOptionModule } from "../modifierOption/modifier-option.module";
 import { OrderStatusHistoryModule } from "../orderStatusHistory/order-status-history.module";
 import { UserModule } from "../user/user.module";
 import { GatewayModule } from "../gateway/gateway.module";
+import { DeliveryModule } from "../delivery/delivery.module";
 import { OrderService } from "./service/order.service";
 import { OrderController } from "./controller/order.controller";
 
@@ -20,6 +21,7 @@ import { OrderController } from "./controller/order.controller";
     OrderStatusHistoryModule,
     UserModule,
     forwardRef(() => GatewayModule),
+    forwardRef(() => DeliveryModule),
   ],
   providers: [OrderService],
   controllers: [OrderController],

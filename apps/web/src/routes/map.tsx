@@ -23,8 +23,8 @@ function restaurantIcon(r: RestaurantEntity) {
   const icon = L.divIcon({
     className: "restaurant-map-marker",
     iconSize: [44, 44],
-    iconAnchor: [22, 44],
-    popupAnchor: [0, -44],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -22],
     html: `<div style="width:44px;height:44px;border-radius:50%;border:3px solid #006FEE;background:#fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.35);">${img}</div>`,
   });
   iconCache.set(key, icon);

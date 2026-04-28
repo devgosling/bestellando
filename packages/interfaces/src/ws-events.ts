@@ -1,6 +1,7 @@
 import { OrderEntity, OrderStatus } from "./order.interface.js";
 import { OrderItemEntity } from "./order-item.interface.js";
 import { AddressEntity } from "./address.interface.js";
+import { VehicleType } from "./delivery-person.interface.js";
 
 // Server -> Client events
 export interface OrderStatusChangedEvent {
@@ -31,8 +32,11 @@ export interface DeliveryAvailableEvent {
 }
 
 export interface DeliveryAssignedEvent {
+  orderId: string;
   driverId: string;
   driverName: string;
+  driverPhone: string;
+  vehicleType: VehicleType;
   estimatedMinutes: number;
 }
 

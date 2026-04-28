@@ -11,14 +11,27 @@ import {
   Spinner,
 } from "@heroui/react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { OrderStatus, RestaurantEntity } from "@repo/interfaces";
-import { ListCheck } from "@gravity-ui/icons";
-import { getOrderSocket } from "@repo/lib";
+import type {
+  DeliveryAssignedEvent,
+  OrderStatus,
+  RestaurantEntity,
+} from "@repo/interfaces";
+import { ListCheck, Person, Phone } from "@gravity-ui/icons";
+import { authenticatedFetch, getOrderSocket } from "@repo/lib";
 import { useApiQuery, useApiMutation } from "@repo/hooks";
 import { AnimatedPage } from "../../../../components/shared/AnimatedPage";
 import { EmptyState } from "../../../../components/shared/EmptyState";
 import { PriceDisplay } from "../../../../components/shared/PriceDisplay";
 import { useSocketEvent } from "../../../../hooks/useSocketEvent";
+import { ProofImage } from "../../../../components/delivery/ProofImage";
+
+const vehicleLabels: Record<string, string> = {
+  BICYCLE: "Fahrrad",
+  SCOOTER: "Roller",
+  CAR: "Auto",
+};
+
+const ORDERS_WITH_DRIVER: OrderStatus[] = ["READY", "PICKED_UP", "DELIVERED"];
 
 type FilterTab = "ALL" | OrderStatus;
 
@@ -80,6 +93,15 @@ function OrdersPage() {
     },
   });
 
+  type CardDelivery = {
+    deliveryId?: string;
+    driver?: DeliveryAssignedEvent;
+    proofImageId?: string;
+  };
+  const [deliveries, setDeliveries] = useState<Record<string, CardDelivery>>(
+    {},
+  );
+
   // Subscribe to restaurant room for new orders
   useEffect(() => {
     if (orderSocket && restaurantId) {
@@ -97,7 +119,60 @@ function OrdersPage() {
     queryClient.invalidateQueries({ queryKey: ["restaurant-orders"] });
   });
 
+  useSocketEvent<DeliveryAssignedEvent>(
+    orderSocket,
+    "delivery:assigned",
+    (data) => {
+      setDeliveries((prev) => ({
+        ...prev,
+        [data.orderId]: { ...prev[data.orderId], driver: data },
+      }));
+    },
+  );
+
   const orders = ordersData?.data ?? [];
+
+  // Hydrate driver info / proof image for accepted orders on initial load
+  useEffect(() => {
+    let cancelled = false;
+    orders.forEach(async (order: any) => {
+      if (deliveries[order.$id]?.driver) return;
+      if (!ORDERS_WITH_DRIVER.includes(order.currentStatus)) return;
+      try {
+        const delivery = (await authenticatedFetch(
+          `/v1/delivery/order/${order.$id}`,
+        )) as {
+          $id: string;
+          proofImageId?: string;
+          deliveryPerson?: any;
+        } | null;
+        if (cancelled || !delivery) return;
+        const dp = delivery.deliveryPerson;
+        setDeliveries((prev) => ({
+          ...prev,
+          [order.$id]: {
+            deliveryId: delivery.$id,
+            proofImageId: delivery.proofImageId,
+            driver: dp
+              ? {
+                  orderId: order.$id,
+                  driverId: dp.$id,
+                  driverName: dp.name,
+                  driverPhone: dp.phone,
+                  vehicleType: dp.vehicleType,
+                  estimatedMinutes: 0,
+                }
+              : prev[order.$id]?.driver,
+          },
+        }));
+      } catch {
+        // ignore
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [orders]);
   const filteredOrders =
     filter === "ALL"
       ? orders
@@ -151,6 +226,31 @@ function OrdersPage() {
                       {order.specialInstructions}
                     </p>
                   )}
+                  {deliveries[order.$id]?.driver && (
+                    <div className="flex items-center gap-3 mt-1 text-xs text-muted">
+                      <span className="flex items-center gap-1">
+                        <Person className="size-3" />
+                        {deliveries[order.$id].driver!.driverName} (
+                        {vehicleLabels[
+                          deliveries[order.$id].driver!.vehicleType
+                        ] ?? deliveries[order.$id].driver!.vehicleType}
+                        )
+                      </span>
+                      <a
+                        href={`tel:${deliveries[order.$id].driver!.driverPhone}`}
+                        className="flex items-center gap-1 text-accent no-underline hover:underline"
+                      >
+                        <Phone className="size-3" />
+                        {deliveries[order.$id].driver!.driverPhone}
+                      </a>
+                    </div>
+                  )}
+                  {deliveries[order.$id]?.proofImageId &&
+                    deliveries[order.$id]?.deliveryId && (
+                      <ProofImage
+                        deliveryId={deliveries[order.$id].deliveryId!}
+                      />
+                    )}
                 </div>
                 <div className="flex items-center gap-3">
                   <Chip

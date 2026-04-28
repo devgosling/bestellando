@@ -1,30 +1,26 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@heroui/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { ToggleSwitch } from "../../../components/shared/ToggleSwitch";
 import { useApiQuery, useApiMutation } from "@repo/hooks";
-import { getDeliverySocket } from "@repo/lib";
+import { authenticatedFetch, getDeliverySocket } from "@repo/lib";
 import type {
   DeliveryPersonEntity,
   DeliveryAvailableEvent,
+  DeliveryEntity,
 } from "@repo/interfaces";
 import { useSocketEvent } from "../../../hooks/useSocketEvent";
 import { AnimatedPage } from "../../../components/shared/AnimatedPage";
 import { LoadingSkeleton } from "../../../components/shared/LoadingSkeleton";
 import { DeliveryCard } from "../../../components/delivery/DeliveryCard";
 
-interface AvailableDelivery {
-  orderId: string;
-  restaurantName: string;
-  pickupAddress: DeliveryAvailableEvent["pickupAddress"];
-  deliveryAddress: DeliveryAvailableEvent["deliveryAddress"];
-}
-
 function DeliveriesPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const socket = getDeliverySocket();
   const [availableDeliveries, setAvailableDeliveries] = useState<
-    AvailableDelivery[]
+    DeliveryAvailableEvent[]
   >([]);
   const [acceptingOrderId, setAcceptingOrderId] = useState<string | null>(null);
 
@@ -43,22 +39,8 @@ function DeliveriesPage() {
       url: "/v1/delivery-person/availability",
       method: "PATCH",
     },
-  });
-
-  const acceptDelivery = useApiMutation<
-    { deliveryId: string },
-    Error,
-    { orderId: string }
-  >({
-    request: {
-      url: "",
-      method: "POST",
-    },
-    success: (data) => {
-      navigate({
-        to: "/deliveries/$deliveryId",
-        params: { deliveryId: data.deliveryId },
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["delivery-person-profile"] });
     },
   });
 
@@ -102,13 +84,13 @@ function DeliveriesPage() {
     async (orderId: string) => {
       setAcceptingOrderId(orderId);
       try {
-        const result = await authenticatedFetchDirect(
+        const delivery = (await authenticatedFetch(
           `/v1/delivery/accept/${orderId}`,
           { method: "POST" },
-        );
+        )) as DeliveryEntity;
         navigate({
           to: "/deliveries/$deliveryId",
-          params: { deliveryId: (result as { deliveryId: string }).deliveryId },
+          params: { deliveryId: delivery.$id },
         });
       } catch {
         setAcceptingOrderId(null);
@@ -116,6 +98,28 @@ function DeliveriesPage() {
     },
     [navigate],
   );
+
+  useEffect(() => {
+    if (!profile?.isAvailable) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = (await authenticatedFetch(
+          "/v1/delivery/available",
+        )) as { data: DeliveryAvailableEvent[] };
+        if (cancelled) return;
+        setAvailableDeliveries((prev) => {
+          const seen = new Set(prev.map((d) => d.orderId));
+          return [...prev, ...result.data.filter((d) => !seen.has(d.orderId))];
+        });
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [profile?.isAvailable]);
 
   if (isProfileLoading) {
     return (
@@ -180,15 +184,6 @@ function DeliveriesPage() {
       )}
     </AnimatedPage>
   );
-}
-
-// Direct fetch helper to avoid mutation boilerplate for accept
-async function authenticatedFetchDirect(
-  url: string,
-  init: RequestInit,
-): Promise<unknown> {
-  const { authenticatedFetch } = await import("@repo/lib");
-  return authenticatedFetch(url, init);
 }
 
 export const Route = createFileRoute("/(protected-delivery)/deliveries/")({

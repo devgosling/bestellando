@@ -41,11 +41,31 @@ function DeliveryDetailPage() {
     }
   };
 
+  const pickProofImage = (): Promise<File | null> =>
+    new Promise((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.capture = "environment";
+      input.onchange = () => resolve(input.files?.[0] ?? null);
+      input.oncancel = () => resolve(null);
+      input.click();
+    });
+
   const handleDeliver = async () => {
+    const file = await pickProofImage();
+    if (!file) return;
     setIsActionLoading(true);
     try {
+      const form = new FormData();
+      form.append("file", file);
+      const uploaded = (await authenticatedFetch(
+        `/v1/delivery/${deliveryId}/proof`,
+        { method: "POST", body: form },
+      )) as { fileId: string };
       await authenticatedFetch(`/v1/delivery/${deliveryId}/delivered`, {
         method: "PATCH",
+        body: JSON.stringify({ proofImageId: uploaded.fileId }),
       });
       queryClient.invalidateQueries({ queryKey: ["delivery", deliveryId] });
     } finally {

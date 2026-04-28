@@ -55,7 +55,20 @@ export function useApiSideEffects<TData, TError>(params: {
     if (!error || lastErrorRef.current === error) return;
     lastErrorRef.current = error;
 
-    const e = error as NormalizedError;
+    const e = error as NormalizedError & {
+      name?: string;
+      message?: string;
+    };
+
+    // Ignore aborted fetches and DOM-state errors that aren't real API failures
+    if (
+      e.name === "AbortError" ||
+      e.name === "InvalidStateError" ||
+      (typeof e.message === "string" &&
+        e.message.includes("Transition was aborted"))
+    ) {
+      return;
+    }
 
     if (e.status === 400 && e.badRequestCode) {
       const handler = handlersRef.current[e.badRequestCode];

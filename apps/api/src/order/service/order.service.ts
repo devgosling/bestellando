@@ -13,6 +13,7 @@ import { OrderItemService } from "../../orderItem/service/order-item.service";
 import { ModifierOptionService } from "../../modifierOption/service/modifier-option.service";
 import { OrderStatusHistoryService } from "../../orderStatusHistory/service/order-status-history.service";
 import { OrderGateway } from "../../gateway/orders/order.gateway";
+import { DeliveryService } from "../../delivery/service/delivery.service";
 import { CreateOrderDto } from "../dto/create-order.dto";
 import { UpdateOrderStatusDto } from "../dto/update-order-status.dto";
 import { validateTransition } from "./order-state-machine";
@@ -33,6 +34,8 @@ export class OrderService {
     private readonly orderStatusHistoryService: OrderStatusHistoryService,
     @Inject(forwardRef(() => OrderGateway))
     private readonly orderGateway: OrderGateway,
+    @Inject(forwardRef(() => DeliveryService))
+    private readonly deliveryService: DeliveryService,
   ) {
     this.dataBase = this.databaseService.getDatabase();
   }
@@ -237,6 +240,10 @@ export class OrderService {
       newStatus: dto.status,
       timestamp: new Date().toISOString(),
     });
+
+    if (dto.status === "READY") {
+      this.deliveryService.notifyOrderReady(orderId).catch(() => {});
+    }
 
     return { success: true, status: dto.status };
   }

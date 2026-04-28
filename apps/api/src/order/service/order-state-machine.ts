@@ -15,7 +15,7 @@ const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 // Which actor types can perform each transition
 const TRANSITION_ACTORS: Record<string, UserType[]> = {
   "PENDING->CONFIRMED": ["RESTAURANT"],
-  "PENDING->CANCELLED": ["CUSTOMER", "RESTAURANT"],
+  "PENDING->CANCELLED": ["CUSTOMER", "RESTAURANT"], 
   "CONFIRMED->PREPARING": ["RESTAURANT"],
   "CONFIRMED->CANCELLED": ["RESTAURANT"],
   "PREPARING->READY": ["RESTAURANT"],
