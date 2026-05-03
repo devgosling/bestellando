@@ -16,8 +16,8 @@ import type {
   OrderStatus,
   RestaurantEntity,
 } from "@repo/interfaces";
-import { ListCheck, Person, Phone } from "@gravity-ui/icons";
-import { authenticatedFetch, getOrderSocket } from "@repo/lib";
+import { ListCheck, Person, Smartphone } from "@gravity-ui/icons";
+import { authenticatedFetch, connectSockets, getOrderSocket } from "@repo/lib";
 import { useApiQuery, useApiMutation } from "@repo/hooks";
 import { AnimatedPage } from "../../../../components/shared/AnimatedPage";
 import { EmptyState } from "../../../../components/shared/EmptyState";
@@ -58,7 +58,20 @@ const nextStatusMap: Record<string, OrderStatus> = {
 function OrdersPage() {
   const [filter, setFilter] = useState<FilterTab>("ALL");
   const queryClient = useQueryClient();
-  const orderSocket = getOrderSocket();
+  const [orderSocket, setOrderSocket] = useState(() => getOrderSocket());
+
+  useEffect(() => {
+    if (orderSocket) return;
+    let cancelled = false;
+    connectSockets()
+      .then(() => {
+        if (!cancelled) setOrderSocket(getOrderSocket());
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [orderSocket]);
 
   const { data: restaurants } = useApiQuery<RestaurantEntity[]>({
     request: { url: "/v1/restaurant/mine" },
@@ -240,7 +253,7 @@ function OrdersPage() {
                         href={`tel:${deliveries[order.$id].driver!.driverPhone}`}
                         className="flex items-center gap-1 text-accent no-underline hover:underline"
                       >
-                        <Phone className="size-3" />
+                        <Smartphone className="size-3" />
                         {deliveries[order.$id].driver!.driverPhone}
                       </a>
                     </div>

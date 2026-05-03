@@ -96,6 +96,7 @@ function OrderDetailPage() {
     retry: false,
   });
 
+
   const items = itemsData?.data ?? [];
   const history = historyData?.data ?? [];
   const isLoading = isLoadingOrder || isLoadingItems || isLoadingHistory;
@@ -199,32 +200,31 @@ function OrderDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Live delivery tracking map */}
+      {/* Live delivery tracking map (visible once driver has picked up) */}
       {(() => {
+        if (!delivery || delivery.status !== "PICKED_UP") return null;
+
         const restaurant =
           typeof order.restaurant === "object" ? order.restaurant : null;
         const restAddr =
           restaurant && typeof restaurant.address === "object"
             ? restaurant.address
             : null;
-        const restCoords = restAddr?.coordinates as unknown as
-          | { coordinates: [number, number] }
-          | undefined;
         const delivAddr =
           typeof order.deliveryAddress === "object"
             ? order.deliveryAddress
             : null;
-        const delivCoords = delivAddr?.coordinates as unknown as
-          | { coordinates: [number, number] }
+
+        // coordinates is a raw [longitude, latitude] tuple (Appwrite Point)
+        const restCoords = restAddr?.coordinates as
+          | [number, number]
           | undefined;
-        if (
-          !delivery ||
-          delivery.status !== "PICKED_UP" ||
-          !restCoords ||
-          !delivCoords
-        ) {
-          return null;
-        }
+        const delivCoords = delivAddr?.coordinates as
+          | [number, number]
+          | undefined;
+
+        if (!restCoords || !delivCoords) return null;
+
         return (
           <Card className="mb-4">
             <CardHeader>
@@ -233,14 +233,8 @@ function OrderDetailPage() {
             <CardContent>
               <DeliveryMap
                 orderId={orderId}
-                restaurantPosition={[
-                  restCoords.coordinates[1],
-                  restCoords.coordinates[0],
-                ]}
-                customerPosition={[
-                  delivCoords.coordinates[1],
-                  delivCoords.coordinates[0],
-                ]}
+                restaurantPosition={[restCoords[1], restCoords[0]]}
+                customerPosition={[delivCoords[1], delivCoords[0]]}
                 restaurantName={restaurant?.name ?? "Restaurant"}
               />
             </CardContent>

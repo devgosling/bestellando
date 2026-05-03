@@ -10,6 +10,7 @@ import {
 import { OrderService } from "../service/order.service";
 import { CreateOrderDto } from "../dto/create-order.dto";
 import { UpdateOrderStatusDto } from "../dto/update-order-status.dto";
+import { RequireUserType } from "../../auth/decorator/user-type.decorator";
 
 @Controller({ path: "order", version: "1" })
 export class OrderController {
@@ -32,6 +33,7 @@ export class OrderController {
   }
 
   @Get("restaurant/:restaurantId")
+  @RequireUserType(["RESTAURANT"])
   async getRestaurantOrders(
     @Param("restaurantId") restaurantId: string,
     @Query("limit") limit?: string,

@@ -37,11 +37,13 @@ export class PaymentController {
     }));
 
     // Add delivery fee as line item if > 0
-    if (order.deliveryFee > 0) {
+    const deliveryFee = order.deliveryFee as number;
+    const totalAmount = order.totalAmount as number;
+    if (deliveryFee > 0) {
       lineItems.push({
         name: "Liefergebühr",
         quantity: 1,
-        unitAmount: Math.round(order.deliveryFee * 100),
+        unitAmount: Math.round(deliveryFee * 100),
       });
     }
 
@@ -51,7 +53,7 @@ export class PaymentController {
         typeof order.restaurant === "object"
           ? (order.restaurant as { $id: string }).$id
           : (order.restaurant as string),
-      amount: Math.round(order.totalAmount * 100),
+      amount: Math.round(totalAmount * 100),
       lineItems,
     });
 

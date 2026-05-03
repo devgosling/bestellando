@@ -80,10 +80,11 @@ export class OrderService {
       const resolvedModifiers: { $id: string; priceDelta: number }[] = [];
       for (const modifierOptionId of item.modifierOptionIds ?? []) {
         const option = await this.modifierOptionService.getById(modifierOptionId);
+        const productField = (option as { Product?: unknown }).Product;
         const optionProductId =
-          typeof option.product === "string"
-            ? option.product
-            : (option.product as { $id?: string } | undefined)?.$id;
+          typeof productField === "string"
+            ? productField
+            : (productField as { $id?: string } | undefined)?.$id;
         if (optionProductId !== item.productId) {
           throw new BadRequestException(
             `Modifier option ${modifierOptionId} does not belong to product ${item.productId}`,
@@ -276,7 +277,7 @@ export class OrderService {
   async getOrderById(orderId: string, enforceOwnership = true) {
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
 
-    const order = await this.dataBase.getRow({
+    const order: Record<string, unknown> = await this.dataBase.getRow({
       databaseId,
       tableId: "order",
       rowId: orderId,
@@ -294,24 +295,75 @@ export class OrderService {
       }
 
       if (userType === "RESTAURANT") {
-        // Verify restaurant ownership by checking the user's teams
-        const restaurantResult =
-          await this.dataBase.getRow({
-            databaseId,
-            tableId: "restaurant",
-            rowId: order.restaurant,
-          });
-        if (!restaurantResult) {
-          throw new NotFoundException("Order not found");
+        const restaurantId =
+          typeof order.restaurant === "string"
+            ? order.restaurant
+            : (order.restaurant as { $id?: string } | null)?.$id;
+        if (restaurantId) {
+          const restaurantResult = await this.dataBase
+            .getRow({ databaseId, tableId: "restaurant", rowId: restaurantId })
+            .catch(() => null);
+          if (!restaurantResult) {
+            throw new NotFoundException("Order not found");
+          }
         }
       }
+    }
+
+    // Eagerly embed restaurant + restaurant.address + deliveryAddress so the
+    // frontend always has coordinates available (Appwrite only expands
+    // relationships one level deep by default).
+    let restaurantObj: Record<string, unknown> | null = null;
+    if (typeof order.restaurant === "string") {
+      restaurantObj = await this.dataBase
+        .getRow({
+          databaseId,
+          tableId: "restaurant",
+          rowId: order.restaurant,
+        })
+        .catch(() => null);
+    } else if (order.restaurant && typeof order.restaurant === "object") {
+      restaurantObj = order.restaurant as Record<string, unknown>;
+    }
+
+    if (restaurantObj && typeof restaurantObj.address === "string") {
+      const addr = await this.dataBase
+        .getRow({
+          databaseId,
+          tableId: "address",
+          rowId: restaurantObj.address as string,
+        })
+        .catch(() => null);
+      if (addr) restaurantObj.address = addr;
+    }
+    if (restaurantObj) order.restaurant = restaurantObj;
+
+    if (typeof order.deliveryAddress === "string") {
+      const addr = await this.dataBase
+        .getRow({
+          databaseId,
+          tableId: "address",
+          rowId: order.deliveryAddress,
+        })
+        .catch(() => null);
+      if (addr) order.deliveryAddress = addr;
     }
 
     return order;
   }
 
   async getRestaurantOrders(restaurantId: string, limit = 25) {
+    const userId = this.actorContextService.get().user.id;
     const databaseId = this.configService.get<string>("DATABASE_ID")!;
+
+    const restaurant = await this.dataBase.getRow({
+      databaseId,
+      tableId: "restaurant",
+      rowId: restaurantId,
+    });
+    if (!restaurant || restaurant.ownerId !== userId) {
+      throw new NotFoundException("Restaurant not found");
+    }
 
     const result = await this.dataBase.listRows({
       databaseId,

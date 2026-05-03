@@ -1,110 +1,150 @@
 # Bestellando
 
-Ein Turborepo Monorepo für die Bestellando Anwendung.
+Eine Food-Ordering-Plattform für Restaurants, Kunden und Lieferpersonen — gebaut als **Turborepo-Monorepo** mit **NestJS-API**, **React-Vite-Frontend**, **Appwrite** als Backend-as-a-Service, **Stripe** für Zahlungen und Live-GPS-Tracking via **Socket.io**.
 
-## Aufsetzen
+## 📚 Vollständige Dokumentation
 
-### pnpm mit npm installieren
+Eine umfangreiche, deutsche Dokumentation liegt in [`docs/`](./docs/). Inkl. Setup-Anleitungen, End-to-End-Flows, Backend-Module, Frontend-Komponenten, Datenbank-Schema und mehr.
 
-```sh
-npm install -g pnpm
+Lokal lesbar als interaktive Single-Page-App über den [`docs-viewer/`](./docs-viewer/):
+
+```bash
+pnpm dev --filter=bestellando-docs-viewer
+# → http://localhost:5180
 ```
 
-### Alle Packages installieren
+## ⚡ Quickstart
+
+### 1. pnpm installieren (falls noch nicht vorhanden)
+
+```sh
+npm install -g pnpm@9
+```
+
+### 2. Dependencies installieren
 
 ```sh
 pnpm install
 ```
 
-## Was ist enthalten?
+### 3. Umgebungsvariablen anlegen
 
-Dieses Turborepo beinhaltet folgende Packages und Apps:
+`.env` in `apps/api/` und `apps/web/` — siehe [docs/setup/umgebungsvariablen.md](./docs/setup/umgebungsvariablen.md).
 
-### Apps und Packages
-
-- `api`: eine [NestJS](https://nestjs.com/) Backend-Anwendung
-- `web`: eine [Vite](https://vitejs.dev/) + [React](https://react.dev/) Frontend-Anwendung mit [TanStack Router](https://tanstack.com/router)
-- `@repo/ui`: eine gemeinsam genutzte React-Komponentenbibliothek
-- `@repo/contexts`: gemeinsam genutzte React Contexts (z.B. Theme)
-- `@repo/hooks`: gemeinsam genutzte React Hooks (z.B. useAuth, useTheme)
-- `@repo/lib`: gemeinsam genutzte Bibliotheken und Utilities (z.B. Appwrite-Konfiguration)
-- `@repo/eslint-config`: `eslint` Konfigurationen für das gesamte Monorepo
-- `@repo/typescript-config`: `tsconfig.json` Konfigurationen für das gesamte Monorepo
-
-Alle Packages und Apps verwenden [TypeScript](https://www.typescriptlang.org/) zu 100%.
-
-### Werkzeuge
-
-Dieses Turborepo hat folgende Werkzeuge bereits konfiguriert:
-
-- [TypeScript](https://www.typescriptlang.org/) für statische Typenprüfung
-- [ESLint](https://eslint.org/) für Code-Linting
-- [Prettier](https://prettier.io) für Code-Formatierung
-
-### Build
-
-Um alle Apps und Packages zu bauen, führe folgenden Befehl aus:
+### 4. Alles starten
 
 ```sh
-pnpm exec turbo build
+pnpm dev
 ```
 
-Du kannst ein bestimmtes Package mit einem [Filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters) bauen:
+Das startet parallel:
+- API auf http://localhost:3000
+- Web-Frontend auf http://localhost:5173
+- Docs-Viewer auf http://localhost:5180
 
-```sh
-# Nur die Web-App bauen
-pnpm exec turbo build --filter=web
+## 🏗️ Was ist enthalten?
 
-# Nur die API bauen
-pnpm exec turbo build --filter=api
-```
+### Apps
+
+| App | Pfad | Tech |
+|-----|------|------|
+| **API** | `apps/api` | NestJS 11, Passport, Socket.io, Stripe, Appwrite |
+| **Web-Frontend** | `apps/web` | React 19, Vite 7, TanStack Router, HeroUI v3, Tailwind v4 |
+| **Docs-Viewer** | `docs-viewer` | React 19, Vite, Framer Motion, react-markdown |
+
+### Shared Packages
+
+| Package | Zweck |
+|---------|-------|
+| `@repo/interfaces` | TypeScript-Typen (DTOs, Entities, WS-Events) |
+| `@repo/lib` | Appwrite-SDK-Init, `authenticatedFetch`, Socket.io-Client |
+| `@repo/hooks` | React-Hooks (`useApiQuery`, `useApiMutation`, `useAuth`, …) |
+| `@repo/contexts` | React-Contexts (z. B. `ThemeProvider`) |
+| `@repo/ui` | Wrapper-Komponenten |
+| `@repo/typescript-config` | tsconfig-Presets |
+
+## 🛠️ Befehle
 
 ### Entwicklung
 
-Um alle Apps und Packages im Entwicklungsmodus zu starten, führe folgenden Befehl aus:
-
 ```sh
-pnpm exec turbo dev
+pnpm dev                                           # alles parallel
+pnpm dev --filter=api                              # nur API
+pnpm dev --filter=web                              # nur Web
+pnpm dev --filter=bestellando-docs-viewer          # nur Docs-Viewer
 ```
 
-Du kannst ein bestimmtes Package mit einem [Filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters) entwickeln:
+### Build
 
 ```sh
-# Nur die Web-App starten
-pnpm exec turbo dev --filter=web
-
-# Nur die API starten
-pnpm exec turbo dev --filter=api
+pnpm build                          # alles bauen
+pnpm build --filter=web             # nur Web
+pnpm --filter @repo/interfaces build  # Pflicht nach Änderung an Interfaces!
 ```
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache ist für alle Pläne kostenlos. Starte noch heute auf [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo kann eine Technik namens [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) verwenden, um Cache-Artefakte zwischen Rechnern zu teilen. Dies ermöglicht das Teilen von Build-Caches mit deinem Team und CI/CD-Pipelines.
-
-Standardmäßig cached Turborepo lokal. Um Remote Caching zu aktivieren, benötigst du einen Account bei Vercel. Falls du noch keinen Account hast, kannst du [einen erstellen](https://vercel.com/signup?utm_source=turborepo-examples), und dann folgende Befehle ausführen:
+### Type-Checking & Formatting
 
 ```sh
-pnpm exec turbo login
+pnpm check-types        # TypeScript-Typeprüfung über alle Workspaces
+pnpm format             # Prettier-Format
 ```
 
-Dies authentifiziert die Turborepo CLI mit deinem [Vercel Account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Als Nächstes kannst du dein Turborepo mit dem Remote Cache verknüpfen:
+### API-Tests
 
 ```sh
-pnpm exec turbo link
+cd apps/api
+pnpm test               # Jest Unit-Tests
+pnpm test:watch         # Watch-Mode
+pnpm test:cov           # Coverage
+pnpm test:e2e           # End-to-End
 ```
 
-## Nützliche Links
+## 🧱 Tech-Stack-Highlights
 
-Erfahre mehr über Turborepo:
+- **Monorepo**: Turborepo + pnpm-Workspaces
+- **Backend**: NestJS, URI-versionierte REST-API (`/v1/...`), JWT-Bearer via Passport
+- **Frontend**: React 19, file-basiertes Routing, TanStack Query für Server-State, Zustand für Cart
+- **BaaS**: Appwrite (Auth, DB, Teams, Storage)
+- **Echtzeit**: Socket.io mit zwei Namespaces (`/orders`, `/delivery`)
+- **Zahlungen**: Stripe Checkout + signaturverifizierte Webhooks
+- **Karten**: Leaflet (OSM-Tiles) + Google Maps Geocoding
+- **Lieferung**: Live-GPS-Tracking, Beweisfoto-Upload zu Appwrite-Storage
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Konfigurationsoptionen](https://turborepo.dev/docs/reference/configuration)
-- [CLI Verwendung](https://turborepo.dev/docs/reference/command-line-reference)
+## 📖 Wichtige Dokumente
+
+| Was suche ich? | Pfad |
+|----------------|------|
+| Erste Schritte | [docs/setup/installation.md](./docs/setup/installation.md) |
+| Architektur-Überblick | [docs/architektur/ueberblick.md](./docs/architektur/ueberblick.md) |
+| Bestellprozess (E2E) | [docs/ablaeufe/bestellprozess.md](./docs/ablaeufe/bestellprozess.md) |
+| Datenbank-Schema | [docs/datenbank/tabellen.md](./docs/datenbank/tabellen.md) |
+| WebSocket-Events | [docs/echtzeit/events.md](./docs/echtzeit/events.md) |
+| AI-Anweisungen | [CLAUDE.md](./CLAUDE.md) |
+
+## ⚠️ Wichtige Regeln
+
+- **Nie `npm` oder `yarn`** auf Root-Ebene — pnpm 9 ist Pflicht
+- **Nach Änderungen an `@repo/interfaces`** unbedingt `pnpm --filter @repo/interfaces build` ausführen, sonst sehen andere Pakete die Änderungen nicht
+- **HeroUI v3 Compound-Pattern** unbedingt einhalten — naive v2-Style-Usage bricht silently. Siehe [docs/frontend/theming.md](./docs/frontend/theming.md)
+- **Coordinates als `[lng, lat]`** in Appwrite-Point-Spalten speichern — nicht als GeoJSON
+- **`modifier_option.Product`** mit großem P! — kleines `option.product` gibt `undefined`
+
+## 🔧 Werkzeuge
+
+- **TypeScript** — Strict-Mode, app-übergreifend
+- **Prettier** — Formatierung (doppelte Anführungszeichen, 2-Space, trailing commas)
+- **Turborepo** — Task-Orchestrierung
+- **Jest** — API-Tests
+
+## 🚀 Remote Caching
+
+Turborepo unterstützt [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) zum Teilen von Build-Artefakten zwischen Maschinen / CI.
+
+```sh
+pnpm exec turbo login         # mit Vercel-Account verknüpfen
+pnpm exec turbo link          # Remote-Cache aktivieren
+```
+
+## 📄 Lizenz
+
+Privat / proprietär. Nicht zur Wiederverwendung freigegeben.

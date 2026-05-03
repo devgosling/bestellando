@@ -70,7 +70,7 @@ export function PaymentStep({
           modifierOptionIds: item.modifiers.map((m) => m.$id),
           specialInstructions: item.specialInstructions,
         })),
-        ...(notes ? { notes } : {}),
+        ...(notes ? { specialInstructions: notes } : {}),
       };
 
       const order = (await authenticatedFetch("/v1/order", {
